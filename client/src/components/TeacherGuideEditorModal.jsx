@@ -31,12 +31,18 @@ export default function TeacherGuideEditorModal({
       let extra = {};
       if (typeof material.extra_data === 'string') {
         try {
-          extra = JSON.parse(material.extra_data);
+          const parsed = JSON.parse(material.extra_data);
+          if (parsed && typeof parsed === 'object') {
+            extra = parsed;
+          }
         } catch (e) {
           extra = {};
         }
       } else if (material.extra_data && typeof material.extra_data === 'object') {
         extra = material.extra_data;
+      }
+      if (!extra || typeof extra !== 'object') {
+        extra = {};
       }
 
       setFormData({
@@ -45,9 +51,9 @@ export default function TeacherGuideEditorModal({
         subtitle: material.subtitle || '',
         badge: material.badge || '',
         content: material.content || '',
-        technique: extra.technique || extra.method || '',
-        topic_url: extra.topic_url || extra.link || '',
-        answer: extra.answer || '',
+        technique: extra?.technique || extra?.method || '',
+        topic_url: extra?.topic_url || extra?.link || '',
+        answer: extra?.answer || '',
         order_index: material.order_index ?? 1
       });
     } else {

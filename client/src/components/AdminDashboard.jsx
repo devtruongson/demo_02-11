@@ -1579,10 +1579,16 @@ export default function AdminDashboard({
                     let extra = {};
                     if (item.extra_data) {
                       try {
-                        extra = typeof item.extra_data === 'string' ? JSON.parse(item.extra_data) : item.extra_data;
+                        const parsed = typeof item.extra_data === 'string' ? JSON.parse(item.extra_data) : item.extra_data;
+                        if (parsed && typeof parsed === 'object') {
+                          extra = parsed;
+                        }
                       } catch (e) {
                         extra = {};
                       }
+                    }
+                    if (!extra || typeof extra !== 'object') {
+                      extra = {};
                     }
 
                     const categoryBadge = () => {
@@ -1636,22 +1642,22 @@ export default function AdminDashboard({
                           </p>
                         </td>
                         <td className="py-3.5 px-4 text-[11px]">
-                          {extra.technique && (
+                          {extra?.technique && (
                             <span className="block text-slate-300 line-clamp-1 font-medium">
                               🛠️ {extra.technique}
                             </span>
                           )}
-                          {extra.answer && (
+                          {extra?.answer && (
                             <span className="block text-emerald-400 line-clamp-1 font-bold">
                               ✓ {extra.answer}
                             </span>
                           )}
-                          {extra.topic_url && (
+                          {extra?.topic_url && (
                             <span className="block text-slate-400 font-mono text-[10px]">
                               🔗 {extra.topic_url}
                             </span>
                           )}
-                          {!extra.technique && !extra.answer && !extra.topic_url && (
+                          {!extra?.technique && !extra?.answer && !extra?.topic_url && (
                             <span className="text-slate-500">—</span>
                           )}
                         </td>
