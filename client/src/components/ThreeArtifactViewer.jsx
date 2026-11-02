@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { RotateCw, ZoomIn, ZoomOut, Maximize2, Sun, Sparkles, Box, Info } from 'lucide-react';
 
 export default function ThreeArtifactViewer({
@@ -26,7 +27,21 @@ export default function ThreeArtifactViewer({
   const isDraggingRef = useRef(false);
   const prevMousePosRef = useRef({ x: 0, y: 0 });
 
+  const isHtmlEmbed =
+    modelCode &&
+    typeof modelCode === 'string' &&
+    (modelCode.includes('<iframe') ||
+      modelCode.includes('<div') ||
+      modelCode.trim().startsWith('<'));
+
+  const isSketchfabUrl =
+    !isHtmlEmbed &&
+    modelCode &&
+    typeof modelCode === 'string' &&
+    modelCode.includes('sketchfab.com');
+
   useEffect(() => {
+    if (isHtmlEmbed || isSketchfabUrl) return;
     const container = containerRef.current;
     if (!container) return;
 
@@ -99,13 +114,67 @@ export default function ThreeArtifactViewer({
     ring.position.y = -1.47;
     scene.add(ring);
 
-    // 6. Build Procedural 3D Historical Artifact Model
+    // 6. Build or Load 3D Historical Artifact Model
     const modelGroup = new THREE.Group();
     modelGroupRef.current = modelGroup;
-
-    buildArtifact(modelGroup, modelCode);
     scene.add(modelGroup);
-    setLoading(false);
+
+    const isExternal3DFile =
+      modelCode &&
+      typeof modelCode === 'string' &&
+      (modelCode.endsWith('.glb') ||
+        modelCode.endsWith('.gltf') ||
+        modelCode.startsWith('/uploads/') ||
+        modelCode.startsWith('http://') ||
+        modelCode.startsWith('https://'));
+
+    if (isExternal3DFile) {
+      setLoading(true);
+      const loader = new GLTFLoader();
+      loader.load(
+        modelCode,
+        (gltf) => {
+          while (modelGroup.children.length > 0) {
+            modelGroup.remove(modelGroup.children[0]);
+          }
+          const loadedModel = gltf.scene;
+
+          // Compute bounding box and auto-center / auto-normalize scale
+          const box = new THREE.Box3().setFromObject(loadedModel);
+          const size = box.getSize(new THREE.Vector3());
+          const center = box.getCenter(new THREE.Vector3());
+
+          loadedModel.position.x -= center.x;
+          loadedModel.position.y -= center.y;
+          loadedModel.position.z -= center.z;
+
+          const maxDim = Math.max(size.x, size.y, size.z);
+          if (maxDim > 0) {
+            const scale = 3.5 / maxDim;
+            loadedModel.scale.set(scale, scale, scale);
+          }
+
+          loadedModel.traverse((node) => {
+            if (node.isMesh) {
+              node.castShadow = true;
+              node.receiveShadow = true;
+            }
+          });
+
+          modelGroup.add(loadedModel);
+          setLoading(false);
+        },
+        undefined,
+        (error) => {
+          console.error('Lỗi khi nạp file 3D GLB:', error);
+          buildArtifact(modelGroup, 'dong_son_drum');
+          setLoading(false);
+        }
+      );
+    } else {
+      buildArtifact(modelGroup, modelCode);
+      setLoading(false);
+    }
 
     // 7. Mouse / Touch Controls
     const onMouseDown = (e) => {
@@ -247,6 +316,37 @@ export default function ThreeArtifactViewer({
     cameraRef.current.position.set(0, 3, 7.5);
     modelGroupRef.current.rotation.set(0, 0, 0);
   };
+
+  if (isHtmlEmbed) {
+    return (
+      <div
+        className="relative rounded-2xl overflow-hidden border border-slate-700/60 shadow-2xl bg-black select-none w-full h-full flex flex-col [&_.sketchfab-embed-wrapper]:w-full [&_.sketchfab-embed-wrapper]:h-full [&_.sketchfab-embed-wrapper]:flex [&_.sketchfab-embed-wrapper]:flex-col [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:flex-1 [&_iframe]:min-h-0 [&_iframe]:border-0 [&_p]:text-center [&_p]:py-1.5 [&_p]:text-slate-400 [&_p]:text-[11px] [&_a]:text-gold hover:[&_a]:underline"
+        style={{ height }}
+        dangerouslySetInnerHTML={{ __html: modelCode }}
+      />
+    );
+  }
+
+  if (isSketchfabUrl) {
+    let embedUrl = modelCode;
+    if (!embedUrl.includes('/embed')) {
+      embedUrl = embedUrl.replace(/(\/models\/[a-zA-Z0-9_-]+)(?:.*)$/, '$1/embed');
+    }
+    return (
+      <div
+        className="relative rounded-2xl overflow-hidden border border-slate-700/60 shadow-2xl bg-black group select-none w-full"
+        style={{ height }}
+      >
+        <iframe
+          src={embedUrl}
+          title={artifactInfo?.name || 'Mô hình 3D'}
+          className="w-full h-full border-0 absolute inset-0"
+          allow="autoplay; fullscreen; xr-spatial-tracking"
+          allowFullScreen
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="relative rounded-2xl overflow-hidden border border-slate-700/60 shadow-2xl bg-[#0f172a] group select-none">

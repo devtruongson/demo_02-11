@@ -3,7 +3,8 @@ import {
     RefreshCw,
     Save,
     Trash2,
-    Upload
+    Upload,
+    Box
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -338,41 +339,91 @@ export default function ResourceEditorModal({ resource, topics, onClose, onSave 
                   </div>
                 </div>
 
-                {/* 3D Preset & YouTube Video */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-200">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Gắn mô hình hiện vật 3D (Tùy chọn)
+                {/* 3D Embed (100% HTML Embed / Iframe) */}
+                <div className="pt-2 border-t border-slate-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                      <Box className="w-3.5 h-3.5 text-navy" />
+                      <span>Mã nhúng mô hình 3D (HTML Embed / Sketchfab)</span>
                     </label>
-                    <select
-                      value={formData.model_3d || ''}
-                      onChange={(e) => setFormData({ ...formData, model_3d: e.target.value || null })}
-                      className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-300 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-navy focus:border-navy bg-white shadow-2xs"
-                    >
-                      <option value="">-- Không dùng mô hình 3D --</option>
-                      <option value="dong_son_drum">Trống đồng Đông Sơn / Ngọc Lũ (3D)</option>
-                      <option value="borobudur_stupa">Bảo tháp Borobudur Java (3D)</option>
-                      <option value="linga_yoni">Đài thờ Linga - Yoni Champa (3D)</option>
-                      <option value="vo_canh_stele">Bia đá Võ Cạnh Sanskrit (3D)</option>
-                      <option value="that_luang">Đại tháp Thạt Luổng bọc vàng (3D)</option>
-                    </select>
-                    <p className="text-[10px] text-slate-400 mt-1">
-                      Chọn từ thư viện mô hình 3D cổ vật có sẵn để kích hoạt chế độ xoay 360°.
-                    </p>
+                    {formData.model_3d && (
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, model_3d: '' })}
+                        className="text-[11px] font-bold text-rose-600 hover:text-rose-700 hover:underline flex items-center gap-1"
+                      >
+                        <Trash2 className="w-3 h-3" /> Xóa mã 3D
+                      </button>
+                    )}
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Liên kết Video bài học (YouTube Embed)
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.video_url}
-                      onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
-                      placeholder="https://www.youtube.com/watch?v=..."
-                      className="w-full px-4 py-2.5 rounded-2xl border border-slate-300 text-xs font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-navy focus:border-navy bg-white shadow-2xs"
-                    />
+                  <textarea
+                    rows={4}
+                    value={formData.model_3d || ''}
+                    onChange={(e) => setFormData({ ...formData, model_3d: e.target.value })}
+                    placeholder={`Dán trực tiếp toàn bộ mã nhúng HTML từ Sketchfab tại đây, ví dụ:\n<div class="sketchfab-embed-wrapper">\n  <iframe title="..." src="https://sketchfab.com/models/.../embed"></iframe>\n</div>`}
+                    className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-300 text-xs font-mono text-slate-800 placeholder:text-slate-400 placeholder:font-sans focus:outline-none focus:ring-2 focus:ring-navy focus:border-navy bg-white shadow-2xs leading-relaxed"
+                  />
+
+                  {/* Preset quick buttons */}
+                  <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+                    <span className="text-slate-400 font-medium">Mẫu 3D tích hợp nhanh:</span>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, model_3d: 'dong_son_drum' })}
+                      className={`px-2.5 py-1 rounded-xl font-bold transition border ${formData.model_3d === 'dong_son_drum' ? 'bg-navy text-white border-navy' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+                    >
+                      Trống đồng
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, model_3d: 'borobudur_stupa' })}
+                      className={`px-2.5 py-1 rounded-xl font-bold transition border ${formData.model_3d === 'borobudur_stupa' ? 'bg-navy text-white border-navy' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+                    >
+                      Borobudur
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, model_3d: 'linga_yoni' })}
+                      className={`px-2.5 py-1 rounded-xl font-bold transition border ${formData.model_3d === 'linga_yoni' ? 'bg-navy text-white border-navy' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+                    >
+                      Linga - Yoni
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, model_3d: 'vo_canh_stele' })}
+                      className={`px-2.5 py-1 rounded-xl font-bold transition border ${formData.model_3d === 'vo_canh_stele' ? 'bg-navy text-white border-navy' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+                    >
+                      Bia Võ Cạnh
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, model_3d: 'that_luang' })}
+                      className={`px-2.5 py-1 rounded-xl font-bold transition border ${formData.model_3d === 'that_luang' ? 'bg-navy text-white border-navy' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+                    >
+                      Thạt Luổng
+                    </button>
                   </div>
+                  <p className="text-[10px] text-slate-400">
+                    Hỗ trợ 100% mã nhúng iframe HTML từ Sketchfab. Hệ thống sẽ tự động hiển thị mô hình tương tác 360° nguyên bản.
+                  </p>
+                </div>
+
+                {/* Video bài học YouTube */}
+                <div className="pt-2 border-t border-slate-200">
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Liên kết Video bài học (YouTube Embed)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.video_url}
+                    onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    className="w-full px-4 py-2.5 rounded-2xl border border-slate-300 text-xs font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-navy focus:border-navy bg-white shadow-2xs"
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    Hệ thống sẽ tự động phân giải liên kết YouTube và hiển thị tràn khung hình 16:9 sắc nét.
+                  </p>
                 </div>
               </div>
 

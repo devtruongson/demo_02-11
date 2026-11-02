@@ -7,6 +7,7 @@ import {
   ChevronRight, LayoutList, LayoutGrid, KeyRound, EyeOff, UserCheck, AlertCircle
 } from 'lucide-react';
 import ThreeArtifactViewer from './ThreeArtifactViewer.jsx';
+import Artifact3DEditorModal from './Artifact3DEditorModal.jsx';
 import { formatYouTubeEmbedUrl } from '../utils/slugify.js';
 
 export default function AdminDashboard({
@@ -16,13 +17,16 @@ export default function AdminDashboard({
   onEditResource,
   onDeleteResource,
   onLogout,
-  refreshTrigger
+  refreshTrigger,
+  artifacts3d = [],
+  onArtifacts3DChange = null
 }) {
   const [analytics, setAnalytics] = useState(null);
   const [resources, setResources] = useState([]);
   const [users, setUsers] = useState([]);
+  const [artifacts3dList, setArtifacts3dList] = useState(artifacts3d || []);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'resources' | 'users'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'resources' | 'artifacts3d' | 'users'
   const [resourceSearch, setResourceSearch] = useState('');
   const [topicFilter, setTopicFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -32,6 +36,11 @@ export default function AdminDashboard({
   const [previewResource, setPreviewResource] = useState(null);
   const [previewActiveTab, setPreviewActiveTab] = useState('gallery'); // 'gallery' | 'video' | '3d'
   const [previewPhotoIdx, setPreviewPhotoIdx] = useState(0);
+
+  // 3D Artifact Management State
+  const [editingArtifact3D, setEditingArtifact3D] = useState(null);
+  const [isArtifactModalOpen, setIsArtifactModalOpen] = useState(false);
+  const [artifactSearch, setArtifactSearch] = useState('');
 
   // User Management State (Edit name, role, change password)
   const [editingUser, setEditingUser] = useState(null);
@@ -120,17 +129,19 @@ export default function AdminDashboard({
     setLoading(true);
     try {
       const ts = Date.now();
-      const [analyticsRes, resRes, usersRes] = await Promise.all([
+      const [analyticsRes, resRes, usersRes, artRes] = await Promise.all([
         fetch(`/api/analytics/overview?_t=${ts}`).then((r) => r.json()),
         fetch(`/api/resources?_t=${ts}`).then((r) => r.json()),
         fetch(`/api/users?_t=${ts}`, {
           headers: { Authorization: `Bearer ${authToken}` }
-        }).then((r) => (r.ok ? r.json() : []))
+        }).then((r) => (r.ok ? r.json() : [])),
+        fetch(`/api/3d-artifacts?_t=${ts}`).then((r) => (r.ok ? r.json() : []))
       ]);
 
       setAnalytics(analyticsRes);
       setResources(resRes);
       setUsers(usersRes);
+      setArtifacts3dList(artRes);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
     } finally {
@@ -141,6 +152,77 @@ export default function AdminDashboard({
   useEffect(() => {
     fetchDashboardData();
   }, [refreshTrigger]);
+
+  useEffect(() => {
+    if (artifacts3d && artifacts3d.length > 0) {
+      setArtifacts3dList(artifacts3d);
+    }
+  }, [artifacts3d]);
+
+  // Handlers for 3D Artifacts
+  const handleOpenNewArtifact3D = () => {
+    setEditingArtifact3D(null);
+    setIsArtifactModalOpen(true);
+  };
+
+  const handleOpenEditArtifact3D = (art) => {
+    setEditingArtifact3D(art);
+    setIsArtifactModalOpen(true);
+  };
+
+  const handleSaveArtifact3D = async (formData, id) => {
+    const url = id ? `/api/3d-artifacts/${id}` : '/api/3d-artifacts';
+    const method = id ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`
+      },
+      body: JSON.stringify(formData)
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Lỗi lưu bảo vật 3D');
+    }
+    await fetchDashboardData();
+    if (onArtifacts3DChange) await onArtifacts3DChange();
+  };
+
+  const handleDeleteArtifact3D = async (id, name) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa bảo vật 3D "${name}" khỏi cơ sở dữ liệu?`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/3d-artifacts/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Lỗi khi xóa bảo vật');
+      }
+      await fetchDashboardData();
+      if (onArtifacts3DChange) await onArtifacts3DChange();
+    } catch (err) {
+      alert('Xóa bảo vật thất bại: ' + err.message);
+    }
+  };
+
+  // Filter 3D artifacts
+  const filteredArtifacts = artifacts3dList.filter((art) => {
+    if (!artifactSearch.trim()) return true;
+    const q = artifactSearch.toLowerCase();
+    return (
+      (art.name && art.name.toLowerCase().includes(q)) ||
+      (art.code && art.code.toLowerCase().includes(q)) ||
+      (art.culture && art.culture.toLowerCase().includes(q)) ||
+      (art.period && art.period.toLowerCase().includes(q)) ||
+      (art.location && art.location.toLowerCase().includes(q))
+    );
+  });
 
   // Filter resources
   const filteredResources = resources.filter((r) => {
@@ -303,6 +385,16 @@ export default function AdminDashboard({
           }`}
         >
           <span>📚 Quản lý tư liệu ({resources.length})</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('artifacts3d')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+            activeTab === 'artifacts3d'
+              ? 'bg-navy text-white shadow-sm ring-1 ring-gold/40 font-black'
+              : 'text-slate-400 hover:text-white hover:bg-slate-900'
+          }`}
+        >
+          <span>🏺 Bảo vật 3D ({artifacts3dList.length})</span>
         </button>
         <button
           onClick={() => setActiveTab('users')}
@@ -764,6 +856,135 @@ export default function AdminDashboard({
         </div>
       )}
 
+      {/* ================= TAB 4: 3D ARTIFACTS MANAGEMENT ================= */}
+      {activeTab === 'artifacts3d' && (
+        <div className="bg-slate-900/90 rounded-3xl border border-slate-800 shadow-sm overflow-hidden animate-fade-in space-y-4 p-5 sm:p-6">
+          {/* Header & Controls */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+            <div>
+              <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                <Box className="w-5 h-5 text-gold" />
+                <span>Quản Lý Danh Mục Bảo Vật Studio 3D</span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Chỉnh sửa thông tin học thuật, niên đại và gắn mã nhúng HTML Sketchfab 3D tương tác xoay 360°.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={artifactSearch}
+                  onChange={(e) => setArtifactSearch(e.target.value)}
+                  placeholder="Tìm theo tên bảo vật, văn hóa..."
+                  className="pl-8 pr-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-gold w-48 sm:w-60"
+                />
+              </div>
+
+              <button
+                onClick={handleOpenNewArtifact3D}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 text-xs font-black transition active:scale-95 shadow-sm"
+              >
+                <PlusCircle className="w-3.5 h-3.5" />
+                <span>Thêm bảo vật 3D</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Artifacts Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-950/70 text-slate-400 uppercase text-[10px] tracking-wider font-extrabold border-b border-slate-800">
+                <tr>
+                  <th className="py-3 px-4">Mã Code</th>
+                  <th className="py-3 px-4">Tên Bảo Vật / Hiện Vật</th>
+                  <th className="py-3 px-4">Nền Văn Hóa & Niên Đại</th>
+                  <th className="py-3 px-4">Nơi Lưu Giữ / Khảo Cổ</th>
+                  <th className="py-3 px-4">Định Dạng 3D</th>
+                  <th className="py-3 px-4 text-right">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800 text-slate-300">
+                {filteredArtifacts.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-8 text-center text-slate-500">
+                      Không tìm thấy bảo vật 3D nào phù hợp với từ khóa tìm kiếm.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredArtifacts.map((art) => (
+                    <tr key={art.id} className="hover:bg-slate-800/50 transition group">
+                      <td className="py-3.5 px-4 font-mono font-bold text-slate-400">
+                        <span className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-[11px] text-gold">
+                          {art.code}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <strong className="text-white font-bold block text-sm group-hover:text-gold transition">
+                          {art.name}
+                        </strong>
+                        <span className="text-[11px] text-slate-400 line-clamp-1 max-w-md">
+                          {art.description}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className="text-slate-200 font-semibold block">{art.culture}</span>
+                        <span className="text-[11px] text-slate-400">{art.period}</span>
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-300">
+                        <span className="line-clamp-1 max-w-xs">{art.location || '—'}</span>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        {art.embed ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-950/80 text-emerald-400 border border-emerald-800">
+                            <Sparkles className="w-3 h-3 text-emerald-400" />
+                            <span>Mã nhúng Sketchfab</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-950/80 text-amber-400 border border-amber-800">
+                            <Box className="w-3 h-3 text-amber-400" />
+                            <span>Mô hình WebGL tích hợp</span>
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Link
+                            to={`/studio-3d/co-vat/${art.code}`}
+                            target="_blank"
+                            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition"
+                            title="Mở xem trực tiếp tại Studio 3D"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </Link>
+                          <button
+                            onClick={() => handleOpenEditArtifact3D(art)}
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-gold hover:text-slate-950 text-slate-200 transition text-xs font-bold"
+                            title="Chỉnh sửa bảo vật 3D"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Sửa</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteArtifact3D(art.id, art.name)}
+                            className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-950 hover:text-rose-300 transition"
+                            title="Xóa bảo vật"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {/* ================= MODAL: EDIT USER (HỌ TÊN, ROLE & CHANGE PASSWORD) ================= */}
       {editingUser && (
         <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
@@ -1123,6 +1344,18 @@ export default function AdminDashboard({
           </div>
         </div>
       )}
+
+      {/* ================= 3D ARTIFACT EDITOR MODAL ================= */}
+      <Artifact3DEditorModal
+        artifact={editingArtifact3D}
+        isOpen={isArtifactModalOpen}
+        onClose={() => {
+          setIsArtifactModalOpen(false);
+          setEditingArtifact3D(null);
+        }}
+        onSave={handleSaveArtifact3D}
+        authToken={authToken}
+      />
     </div>
   );
 }

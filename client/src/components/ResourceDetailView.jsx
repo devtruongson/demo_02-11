@@ -4,7 +4,7 @@ import {
   ArrowLeft, Box, Image, Video, Calendar, MapPin, Eye, ExternalLink,
   Edit3, Trash2, Share2, Compass, Sparkles, BookOpen, Lightbulb,
   CheckCircle2, Layers, Maximize2, ChevronLeft, ChevronRight, Bookmark,
-  Play, Film, Globe2, Clock
+  Play, Film, Globe2, Clock, FileText, Copy, Check, Printer, Target, GraduationCap
 } from 'lucide-react';
 import ThreeArtifactViewer from './ThreeArtifactViewer.jsx';
 import { parseIdFromSlug, createResourceSlug, formatYouTubeEmbedUrl } from '../utils/slugify.js';
@@ -26,8 +26,17 @@ export default function ResourceDetailView({
   const [activeMediaTab, setActiveMediaTab] = useState('gallery'); // 'gallery' | 'video' | '3d'
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [copiedCitation, setCopiedCitation] = useState(false);
 
   const isAdmin = currentUser?.role === 'admin';
+
+  const handleCopyCitation = () => {
+    if (!resource) return;
+    const citation = `Sử Ký Số (2026). "${resource.title}". Cổng học liệu số & Mô phỏng 3D Lịch sử 10 GDPT 2018. Truy xuất từ: ${window.location.href}`;
+    navigator.clipboard.writeText(citation);
+    setCopiedCitation(true);
+    setTimeout(() => setCopiedCitation(false), 2000);
+  };
 
   // Fetch resource if navigated directly or after page refresh (F5)
   useEffect(() => {
@@ -297,7 +306,7 @@ export default function ResourceDetailView({
         </div>
 
         {/* Visual Display Screen */}
-        <div className="relative min-h-[460px] lg:min-h-[580px] w-full flex items-center justify-center overflow-hidden bg-slate-900">
+        <div className={`relative w-full overflow-hidden bg-slate-900 ${activeMediaTab === 'video' ? '' : 'min-h-[460px] lg:min-h-[580px] flex items-center justify-center'}`}>
           {/* TAB 1: 3D MODEL */}
           {activeMediaTab === '3d' && resource.model_3d && (
             <div className="w-full h-full min-h-[580px]">
@@ -312,7 +321,7 @@ export default function ResourceDetailView({
 
           {/* TAB 2: YOUTUBE EMBED PLAYER (FULL BLEED CINEMA EXPANSION) */}
           {activeMediaTab === 'video' && youtubeEmbedUrl && (
-            <div className="w-full aspect-video min-h-[460px] lg:min-h-[580px] max-h-[80vh] bg-black relative flex items-center justify-center">
+            <div className="w-full aspect-video bg-black relative">
               <iframe
                 src={`${youtubeEmbedUrl}?autoplay=1&rel=0&modestbranding=1`}
                 title={resource.title}

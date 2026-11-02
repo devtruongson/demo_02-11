@@ -162,6 +162,31 @@ app.post('/api/upload/multiple', upload.array('images', 20), (req, res) => {
   }
 });
 
+// POST /api/upload/model-3d (Upload file 3D: .glb, .gltf, .obj)
+app.post('/api/upload/model-3d', upload.single('model3d'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'Không tìm thấy tệp 3D nào được tải lên.' });
+    }
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    const allowed = ['.glb', '.gltf', '.obj', '.fbx'];
+    if (!allowed.includes(ext)) {
+      return res.status(400).json({ error: `Định dạng tệp ${ext} không được hỗ trợ. Vui lòng tải file 3D định dạng .glb, .gltf hoặc .obj` });
+    }
+    const fileUrl = `/uploads/${req.file.filename}`;
+    res.json({
+      success: true,
+      url: fileUrl,
+      filename: req.file.filename,
+      originalName: req.file.originalname,
+      size: req.file.size
+    });
+  } catch (error) {
+    console.error('3D model upload error:', error);
+    res.status(500).json({ error: 'Lỗi máy chủ khi tải tệp 3D: ' + error.message });
+  }
+});
+
 // ==========================================
 // AUTHENTICATION ROUTES (BCRYPT + JWT)
 // ==========================================
@@ -775,11 +800,173 @@ app.delete('/api/resources/:id', requireAdmin, async (req, res) => {
   }
 });
 
-// GET 3D artifacts
+// GET all 3D artifacts
 app.get('/api/3d-artifacts', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM artifacts_3d ORDER BY id ASC');
     res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET single 3D artifact by ID or code
+app.get('/api/3d-artifacts/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const [rows] = await pool.query('SELECT * FROM artifacts_3d WHERE id = ? OR code = ?', [id, id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy bảo vật 3D' });
+    }
+    res.json(rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST new 3D artifact (Admin only)
+app.post('/api/3d-artifacts', requireAdmin, async (req, res) => {
+  try {
+    const {
+      code,
+      name,
+      culture,
+      period,
+      location,
+      description,
+      material,
+      dimensions,
+      significance,
+      lighting_preset,
+      color_base,
+      embed
+    } = req.body;
+
+    if (!name || !code) {
+      return res.status(400).json({ error: 'Tên bảo vật và Mã định danh (code) là bắt buộc' });
+    }
+
+    const cleanCode = code.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+    const [existing] = await pool.query('SELECT id FROM artifacts_3d WHERE code = ?', [cleanCode]);
+    if (existing.length > 0) {
+      return res.status(400).json({ error: `Mã định danh "${cleanCode}" đã tồn tại. Vui lòng chọn mã khác.` });
+    }
+
+    const [result] = await pool.query(
+      `INSERT INTO artifacts_3d 
+       (code, name, culture, period, location, description, material, dimensions, significance, lighting_preset, color_base, embed)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        cleanCode,
+        name.trim(),
+        culture || '',
+        period || '',
+        location || '',
+        description || '',
+        material || '',
+        dimensions || '',
+        significance || '',
+        lighting_preset || 'museum',
+        color_base || '#b58b4c',
+        embed ? embed.trim() : null
+      ]
+    );
+
+    await logActivity(req.user?.username || 'admin', 'CREATE_3D_ARTIFACT', `Thêm mới bảo vật 3D ID ${result.insertId}: ${name}`);
+
+    const [newItem] = await pool.query('SELECT * FROM artifacts_3d WHERE id = ?', [result.insertId]);
+    res.status(201).json(newItem[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT update 3D artifact (Admin only)
+app.put('/api/3d-artifacts/:id', requireAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const {
+      code,
+      name,
+      culture,
+      period,
+      location,
+      description,
+      material,
+      dimensions,
+      significance,
+      lighting_preset,
+      color_base,
+      embed
+    } = req.body;
+
+    const [exists] = await pool.query('SELECT id, name FROM artifacts_3d WHERE id = ?', [id]);
+    if (exists.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy bảo vật 3D cần cập nhật' });
+    }
+
+    let cleanCode = code ? code.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '_') : null;
+    if (cleanCode) {
+      const [duplicate] = await pool.query('SELECT id FROM artifacts_3d WHERE code = ? AND id != ?', [cleanCode, id]);
+      if (duplicate.length > 0) {
+        return res.status(400).json({ error: `Mã định danh "${cleanCode}" đã trùng với một bảo vật khác.` });
+      }
+    }
+
+    await pool.query(
+      `UPDATE artifacts_3d SET
+         code = COALESCE(?, code),
+         name = ?,
+         culture = ?,
+         period = ?,
+         location = ?,
+         description = ?,
+         material = ?,
+         dimensions = ?,
+         significance = ?,
+         lighting_preset = ?,
+         color_base = ?,
+         embed = ?
+       WHERE id = ?`,
+      [
+        cleanCode,
+        name ? name.trim() : exists[0].name,
+        culture || '',
+        period || '',
+        location || '',
+        description || '',
+        material || '',
+        dimensions || '',
+        significance || '',
+        lighting_preset || 'museum',
+        color_base || '#b58b4c',
+        embed !== undefined ? (embed ? embed.trim() : null) : null,
+        id
+      ]
+    );
+
+    await logActivity(req.user?.username || 'admin', 'UPDATE_3D_ARTIFACT', `Cập nhật bảo vật 3D ID ${id}: ${name}`);
+
+    const [updated] = await pool.query('SELECT * FROM artifacts_3d WHERE id = ?', [id]);
+    res.json(updated[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE 3D artifact (Admin only)
+app.delete('/api/3d-artifacts/:id', requireAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const [exists] = await pool.query('SELECT name FROM artifacts_3d WHERE id = ?', [id]);
+    if (exists.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy bảo vật 3D cần xóa' });
+    }
+
+    await pool.query('DELETE FROM artifacts_3d WHERE id = ?', [id]);
+    await logActivity(req.user?.username || 'admin', 'DELETE_3D_ARTIFACT', `Xóa bảo vật 3D ID ${id}: ${exists[0].name}`);
+
+    res.json({ message: 'Xóa bảo vật 3D thành công' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

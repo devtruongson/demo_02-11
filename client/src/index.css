@@ -31,3 +31,8 @@
   -webkit-backdrop-filter: blur(12px);
 }
 
+
+
+.sketchfab-embed-wrapper div,p{
+    display: none !important;
+}

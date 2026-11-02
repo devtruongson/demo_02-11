@@ -1,5 +1,4 @@
-import React from 'react';
-import { Search, Sparkles, Box, ShieldCheck, Compass } from 'lucide-react';
+import { Box, Search, Sparkles } from 'lucide-react';
 
 export default function Hero({ searchQuery, setSearchQuery, onSearchSubmit, onOpenStudio3D }) {
   return (
@@ -10,7 +9,7 @@ export default function Hero({ searchQuery, setSearchQuery, onSearchSubmit, onOp
       {/* Decorative Glow */}
       <div className="absolute -top-24 -right-24 w-96 h-96 bg-gold/20 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="relative z-10 max-w-3xl">
+      <div className="relative z-10">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-widest bg-gold/20 text-gold-light border border-gold/30 mb-4 backdrop-blur-md">
           <Sparkles className="w-3.5 h-3.5" /> Hệ Thống Học Liệu Số & Mô Phỏng 3D
         </div>

@@ -585,11 +585,25 @@ export default function App() {
             />
             <Route
               path="/studio-3d/:mode"
-              element={<Studio3DView artifacts3d={artifacts3d} />}
+              element={
+                <Studio3DView
+                  artifacts3d={artifacts3d}
+                  currentUser={currentUser}
+                  authToken={authToken}
+                  onArtifacts3DChange={fetchInitialData}
+                />
+              }
             />
             <Route
               path="/studio-3d/:mode/:artifactCode"
-              element={<Studio3DView artifacts3d={artifacts3d} />}
+              element={
+                <Studio3DView
+                  artifacts3d={artifacts3d}
+                  currentUser={currentUser}
+                  authToken={authToken}
+                  onArtifacts3DChange={fetchInitialData}
+                />
+              }
             />
 
             {/* ================= ROUTE: TEACHERS WITH REAL SLUGS ================= */}
@@ -631,6 +645,8 @@ export default function App() {
                     onDeleteResource={handleDeleteResource}
                     refreshTrigger={dashboardRefreshTrigger}
                     onLogout={handleLogout}
+                    artifacts3d={artifacts3d}
+                    onArtifacts3DChange={fetchInitialData}
                   />
                 ) : (
                   <Navigate to="/" replace />
