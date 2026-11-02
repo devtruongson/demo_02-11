@@ -15,8 +15,10 @@ import Studio3DView from './components/Studio3DView.jsx';
 import TeachersView from './components/TeachersView.jsx';
 import StudentsView from './components/StudentsView.jsx';
 import AboutView from './components/AboutView.jsx';
+import ContactView from './components/ContactView.jsx';
+import TopicEditorModal from './components/TopicEditorModal.jsx';
 import { createResourceSlug } from './utils/slugify.js';
-import { Filter, Layers, Box, Search, RotateCcw, ArrowRight, BookOpen, Sparkles, AlertCircle, LayoutDashboard, Globe, ShieldCheck, Users, X } from 'lucide-react';
+import { Filter, Layers, Box, Search, RotateCcw, ArrowRight, BookOpen, Sparkles, AlertCircle, LayoutDashboard, Globe, ShieldCheck, Users, X, PlusCircle, Edit3 } from 'lucide-react';
 
 const API_BASE = '/api';
 
@@ -62,6 +64,10 @@ export default function App() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [dashboardRefreshTrigger, setDashboardRefreshTrigger] = useState(0);
+
+  // Topic Management State for Admin
+  const [editingTopic, setEditingTopic] = useState(null);
+  const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
 
   // Is this the full-width detail page or full-screen dashboard?
   const isDetailPage = location.pathname.startsWith('/tu-lieu/');
@@ -256,6 +262,74 @@ export default function App() {
     }
     setEditorResource(null);
     setIsEditorOpen(true);
+  };
+
+  // Handlers for Topics CRUD from App.jsx
+  const handleOpenEditTopic = (topic) => {
+    if (!currentUser || currentUser.role !== 'admin') {
+      setIsLoginModalOpen(true);
+      return;
+    }
+    setEditingTopic(topic);
+    setIsTopicModalOpen(true);
+  };
+
+  const handleOpenNewTopic = () => {
+    if (!currentUser || currentUser.role !== 'admin') {
+      setIsLoginModalOpen(true);
+      return;
+    }
+    setEditingTopic(null);
+    setIsTopicModalOpen(true);
+  };
+
+  const handleSaveTopic = async (formData, id) => {
+    if (!currentUser || currentUser.role !== 'admin') {
+      setIsLoginModalOpen(true);
+      throw new Error('Chỉ Quản trị viên (Admin) mới có quyền đổi tên hoặc thêm chủ đề.');
+    }
+    const url = id ? `${API_BASE}/topics/${id}` : `${API_BASE}/topics`;
+    const method = id ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`
+      },
+      body: JSON.stringify(formData)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || 'Lỗi lưu chủ đề');
+    }
+    await fetchInitialData();
+    setDashboardRefreshTrigger((prev) => prev + 1);
+  };
+
+  const handleDeleteTopic = async (topic) => {
+    if (!currentUser || currentUser.role !== 'admin') {
+      setIsLoginModalOpen(true);
+      return;
+    }
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa chủ đề "${topic.title}"?\nLưu ý: Không thể xóa nếu chủ đề đang có tư liệu đính kèm.`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE}/topics/${topic.id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Lỗi xóa chủ đề');
+      }
+      await fetchInitialData();
+      setDashboardRefreshTrigger((prev) => prev + 1);
+    } catch (err) {
+      alert('Không thể xóa chủ đề: ' + err.message);
+    }
   };
 
   return (
@@ -515,6 +589,9 @@ export default function App() {
                         <TopicCard
                           key={t.id}
                           topic={t}
+                          isAdmin={currentUser?.role === 'admin'}
+                          onEdit={handleOpenEditTopic}
+                          onDelete={handleDeleteTopic}
                           onSelect={(topic) => {
                             navigate(`/kho-tu-lieu?topic=${topic.id}`);
                           }}
@@ -563,13 +640,25 @@ export default function App() {
               path="/chu-de"
               element={
                 <div className="space-y-6 animate-fade-in">
-                  <div>
-                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-                      7 Chủ Đề Học Tập Môn Lịch Sử 10
-                    </h2>
-                    <p className="text-xs text-slate-500 mt-1">
-                      Được xây dựng theo mạch nội dung chuẩn của Chương trình GDPT 2018
-                    </p>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                        {topics.length} Chủ Đề Học Tập Môn Lịch Sử 10
+                      </h2>
+                      <p className="text-xs text-slate-500 mt-1">
+                        Được xây dựng theo mạch nội dung chuẩn của Chương trình GDPT 2018
+                      </p>
+                    </div>
+
+                    {currentUser?.role === 'admin' && (
+                      <button
+                        onClick={handleOpenNewTopic}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 text-xs font-black transition shadow-sm active:scale-95 shrink-0"
+                      >
+                        <PlusCircle className="w-4 h-4" />
+                        <span>Thêm chủ đề mới</span>
+                      </button>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -577,6 +666,9 @@ export default function App() {
                       <TopicCard
                         key={t.id}
                         topic={t}
+                        isAdmin={currentUser?.role === 'admin'}
+                        onEdit={handleOpenEditTopic}
+                        onDelete={handleDeleteTopic}
                         onSelect={(topic) => {
                           navigate(`/kho-tu-lieu?topic=${topic.id}`);
                         }}
@@ -825,6 +917,9 @@ export default function App() {
             {/* ================= ROUTE: ABOUT ================= */}
             <Route path="/gioi-thieu" element={<AboutView />} />
 
+            {/* ================= ROUTE: CONTACT & FEEDBACK ================= */}
+            <Route path="/lien-he" element={<ContactView />} />
+
             {/* ================= ROUTE: ADMIN DASHBOARD ================= */}
             <Route
               path="/dashboard"
@@ -844,6 +939,8 @@ export default function App() {
                     artifacts3d={artifacts3d}
                     onArtifacts3DChange={fetchInitialData}
                     onOpenBannerConfig={() => setIsBannerModalOpen(true)}
+                    topics={topics}
+                    onTopicsChange={fetchInitialData}
                   />
                 ) : (
                   <Navigate to="/" replace />
@@ -899,6 +996,18 @@ export default function App() {
           onSlidesUpdated={fetchInitialData}
         />
       )}
+
+      {/* Topic Editor / Rename Modal for Public /chu-de View */}
+      <TopicEditorModal
+        isOpen={isTopicModalOpen}
+        topic={editingTopic}
+        onClose={() => {
+          setIsTopicModalOpen(false);
+          setEditingTopic(null);
+        }}
+        onSave={handleSaveTopic}
+        authToken={authToken}
+      />
     </div>
   );
 }

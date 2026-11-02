@@ -632,6 +632,160 @@ app.get('/api/topics/:id', async (req, res) => {
   }
 });
 
+// POST /api/topics (requireAdmin) - Create new topic
+app.post('/api/topics', requireAdmin, async (req, res) => {
+  try {
+    const { title, description, img } = req.body;
+    if (!title || !title.trim()) {
+      return res.status(400).json({ error: 'Vui lòng nhập tên chủ đề học tập.' });
+    }
+
+    const [result] = await pool.query(
+      'INSERT INTO topics (title, description, img) VALUES (?, ?, ?)',
+      [title.trim(), description ? description.trim() : '', img ? img.trim() : '']
+    );
+
+    await logActivity(req.user?.username || 'admin', 'CREATE_TOPIC', `Tạo chủ đề mới ID ${result.insertId}: ${title.trim()}`);
+    const [created] = await pool.query('SELECT * FROM topics WHERE id = ?', [result.insertId]);
+    res.status(201).json(created[0]);
+  } catch (error) {
+    console.error('Create topic error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT /api/topics/:id (requireAdmin) - Update / Rename topic
+app.put('/api/topics/:id', requireAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { title, description, img } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({ error: 'Vui lòng nhập tên chủ đề học tập.' });
+    }
+
+    const [exists] = await pool.query('SELECT id, title FROM topics WHERE id = ?', [id]);
+    if (exists.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy chủ đề học tập cần chỉnh sửa.' });
+    }
+
+    await pool.query(
+      'UPDATE topics SET title = ?, description = ?, img = ? WHERE id = ?',
+      [title.trim(), description ? description.trim() : '', img ? img.trim() : '', id]
+    );
+
+    await logActivity(req.user?.username || 'admin', 'UPDATE_TOPIC', `Đổi tên/Cập nhật chủ đề ID ${id}: ${title.trim()}`);
+    const [updated] = await pool.query('SELECT * FROM topics WHERE id = ?', [id]);
+    res.json(updated[0]);
+  } catch (error) {
+    console.error('Update topic error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE /api/topics/:id (requireAdmin) - Delete topic
+app.delete('/api/topics/:id', requireAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const [exists] = await pool.query('SELECT id, title FROM topics WHERE id = ?', [id]);
+    if (exists.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy chủ đề học tập cần xóa.' });
+    }
+
+    // Check if any resources use this topic
+    const [resourcesCount] = await pool.query('SELECT COUNT(*) as count FROM resources WHERE topic_id = ?', [id]);
+    if (resourcesCount[0].count > 0) {
+      return res.status(400).json({
+        error: `Không thể xóa chủ đề "${exists[0].title}" vì đang có ${resourcesCount[0].count} tư liệu thuộc chủ đề này. Vui lòng chuyển các tư liệu sang chủ đề khác trước khi xóa.`
+      });
+    }
+
+    await pool.query('DELETE FROM topics WHERE id = ?', [id]);
+    await logActivity(req.user?.username || 'admin', 'DELETE_TOPIC', `Xóa chủ đề ID ${id}: ${exists[0].title}`);
+    res.json({ message: 'Xóa chủ đề thành công.' });
+  } catch (error) {
+    console.error('Delete topic error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /api/topics (requireAdmin) - Create new topic
+app.post('/api/topics', requireAdmin, async (req, res) => {
+  try {
+    const { title, description, img } = req.body;
+    if (!title || !title.trim()) {
+      return res.status(400).json({ error: 'Vui lòng nhập tên chủ đề học tập.' });
+    }
+
+    const [result] = await pool.query(
+      'INSERT INTO topics (title, description, img) VALUES (?, ?, ?)',
+      [title.trim(), description ? description.trim() : '', img ? img.trim() : '']
+    );
+
+    await logActivity(req.user?.username || 'admin', 'CREATE_TOPIC', `Tạo chủ đề mới ID ${result.insertId}: ${title.trim()}`);
+    const [created] = await pool.query('SELECT * FROM topics WHERE id = ?', [result.insertId]);
+    res.status(201).json(created[0]);
+  } catch (error) {
+    console.error('Create topic error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT /api/topics/:id (requireAdmin) - Update / Rename topic
+app.put('/api/topics/:id', requireAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { title, description, img } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({ error: 'Vui lòng nhập tên chủ đề học tập.' });
+    }
+
+    const [exists] = await pool.query('SELECT id, title FROM topics WHERE id = ?', [id]);
+    if (exists.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy chủ đề học tập cần chỉnh sửa.' });
+    }
+
+    await pool.query(
+      'UPDATE topics SET title = ?, description = ?, img = ? WHERE id = ?',
+      [title.trim(), description ? description.trim() : '', img ? img.trim() : '', id]
+    );
+
+    await logActivity(req.user?.username || 'admin', 'UPDATE_TOPIC', `Đổi tên/Cập nhật chủ đề ID ${id}: ${title.trim()}`);
+    const [updated] = await pool.query('SELECT * FROM topics WHERE id = ?', [id]);
+    res.json(updated[0]);
+  } catch (error) {
+    console.error('Update topic error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE /api/topics/:id (requireAdmin) - Delete topic
+app.delete('/api/topics/:id', requireAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const [exists] = await pool.query('SELECT id, title FROM topics WHERE id = ?', [id]);
+    if (exists.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy chủ đề học tập cần xóa.' });
+    }
+
+    // Check if any resources use this topic
+    const [resourcesCount] = await pool.query('SELECT COUNT(*) as count FROM resources WHERE topic_id = ?', [id]);
+    if (resourcesCount[0].count > 0) {
+      return res.status(400).json({
+        error: `Không thể xóa chủ đề "${exists[0].title}" vì đang có ${resourcesCount[0].count} tư liệu thuộc chủ đề này. Vui lòng chuyển các tư liệu sang chủ đề khác trước khi xóa.`
+      });
+    }
+
+    await pool.query('DELETE FROM topics WHERE id = ?', [id]);
+    await logActivity(req.user?.username || 'admin', 'DELETE_TOPIC', `Xóa chủ đề ID ${id}: ${exists[0].title}`);
+    res.json({ message: 'Xóa chủ đề thành công.' });
+  } catch (error) {
+    console.error('Delete topic error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // GET resources with search and filters
 app.get('/api/resources', async (req, res) => {
   try {
@@ -2196,6 +2350,179 @@ app.delete('/api/banner-slides/:id', requireAdmin, async (req, res) => {
     await pool.query('DELETE FROM banner_slides WHERE id = ?', [id]);
     await logActivity(req.user?.username || 'admin', 'DELETE_BANNER', `Xóa slide banner ID ${id}`);
     res.json({ message: 'Xóa slide banner thành công.' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// CONTACTS & FEEDBACK MANAGEMENT SYSTEM
+// ==========================================
+async function initContactsTable() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS contacts (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        full_name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NULL,
+        phone VARCHAR(50) NOT NULL,
+        content TEXT NOT NULL,
+        status ENUM('new', 'read', 'replied') DEFAULT 'new',
+        admin_note TEXT NULL,
+        ip_address VARCHAR(50) NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_status (status),
+        INDEX idx_created (created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    const [rows] = await pool.query('SELECT COUNT(*) as count FROM contacts');
+    if (rows[0].count === 0) {
+      console.log('Seeding initial sample contacts...');
+      const seedContacts = [
+        {
+          full_name: 'Thầy Nguyễn Hữu Đức',
+          email: 'huuduc.history@gmail.com',
+          phone: '0912345678',
+          content: 'Kính gửi Ban biên tập Sử Ký Số. Tôi là giáo viên Lịch sử trường THPT Chuyên Hà Nội - Amsterdam. Tôi muốn xin phép trích xuất các tư liệu và liên kết mô hình 3D Trống đồng Ngọc Lũ vào giáo án điện tử thao giảng cấp tỉnh sắp tới. Rất mong nhận được phản hồi hỗ trợ của quý Ban.',
+          status: 'new'
+        },
+        {
+          full_name: 'Cô Lê Thị Mai',
+          email: 'maile.edu@gmail.com',
+          phone: '0987654321',
+          content: 'Em muốn đóng góp thêm bộ ảnh tư liệu độ phân giải cao về văn hóa Óc Eo và hiện vật tượng thần Vishnu khai quật tại An Giang do tổ bộ môn sưu tầm. Ban biên tập có thể hướng dẫn quy trình thẩm định để đưa lên kho tư liệu lớp 10 không ạ?',
+          status: 'replied'
+        }
+      ];
+
+      for (const c of seedContacts) {
+        await pool.query(
+          `INSERT INTO contacts (full_name, email, phone, content, status)
+           VALUES (?, ?, ?, ?, ?)`,
+          [c.full_name, c.email, c.phone, c.content, c.status]
+        );
+      }
+      console.log('Seeded sample contacts successfully.');
+    }
+  } catch (err) {
+    console.error('Error initializing contacts table:', err.message);
+  }
+}
+initContactsTable();
+
+// POST /api/contacts (Public - submit contact/feedback)
+app.post('/api/contacts', async (req, res) => {
+  try {
+    const { full_name, email, phone, content } = req.body;
+
+    if (!full_name || !full_name.trim()) {
+      return res.status(400).json({ error: 'Vui lòng nhập họ và tên của bạn.' });
+    }
+    if (!phone || !phone.trim()) {
+      return res.status(400).json({ error: 'Vui lòng nhập số điện thoại để chúng tôi liên hệ lại.' });
+    }
+    if (!content || !content.trim()) {
+      return res.status(400).json({ error: 'Vui lòng nhập nội dung tin nhắn hoặc câu hỏi liên hệ.' });
+    }
+
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null;
+
+    const [result] = await pool.query(
+      `INSERT INTO contacts (full_name, email, phone, content, status, ip_address)
+       VALUES (?, ?, ?, ?, 'new', ?)`,
+      [
+        full_name.trim(),
+        email ? email.trim() : null,
+        phone.trim(),
+        content.trim(),
+        typeof ip === 'string' ? ip.slice(0, 50) : null
+      ]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'Gửi thông tin liên hệ thành công! Ban biên tập Sử Ký Số sẽ tiếp nhận và phản hồi sớm nhất.',
+      id: result.insertId
+    });
+  } catch (error) {
+    console.error('Submit contact error:', error);
+    res.status(500).json({ error: 'Lỗi gửi liên hệ: ' + error.message });
+  }
+});
+
+// GET /api/contacts (Admin only - get list with optional status filter)
+app.get('/api/contacts', requireAdmin, async (req, res) => {
+  try {
+    const { status, q } = req.query;
+    let query = 'SELECT * FROM contacts WHERE 1=1';
+    const params = [];
+
+    if (status && status !== 'all') {
+      query += ' AND status = ?';
+      params.push(status);
+    }
+
+    if (q && q.trim()) {
+      query += ' AND (full_name LIKE ? OR phone LIKE ? OR email LIKE ? OR content LIKE ?)';
+      const s = `%${q.trim()}%`;
+      params.push(s, s, s, s);
+    }
+
+    query += ' ORDER BY created_at DESC';
+
+    const [rows] = await pool.query(query, params);
+    res.json(rows);
+  } catch (error) {
+    console.error('Get contacts error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/contacts/unread-count (Admin only)
+app.get('/api/contacts/unread-count', requireAdmin, async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT COUNT(*) as unread FROM contacts WHERE status = "new"');
+    res.json({ unread: rows[0]?.unread || 0 });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT /api/contacts/:id/status (Admin only - update status & note)
+app.put('/api/contacts/:id/status', requireAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { status, admin_note } = req.body;
+
+    const [exists] = await pool.query('SELECT id, full_name FROM contacts WHERE id = ?', [id]);
+    if (exists.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy liên hệ cần cập nhật.' });
+    }
+
+    await pool.query(
+      `UPDATE contacts
+       SET status = COALESCE(?, status),
+           admin_note = COALESCE(?, admin_note)
+       WHERE id = ?`,
+      [status || null, admin_note !== undefined ? admin_note : null, id]
+    );
+
+    const [updated] = await pool.query('SELECT * FROM contacts WHERE id = ?', [id]);
+    res.json(updated[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE /api/contacts/:id (Admin only)
+app.delete('/api/contacts/:id', requireAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    await pool.query('DELETE FROM contacts WHERE id = ?', [id]);
+    await logActivity(req.user?.username || 'admin', 'DELETE_CONTACT', `Xóa tin nhắn liên hệ ID ${id}`);
+    res.json({ message: 'Xóa tin nhắn liên hệ thành công.' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

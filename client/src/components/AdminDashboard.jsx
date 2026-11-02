@@ -5,12 +5,13 @@ import {
   RefreshCw, PlusCircle, Edit3, Trash2, Calendar, Award, ArrowUpRight, Search, Filter,
   ArrowLeft, LogOut, X, ExternalLink, Film, Image, MapPin, Sparkles, CheckCircle2,
   ChevronRight, LayoutList, LayoutGrid, KeyRound, EyeOff, UserCheck, AlertCircle,
-  GraduationCap, HelpCircle, FileText, Sliders
+  GraduationCap, HelpCircle, FileText, Sliders, Mail, Phone, MessageSquare, Send, CheckCircle, Clock, Compass, FolderPlus
 } from 'lucide-react';
 import ThreeArtifactViewer from './ThreeArtifactViewer.jsx';
 import Artifact3DEditorModal from './Artifact3DEditorModal.jsx';
 import TeacherGuideEditorModal from './TeacherGuideEditorModal.jsx';
 import QuizEditorModal from './QuizEditorModal.jsx';
+import TopicEditorModal from './TopicEditorModal.jsx';
 import { formatYouTubeEmbedUrl } from '../utils/slugify.js';
 
 export default function AdminDashboard({
@@ -23,14 +24,16 @@ export default function AdminDashboard({
   refreshTrigger,
   artifacts3d = [],
   onArtifacts3DChange = null,
-  onOpenBannerConfig = null
+  onOpenBannerConfig = null,
+  topics: externalTopics = [],
+  onTopicsChange = null
 }) {
   const [analytics, setAnalytics] = useState(null);
   const [resources, setResources] = useState([]);
   const [users, setUsers] = useState([]);
   const [artifacts3dList, setArtifacts3dList] = useState(artifacts3d || []);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'resources' | 'artifacts3d' | 'users'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'resources' | 'artifacts3d' | 'users' | 'teachers' | 'quizzes' | 'topics' | 'contacts'
   const [resourceSearch, setResourceSearch] = useState('');
   const [topicFilter, setTopicFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -59,6 +62,21 @@ export default function AdminDashboard({
   const [quizSearch, setQuizSearch] = useState('');
   const [editingQuiz, setEditingQuiz] = useState(null);
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
+
+  // Topics Management State
+  const [topicsList, setTopicsList] = useState(externalTopics || []);
+  const [editingTopic, setEditingTopic] = useState(null);
+  const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
+  const [topicSearch, setTopicSearch] = useState('');
+
+  // Contacts / Feedback Submissions State
+  const [contactsList, setContactsList] = useState([]);
+  const [unreadContactsCount, setUnreadContactsCount] = useState(0);
+  const [contactStatusFilter, setContactStatusFilter] = useState('all'); // 'all' | 'new' | 'replied'
+  const [contactSearch, setContactSearch] = useState('');
+  const [viewingContact, setViewingContact] = useState(null);
+  const [adminNoteInput, setAdminNoteInput] = useState('');
+  const [savingNote, setSavingNote] = useState(false);
 
   // User Management State (Edit name, role, change password)
   const [editingUser, setEditingUser] = useState(null);
@@ -147,7 +165,7 @@ export default function AdminDashboard({
     setLoading(true);
     try {
       const ts = Date.now();
-      const [analyticsRes, resRes, usersRes, artRes, teacherRes, quizRes] = await Promise.all([
+      const [analyticsRes, resRes, usersRes, artRes, teacherRes, quizRes, topicsRes, contactsRes, unreadRes] = await Promise.all([
         fetch(`/api/analytics/overview?_t=${ts}`).then((r) => r.json()),
         fetch(`/api/resources?_t=${ts}`).then((r) => r.json()),
         fetch(`/api/users?_t=${ts}`, {
@@ -155,7 +173,14 @@ export default function AdminDashboard({
         }).then((r) => (r.ok ? r.json() : [])),
         fetch(`/api/3d-artifacts?_t=${ts}`).then((r) => (r.ok ? r.json() : [])),
         fetch(`/api/teacher-materials?_t=${ts}`).then((r) => (r.ok ? r.json() : [])),
-        fetch(`/api/quizzes?_t=${ts}`).then((r) => (r.ok ? r.json() : []))
+        fetch(`/api/quizzes?_t=${ts}`).then((r) => (r.ok ? r.json() : [])),
+        fetch(`/api/topics?_t=${ts}`).then((r) => (r.ok ? r.json() : [])),
+        fetch(`/api/contacts?_t=${ts}`, {
+          headers: { Authorization: `Bearer ${authToken}` }
+        }).then((r) => (r.ok ? r.json() : [])),
+        fetch(`/api/contacts/unread-count?_t=${ts}`, {
+          headers: { Authorization: `Bearer ${authToken}` }
+        }).then((r) => (r.ok ? r.json() : { unread: 0 }))
       ]);
 
       setAnalytics(analyticsRes);
@@ -164,6 +189,9 @@ export default function AdminDashboard({
       setArtifacts3dList(artRes);
       setTeacherMaterials(teacherRes);
       setQuizzesList(quizRes);
+      setTopicsList(topicsRes);
+      setContactsList(contactsRes);
+      setUnreadContactsCount(unreadRes?.unread || 0);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
     } finally {
@@ -180,6 +208,166 @@ export default function AdminDashboard({
       setArtifacts3dList(artifacts3d);
     }
   }, [artifacts3d]);
+
+  useEffect(() => {
+    if (externalTopics && externalTopics.length > 0) {
+      setTopicsList(externalTopics);
+    }
+  }, [externalTopics]);
+
+  // Handlers for Topics CRUD
+  const handleOpenNewTopic = () => {
+    setEditingTopic(null);
+    setIsTopicModalOpen(true);
+  };
+
+  const handleOpenEditTopic = (topic) => {
+    setEditingTopic(topic);
+    setIsTopicModalOpen(true);
+  };
+
+  const handleSaveTopic = async (formData, id) => {
+    const url = id ? `/api/topics/${id}` : '/api/topics';
+    const method = id ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`
+      },
+      body: JSON.stringify(formData)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || 'Lỗi khi lưu chủ đề');
+    }
+    await fetchDashboardData();
+    if (onTopicsChange) await onTopicsChange();
+  };
+
+  const handleDeleteTopic = async (topic) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa chủ đề "${topic.title}"?\nLưu ý: Không thể xóa nếu chủ đề đang có tư liệu đính kèm.`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/topics/${topic.id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Lỗi xóa chủ đề');
+      }
+      await fetchDashboardData();
+      if (onTopicsChange) await onTopicsChange();
+    } catch (err) {
+      alert('Không thể xóa chủ đề: ' + err.message);
+    }
+  };
+
+  // Handlers for Contacts
+  const handleUpdateContactStatus = async (id, newStatus, note = null) => {
+    try {
+      const res = await fetch(`/api/contacts/${id}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`
+        },
+        body: JSON.stringify({
+          status: newStatus,
+          admin_note: note !== null ? note : (viewingContact?.admin_note || '')
+        })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Lỗi cập nhật trạng thái');
+      }
+      setContactsList((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, status: newStatus, admin_note: note !== null ? note : c.admin_note } : c))
+      );
+      if (viewingContact && viewingContact.id === id) {
+        setViewingContact((prev) => ({
+          ...prev,
+          status: newStatus,
+          admin_note: note !== null ? note : prev.admin_note
+        }));
+      }
+      const countRes = await fetch(`/api/contacts/unread-count?_t=${Date.now()}`, {
+        headers: { Authorization: `Bearer ${authToken}` }
+      }).then((r) => (r.ok ? r.json() : { unread: 0 }));
+      setUnreadContactsCount(countRes?.unread || 0);
+    } catch (err) {
+      alert('Cập nhật thất bại: ' + err.message);
+    }
+  };
+
+  const handleSaveContactNote = async (id) => {
+    setSavingNote(true);
+    try {
+      const res = await fetch(`/api/contacts/${id}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`
+        },
+        body: JSON.stringify({
+          status: viewingContact.status,
+          admin_note: adminNoteInput
+        })
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Lỗi lưu ghi chú');
+      }
+      setContactsList((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, admin_note: adminNoteInput } : c))
+      );
+      if (viewingContact && viewingContact.id === id) {
+        setViewingContact((prev) => ({ ...prev, admin_note: adminNoteInput }));
+      }
+      alert('Đã lưu ghi chú xử lý thành công!');
+    } catch (err) {
+      alert('Lỗi lưu ghi chú: ' + err.message);
+    } finally {
+      setSavingNote(false);
+    }
+  };
+
+  const handleDeleteContact = async (id) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa tin nhắn liên hệ này?')) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/contacts/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Lỗi khi xóa');
+      }
+      setContactsList((prev) => prev.filter((c) => c.id !== id));
+      if (viewingContact && viewingContact.id === id) {
+        setViewingContact(null);
+      }
+      const countRes = await fetch(`/api/contacts/unread-count?_t=${Date.now()}`, {
+        headers: { Authorization: `Bearer ${authToken}` }
+      }).then((r) => (r.ok ? r.json() : { unread: 0 }));
+      setUnreadContactsCount(countRes?.unread || 0);
+    } catch (err) {
+      alert('Xóa liên hệ thất bại: ' + err.message);
+    }
+  };
+
+  const handleOpenContactDetail = (contact) => {
+    setViewingContact(contact);
+    setAdminNoteInput(contact.admin_note || '');
+  };
 
   // Handlers for 3D Artifacts
   const handleOpenNewArtifact3D = () => {
@@ -409,6 +597,31 @@ export default function AdminDashboard({
     return res.img ? [res.img] : [];
   };
 
+  // Filter Topics
+  const filteredTopics = topicsList.filter((t) => {
+    if (!topicSearch.trim()) return true;
+    const q = topicSearch.toLowerCase();
+    return (
+      (t.title && t.title.toLowerCase().includes(q)) ||
+      (t.description && t.description.toLowerCase().includes(q)) ||
+      String(t.id).includes(q)
+    );
+  });
+
+  // Filter Contacts
+  const filteredContacts = contactsList.filter((c) => {
+    const matchStatus = contactStatusFilter === 'all' || c.status === contactStatusFilter;
+    if (!matchStatus) return false;
+    if (!contactSearch.trim()) return true;
+    const q = contactSearch.toLowerCase();
+    return (
+      (c.full_name && c.full_name.toLowerCase().includes(q)) ||
+      (c.phone && c.phone.includes(q)) ||
+      (c.email && c.email.toLowerCase().includes(q)) ||
+      (c.content && c.content.toLowerCase().includes(q))
+    );
+  });
+
   const previewPhotos = previewResource ? getPreviewPhotos(previewResource) : [];
   const previewYoutubeUrl = previewResource ? formatYouTubeEmbedUrl(previewResource.video_url) : null;
 
@@ -419,15 +632,6 @@ export default function AdminDashboard({
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-navy to-navy-light text-white flex items-center justify-center font-black text-sm border border-white/20 shadow-sm">
             🏛️
-          </div>
-          <div>
-            <span className="font-extrabold text-sm text-white block leading-tight">
-              Sử Ký Số • Trung Tâm Quản Trị Hệ Thống
-            </span>
-            <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              Hệ thống vận hành trực tuyến • Phiên làm việc Quản trị viên
-            </span>
           </div>
           <div>
             <span className="font-extrabold text-sm text-white block leading-tight">
@@ -599,6 +803,33 @@ export default function AdminDashboard({
           <Award className="w-3.5 h-3.5 text-gold" />
           <span>🎯 Trắc nghiệm theo bài ({quizzesList.length})</span>
         </button>
+        <button
+          onClick={() => setActiveTab('topics')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+            activeTab === 'topics'
+              ? 'bg-navy text-white shadow-sm ring-1 ring-gold/40 font-black'
+              : 'text-slate-400 hover:text-white hover:bg-slate-900'
+          }`}
+        >
+          <Compass className="w-3.5 h-3.5 text-gold" />
+          <span>📂 Quản lý Chủ đề ({topicsList.length})</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('contacts')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+            activeTab === 'contacts'
+              ? 'bg-navy text-white shadow-sm ring-1 ring-gold/40 font-black'
+              : 'text-slate-400 hover:text-white hover:bg-slate-900'
+          }`}
+        >
+          <Mail className="w-3.5 h-3.5 text-gold" />
+          <span>📬 Hộp thư Liên hệ ({contactsList.length})</span>
+          {unreadContactsCount > 0 && (
+            <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[10px] font-black animate-pulse">
+              {unreadContactsCount} mới
+            </span>
+          )}
+        </button>
         {onOpenBannerConfig && (
           <button
             onClick={onOpenBannerConfig}
@@ -614,7 +845,7 @@ export default function AdminDashboard({
       {activeTab === 'overview' && (
         <div className="space-y-8 animate-fade-in">
           {/* KPI Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <div className="bg-slate-900/90 p-5 rounded-3xl border border-slate-800 shadow-sm flex flex-col justify-between">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
@@ -649,7 +880,7 @@ export default function AdminDashboard({
                   {analytics?.kpis?.total_resources || resources.length}
                 </span>
                 <span className="text-xs font-bold text-slate-300 bg-slate-800 px-2 py-0.5 rounded-full">
-                  7 Chủ đề
+                  {topicsList.length} Chủ đề
                 </span>
               </div>
               <span className="text-[11px] text-slate-400 mt-1">Chuẩn hóa GDPT 2018</span>
@@ -693,6 +924,35 @@ export default function AdminDashboard({
                 </span>
               </div>
               <span className="text-[11px] text-slate-400 mt-1">Xoay 360°, đổi ánh sáng</span>
+            </div>
+
+            <div
+              onClick={() => setActiveTab('contacts')}
+              className="bg-slate-900/90 p-5 rounded-3xl border border-slate-800 shadow-sm flex flex-col justify-between cursor-pointer hover:border-gold/40 transition group"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider group-hover:text-gold transition">
+                  Hộp thư liên hệ
+                </span>
+                <div className="w-10 h-10 rounded-2xl bg-amber-950 text-amber-400 flex items-center justify-center border border-amber-800">
+                  <Mail className="w-5 h-5" />
+                </div>
+              </div>
+              <div className="mt-4 flex items-baseline justify-between">
+                <span className="text-3xl font-black text-white">
+                  {contactsList.length}
+                </span>
+                {unreadContactsCount > 0 ? (
+                  <span className="inline-flex items-center gap-0.5 text-xs font-bold text-rose-400 bg-rose-950/80 px-2 py-0.5 rounded-full border border-rose-800 animate-pulse">
+                    {unreadContactsCount} mới
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-0.5 text-xs font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-800">
+                    Đã xử lý
+                  </span>
+                )}
+              </div>
+              <span className="text-[11px] text-slate-400 mt-1">Từ trang Liên hệ người dùng</span>
             </div>
           </div>
 
@@ -1624,6 +1884,489 @@ export default function AdminDashboard({
         </div>
       )}
 
+      {/* ================= TAB: TOPICS MANAGEMENT (CHỦ ĐỀ) ================= */}
+      {activeTab === 'topics' && (
+        <div className="space-y-6 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/90 p-6 rounded-3xl border border-slate-800">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-gold/15 text-gold border border-gold/30">
+                  GDPT 2018 Lịch Sử 10
+                </span>
+                <span className="text-xs text-slate-400">• Tổng số: {topicsList.length} chủ đề</span>
+              </div>
+              <h3 className="text-xl font-extrabold text-white">Quản Lý Danh Sách & Tên Chủ Đề</h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Cho phép đổi tên chủ đề, biên tập nội dung tóm tắt và cập nhật ảnh bìa đại diện trực quan.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <button
+                onClick={handleOpenNewTopic}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 text-xs font-black transition shadow-sm active:scale-95"
+              >
+                <PlusCircle className="w-4 h-4" />
+                <span>Thêm Chủ Đề Mới</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Search bar */}
+          <div className="flex items-center gap-3 bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+              <input
+                type="text"
+                value={topicSearch}
+                onChange={(e) => setTopicSearch(e.target.value)}
+                placeholder="Tìm chủ đề theo tên hoặc nội dung..."
+                className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-gold"
+              />
+            </div>
+          </div>
+
+          {/* Topics Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredTopics.map((topic) => {
+              const count = resources.filter((r) => r.topic_id === topic.id).length;
+              return (
+                <div
+                  key={topic.id}
+                  className="bg-slate-900/90 rounded-2xl border border-slate-800 overflow-hidden flex flex-col justify-between hover:border-slate-700 transition group shadow-sm"
+                >
+                  <div>
+                    {/* Topic Cover Image */}
+                    <div className="relative h-40 bg-slate-950 overflow-hidden">
+                      <img
+                        src={topic.img || 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=600&q=80'}
+                        alt={topic.title}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=600&q=80';
+                        }}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
+                      <div className="absolute top-3 left-3 bg-slate-950/90 backdrop-blur-md text-gold text-xs font-black px-2.5 py-1 rounded-lg border border-gold/30">
+                        Chủ đề #{topic.id}
+                      </div>
+                      <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-md border border-white/10 flex items-center gap-1">
+                        <BookOpen className="w-3 h-3 text-gold" />
+                        <span>{count} tư liệu</span>
+                      </div>
+                    </div>
+
+                    {/* Topic Info */}
+                    <div className="p-4 space-y-2">
+                      <h4 className="font-extrabold text-sm text-white group-hover:text-gold transition">
+                        {topic.title}
+                      </h4>
+                      <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed">
+                        {topic.description || 'Chưa có tóm tắt nội dung chủ đề.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Actions Footer */}
+                  <div className="p-3.5 bg-slate-950/70 border-t border-slate-800/80 flex items-center justify-between gap-2">
+                    <span className="text-[11px] text-slate-500 font-mono">ID: {topic.id}</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleOpenEditTopic(topic)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gold/15 hover:bg-gold text-amber-300 hover:text-slate-950 text-xs font-bold transition cursor-pointer"
+                        title="Đổi tên & chỉnh sửa chủ đề"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Đổi tên / Sửa</span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteTopic(topic)}
+                        className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white transition cursor-pointer"
+                        title="Xóa chủ đề này"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ================= TAB: CONTACTS & FEEDBACK MANAGEMENT ================= */}
+      {activeTab === 'contacts' && (
+        <div className="space-y-6 animate-fade-in">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/90 p-6 rounded-3xl border border-slate-800">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-gold/15 text-gold border border-gold/30">
+                  Hộp Thư Tiếp Nhận
+                </span>
+                {unreadContactsCount > 0 && (
+                  <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-rose-500 text-white animate-pulse">
+                    {unreadContactsCount} tin nhắn mới
+                  </span>
+                )}
+              </div>
+              <h3 className="text-xl font-extrabold text-white">Hộp Thư Liên Hệ & Đóng Góp Ý Kiến</h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Danh sách liên hệ, câu chuyện đóng góp và yêu cầu hỗ trợ gửi từ trang Liên hệ của Sử Ký Số.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={fetchDashboardData}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition border border-slate-700"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                <span>Làm mới hộp thư</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Filters & Search */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
+            <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs shrink-0">
+              <button
+                onClick={() => setContactStatusFilter('all')}
+                className={`px-3 py-1.5 rounded-lg font-bold transition ${
+                  contactStatusFilter === 'all'
+                    ? 'bg-navy text-white shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Tất cả ({contactsList.length})
+              </button>
+              <button
+                onClick={() => setContactStatusFilter('new')}
+                className={`px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1 ${
+                  contactStatusFilter === 'new'
+                    ? 'bg-rose-950 text-rose-300 border border-rose-800 shadow-sm'
+                    : 'text-slate-400 hover:text-rose-300'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-rose-500" />
+                <span>Chưa xử lý ({contactsList.filter((c) => c.status === 'new').length})</span>
+              </button>
+              <button
+                onClick={() => setContactStatusFilter('replied')}
+                className={`px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1 ${
+                  contactStatusFilter === 'replied'
+                    ? 'bg-emerald-950 text-emerald-300 border border-emerald-800 shadow-sm'
+                    : 'text-slate-400 hover:text-emerald-300'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span>Đã phản hồi ({contactsList.filter((c) => c.status === 'replied').length})</span>
+              </button>
+            </div>
+
+            <div className="relative flex-1 max-w-md">
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+              <input
+                type="text"
+                value={contactSearch}
+                onChange={(e) => setContactSearch(e.target.value)}
+                placeholder="Tìm theo họ tên, SĐT, email, nội dung..."
+                className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-gold"
+              />
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="bg-slate-900/90 rounded-3xl border border-slate-800 overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs text-slate-300">
+                <thead className="bg-slate-950 text-slate-400 uppercase font-black tracking-wider text-[10px] border-b border-slate-800">
+                  <tr>
+                    <th className="py-3 px-4">Trạng thái</th>
+                    <th className="py-3 px-4">Người gửi & Liên hệ</th>
+                    <th className="py-3 px-4">Nội dung tin nhắn</th>
+                    <th className="py-3 px-4">Thời gian</th>
+                    <th className="py-3 px-4">Ghi chú xử lý</th>
+                    <th className="py-3 px-4 text-right">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/80">
+                  {filteredContacts.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-12 text-center text-slate-500 font-medium">
+                        Không có tin nhắn liên hệ nào phù hợp.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredContacts.map((contact) => (
+                      <tr
+                        key={contact.id}
+                        className={`hover:bg-slate-800/50 transition ${
+                          contact.status === 'new' ? 'bg-amber-950/10' : ''
+                        }`}
+                      >
+                        <td className="py-3 px-4 whitespace-nowrap">
+                          {contact.status === 'new' ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-rose-950/80 text-rose-300 border border-rose-800">
+                              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+                              Chưa xử lý
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-950/80 text-emerald-300 border border-emerald-800">
+                              <CheckCircle className="w-3 h-3 text-emerald-400" />
+                              Đã phản hồi
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="font-extrabold text-white text-xs">{contact.full_name}</div>
+                          <div className="text-[11px] text-amber-300 font-mono mt-0.5 flex items-center gap-1">
+                            <Phone className="w-3 h-3 shrink-0" />
+                            <span>{contact.phone}</span>
+                          </div>
+                          {contact.email && (
+                            <div className="text-[11px] text-slate-400 font-mono flex items-center gap-1">
+                              <Mail className="w-3 h-3 shrink-0" />
+                              <span>{contact.email}</span>
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 max-w-xs">
+                          <p className="line-clamp-2 text-slate-200 leading-relaxed">
+                            {contact.content}
+                          </p>
+                        </td>
+                        <td className="py-3 px-4 whitespace-nowrap text-[11px] text-slate-400 font-mono">
+                          {new Date(contact.created_at).toLocaleDateString('vi-VN', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </td>
+                        <td className="py-3 px-4 max-w-[180px]">
+                          {contact.admin_note ? (
+                            <span className="text-[11px] text-slate-300 line-clamp-1 italic bg-slate-950 px-2 py-1 rounded-lg border border-slate-800 block">
+                              📝 {contact.admin_note}
+                            </span>
+                          ) : (
+                            <span className="text-[11px] text-slate-600 italic">Chưa có ghi chú</span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              onClick={() => handleOpenContactDetail(contact)}
+                              className="px-2.5 py-1.5 rounded-lg bg-gold/15 hover:bg-gold text-amber-300 hover:text-slate-950 text-xs font-bold transition flex items-center gap-1"
+                              title="Xem chi tiết tin nhắn"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>Chi tiết</span>
+                            </button>
+                            <button
+                              onClick={() =>
+                                handleUpdateContactStatus(
+                                  contact.id,
+                                  contact.status === 'new' ? 'replied' : 'new'
+                                )
+                              }
+                              className={`p-1.5 rounded-lg transition ${
+                                contact.status === 'new'
+                                  ? 'bg-emerald-950/60 hover:bg-emerald-900 text-emerald-400'
+                                  : 'bg-slate-800 hover:bg-slate-700 text-slate-400'
+                              }`}
+                              title={
+                                contact.status === 'new'
+                                  ? 'Đánh dấu đã phản hồi'
+                                  : 'Đổi về chưa xử lý'
+                              }
+                            >
+                              <CheckCircle className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteContact(contact.id)}
+                              className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-950 hover:text-rose-300 transition"
+                              title="Xóa tin nhắn này"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= MODAL: CONTACT MESSAGE DETAIL & ADMIN ACTION ================= */}
+      {viewingContact && (
+        <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-slate-900 border border-slate-800 rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl text-slate-100 flex flex-col max-h-[90vh]"
+          >
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/70">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-gold/15 text-gold border border-gold/30 flex items-center justify-center font-bold">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base text-white">
+                    Chi Tiết Liên Hệ #{viewingContact.id}
+                  </h3>
+                  <span className="text-xs text-slate-400">
+                    Gửi lúc {new Date(viewingContact.created_at).toLocaleString('vi-VN')}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setViewingContact(null)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 space-y-5 overflow-y-auto flex-1">
+              {/* Sender Details Card */}
+              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                  <span className="text-slate-500 block font-bold mb-0.5">Họ và tên người gửi:</span>
+                  <span className="font-black text-white text-sm">{viewingContact.full_name}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block font-bold mb-0.5">Trạng thái:</span>
+                  {viewingContact.status === 'new' ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-950 text-rose-300 border border-rose-800">
+                      Chưa xử lý
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-950 text-emerald-300 border border-emerald-800">
+                      Đã phản hồi
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <span className="text-slate-500 block font-bold mb-0.5">Số điện thoại:</span>
+                  <a
+                    href={`tel:${viewingContact.phone}`}
+                    className="font-bold text-amber-300 hover:underline flex items-center gap-1"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>{viewingContact.phone}</span>
+                  </a>
+                </div>
+                <div>
+                  <span className="text-slate-500 block font-bold mb-0.5">Email liên hệ:</span>
+                  {viewingContact.email ? (
+                    <a
+                      href={`mailto:${viewingContact.email}`}
+                      className="font-bold text-blue-400 hover:underline flex items-center gap-1 truncate"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                      <span>{viewingContact.email}</span>
+                    </a>
+                  ) : (
+                    <span className="text-slate-600 italic">Không cung cấp</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Message Content */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block">
+                  Nội dung tin nhắn / câu chuyện gửi về:
+                </label>
+                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-xs sm:text-sm text-slate-200 leading-relaxed whitespace-pre-line">
+                  {viewingContact.content}
+                </div>
+              </div>
+
+              {/* Admin Internal Note */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-amber-300 uppercase tracking-wider block">
+                    Ghi chú xử lý của Quản trị viên:
+                  </label>
+                  <span className="text-[11px] text-slate-500">Nội bộ (không gửi cho khách)</span>
+                </div>
+                <textarea
+                  rows={3}
+                  value={adminNoteInput}
+                  onChange={(e) => setAdminNoteInput(e.target.value)}
+                  placeholder="Ví dụ: Đã gọi điện trao đổi tư liệu Trống đồng; Giáo viên trường THPT Chu Văn An..."
+                  className="w-full px-4 py-2.5 rounded-2xl bg-slate-950 border border-slate-700 text-white text-xs placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-gold"
+                />
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    disabled={savingNote}
+                    onClick={() => handleSaveContactNote(viewingContact.id)}
+                    className="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition border border-slate-700 active:scale-95 disabled:opacity-50"
+                  >
+                    {savingNote ? 'Đang lưu...' : 'Lưu ghi chú'}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 bg-slate-950 border-t border-slate-800 flex items-center justify-between gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => handleDeleteContact(viewingContact.id)}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-950/60 hover:bg-rose-900 text-rose-300 text-xs font-bold transition border border-rose-800"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Xóa liên hệ</span>
+              </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleUpdateContactStatus(
+                      viewingContact.id,
+                      viewingContact.status === 'new' ? 'replied' : 'new',
+                      adminNoteInput
+                    )
+                  }
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition ${
+                    viewingContact.status === 'new'
+                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                      : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                  }`}
+                >
+                  <CheckCircle className="w-3.5 h-3.5" />
+                  <span>
+                    {viewingContact.status === 'new'
+                      ? 'Đánh dấu Đã phản hồi'
+                      : 'Đổi về Chưa xử lý'}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewingContact(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition"
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ================= MODAL: EDIT USER (HỌ TÊN, ROLE & CHANGE PASSWORD) ================= */}
       {editingUser && (
         <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
@@ -2019,6 +2762,18 @@ export default function AdminDashboard({
         onSave={handleSaveQuiz}
         defaultLesson={quizLessonFilter !== 'all' ? quizLessonFilter : ''}
         allResources={resources}
+      />
+
+      {/* ================= TOPIC EDITOR / RENAME MODAL ================= */}
+      <TopicEditorModal
+        topic={editingTopic}
+        isOpen={isTopicModalOpen}
+        onClose={() => {
+          setIsTopicModalOpen(false);
+          setEditingTopic(null);
+        }}
+        onSave={handleSaveTopic}
+        authToken={authToken}
       />
     </div>
   );

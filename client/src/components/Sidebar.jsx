@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Compass, BookOpen, Box, GraduationCap, Users, Info, Lightbulb, LayoutDashboard } from 'lucide-react';
+import { Home, Compass, BookOpen, Box, GraduationCap, Users, Info, Lightbulb, LayoutDashboard, Mail } from 'lucide-react';
 
 export default function Sidebar({ stats, currentUser }) {
   const isAdmin = currentUser?.role === 'admin';
@@ -13,6 +13,7 @@ export default function Sidebar({ stats, currentUser }) {
     { to: '/studio-3d', label: 'Studio Hiện vật 3D', icon: Box, count: stats?.artifacts_3d, badge: '3D' },
     { to: '/giao-vien', label: 'Dành cho giáo viên', icon: GraduationCap },
     { to: '/hoc-sinh', label: 'Dành cho học sinh', icon: Users },
+    { to: '/lien-he', label: 'Liên hệ & Góp ý', icon: Mail },
     { to: '/gioi-thieu', label: 'Giới thiệu dự án', icon: Info },
   ];
 

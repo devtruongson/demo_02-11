@@ -4,7 +4,7 @@ import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Landmark, Compass, BookOpen, GraduationCap, Users, Box,
   ShieldCheck, User, LogOut, LayoutDashboard, LogIn, ChevronDown, UserCheck,
-  Menu, X, Info, Sparkles
+  Menu, X, Info, Sparkles, Mail
 } from 'lucide-react';
 
 export default function Navbar({
@@ -47,6 +47,7 @@ export default function Navbar({
     { to: '/studio-3d', label: 'Studio 3D', icon: Box, badge: 'Mới' },
     { to: '/giao-vien', label: 'Giáo viên', icon: GraduationCap },
     { to: '/hoc-sinh', label: 'Học sinh', icon: Users },
+    { to: '/lien-he', label: 'Liên hệ', icon: Mail },
   ];
 
   // Close dropdown on click outside
