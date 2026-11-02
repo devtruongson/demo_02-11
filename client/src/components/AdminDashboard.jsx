@@ -3069,10 +3069,23 @@ export default function AdminDashboard({
         assignment={viewingSubmissionsAssignment}
         onClose={() => setViewingSubmissionsAssignment(null)}
         authToken={authToken}
-        onViewStudentDetail={(submission) => {
+        onViewStudentDetail={(subOrAssignId, maybeStudentId) => {
+          let assignmentId = viewingSubmissionsAssignment?.id;
+          let studentId = null;
+
+          if (typeof subOrAssignId === 'number' && maybeStudentId !== undefined) {
+            assignmentId = subOrAssignId;
+            studentId = maybeStudentId;
+          } else if (subOrAssignId && typeof subOrAssignId === 'object') {
+            studentId = subOrAssignId.student_id;
+            assignmentId = subOrAssignId.assignment_id || viewingSubmissionsAssignment?.id;
+          } else {
+            studentId = subOrAssignId;
+          }
+
           setReviewingStudentExam({
-            assignmentId: viewingSubmissionsAssignment.id,
-            studentId: submission.student_id
+            assignmentId,
+            studentId
           });
         }}
       />

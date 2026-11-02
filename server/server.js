@@ -2639,6 +2639,17 @@ async function initExamAssignmentsTable() {
 }
 initExamAssignmentsTable();
 
+// Safe JSON parser for MySQL JSON columns
+function safeParseJson(value, fallback = []) {
+  if (value === null || value === undefined) return fallback;
+  if (typeof value === 'object') return value;
+  try {
+    return JSON.parse(value);
+  } catch (e) {
+    return fallback;
+  }
+}
+
 // GET /api/users/students (Teacher or Admin: get list of students to assign)
 app.get('/api/users/students', requireTeacherOrAdmin, async (req, res) => {
   try {
@@ -2670,8 +2681,8 @@ app.get('/api/exam-assignments', requireAuth, async (req, res) => {
 
       const formatted = assignments.map((a) => ({
         ...a,
-        question_ids: typeof a.question_ids === 'string' ? JSON.parse(a.question_ids) : a.question_ids,
-        assigned_student_ids: typeof a.assigned_student_ids === 'string' ? JSON.parse(a.assigned_student_ids) : a.assigned_student_ids
+        question_ids: safeParseJson(a.question_ids),
+        assigned_student_ids: safeParseJson(a.assigned_student_ids)
       }));
 
       return res.json(formatted);
@@ -2704,8 +2715,8 @@ app.get('/api/exam-assignments', requireAuth, async (req, res) => {
     // Filter assignments assigned to this student
     const studentExams = assignments
       .map((a) => {
-        const qIds = typeof a.question_ids === 'string' ? JSON.parse(a.question_ids) : a.question_ids;
-        const studentIds = typeof a.assigned_student_ids === 'string' ? JSON.parse(a.assigned_student_ids) : a.assigned_student_ids;
+        const qIds = safeParseJson(a.question_ids);
+        const studentIds = safeParseJson(a.assigned_student_ids);
         return {
           ...a,
           question_ids: qIds,
@@ -2738,7 +2749,7 @@ app.get('/api/exam-assignments/:id/take', requireAuth, async (req, res) => {
     }
 
     const assignment = rows[0];
-    const studentIds = typeof assignment.assigned_student_ids === 'string' ? JSON.parse(assignment.assigned_student_ids) : assignment.assigned_student_ids;
+    const studentIds = safeParseJson(assignment.assigned_student_ids);
 
     // Check if student is authorized to take this exam
     const isAssigned = Array.isArray(studentIds) && (studentIds.includes('all') || studentIds.includes(userId) || studentIds.includes(String(userId)));
@@ -2756,7 +2767,7 @@ app.get('/api/exam-assignments/:id/take', requireAuth, async (req, res) => {
       });
     }
 
-    const qIds = typeof assignment.question_ids === 'string' ? JSON.parse(assignment.question_ids) : assignment.question_ids;
+    const qIds = safeParseJson(assignment.question_ids);
     if (!Array.isArray(qIds) || qIds.length === 0) {
       return res.status(400).json({ error: 'Đề thi chưa có câu hỏi nào.' });
     }
@@ -2818,7 +2829,7 @@ app.post('/api/exam-assignments/:id/submit', requireAuth, async (req, res) => {
       return res.status(400).json({ error: 'Bạn đã nộp bài thi này trước đó rồi.' });
     }
 
-    const qIds = typeof assignment.question_ids === 'string' ? JSON.parse(assignment.question_ids) : assignment.question_ids;
+    const qIds = safeParseJson(assignment.question_ids);
     if (!Array.isArray(qIds) || qIds.length === 0) {
       return res.status(400).json({ error: 'Đề thi không có câu hỏi.' });
     }
@@ -2897,33 +2908,58 @@ app.get('/api/exam-assignments/:id/result', requireAuth, async (req, res) => {
   try {
     const id = Number(req.params.id);
     const userId = req.user.id;
-    const requestedStudentId = req.query.student_id ? Number(req.query.student_id) : userId;
-
-    // Only allow teachers/admins to see other students' results
-    const targetStudentId = (req.user.role === 'admin' || req.user.role === 'teacher') ? requestedStudentId : userId;
-
-    const [subs] = await pool.query('SELECT * FROM exam_submissions WHERE assignment_id = ? AND student_id = ?', [id, targetStudentId]);
-    if (subs.length === 0) {
-      return res.status(404).json({ error: 'Chưa có kết quả làm bài cho bài thi này.' });
-    }
-
-    const sub = subs[0];
-    const answers = typeof sub.answers === 'string' ? JSON.parse(sub.answers) : sub.answers;
+    const isTeacherOrAdmin = req.user.role === 'admin' || req.user.role === 'teacher';
 
     const [rows] = await pool.query('SELECT title, description, duration_minutes, question_ids FROM exam_assignments WHERE id = ?', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy bài thi.' });
+    }
+
     const assignment = rows[0];
-    const qIds = typeof assignment.question_ids === 'string' ? JSON.parse(assignment.question_ids) : assignment.question_ids;
+    const qIds = safeParseJson(assignment.question_ids);
+
+    let sub = null;
+    if (isTeacherOrAdmin) {
+      if (req.query.student_id) {
+        const [subs] = await pool.query(
+          'SELECT * FROM exam_submissions WHERE assignment_id = ? AND student_id = ?',
+          [id, Number(req.query.student_id)]
+        );
+        if (subs.length > 0) sub = subs[0];
+      } else {
+        // If teacher/admin didn't supply student_id, find the latest submission for this exam if any
+        const [subs] = await pool.query(
+          'SELECT * FROM exam_submissions WHERE assignment_id = ? ORDER BY submitted_at DESC LIMIT 1',
+          [id]
+        );
+        if (subs.length > 0) sub = subs[0];
+      }
+    } else {
+      // Student: only their own submission
+      const [subs] = await pool.query(
+        'SELECT * FROM exam_submissions WHERE assignment_id = ? AND student_id = ?',
+        [id, userId]
+      );
+      if (subs.length > 0) sub = subs[0];
+    }
+
+    // If student has not submitted yet, return 404
+    if (!sub && !isTeacherOrAdmin) {
+      return res.status(404).json({ error: 'Bạn chưa hoàn thành bài thi này.' });
+    }
+
+    const answers = sub ? safeParseJson(sub.answers, {}) : {};
 
     const [trueQuestions] = await pool.query(
       `SELECT id, lesson, question, options, correct_index, explanation, difficulty 
        FROM quizzes 
        WHERE id IN (?)`,
-      [qIds]
+      [qIds.length > 0 ? qIds : [0]]
     );
 
     const gradedReview = trueQuestions.map((q) => {
-      const parsedOptions = typeof q.options === 'string' ? JSON.parse(q.options) : q.options;
-      const selectedIndex = answers[q.id] !== undefined ? Number(answers[q.id]) : null;
+      const parsedOptions = safeParseJson(q.options);
+      const selectedIndex = answers[q.id] !== undefined ? Number(answers[q.id]) : (sub ? null : q.correct_index);
       const isCorrect = selectedIndex !== null && selectedIndex === q.correct_index;
 
       return {
@@ -2946,7 +2982,7 @@ app.get('/api/exam-assignments/:id/result', requireAuth, async (req, res) => {
         description: assignment.description,
         duration_minutes: assignment.duration_minutes
       },
-      submission: {
+      submission: sub ? {
         id: sub.id,
         student_name: sub.student_name,
         score: sub.score,
@@ -2954,6 +2990,14 @@ app.get('/api/exam-assignments/:id/result', requireAuth, async (req, res) => {
         total_questions: sub.total_questions,
         time_spent_seconds: sub.time_spent_seconds,
         submitted_at: sub.submitted_at
+      } : {
+        id: 0,
+        student_name: 'Đáp án chuẩn (Xem trước đề thi)',
+        score: 10,
+        correct_count: trueQuestions.length,
+        total_questions: trueQuestions.length,
+        time_spent_seconds: 0,
+        submitted_at: new Date()
       },
       review: gradedReview
     });
@@ -2973,7 +3017,7 @@ app.get('/api/exam-assignments/:id/submissions', requireTeacherOrAdmin, async (r
     }
 
     const assignment = assignmentRows[0];
-    const assignedIds = typeof assignment.assigned_student_ids === 'string' ? JSON.parse(assignment.assigned_student_ids) : assignment.assigned_student_ids;
+    const assignedIds = safeParseJson(assignment.assigned_student_ids);
 
     // Fetch all submissions
     const [submissions] = await pool.query(
@@ -3057,8 +3101,8 @@ app.post('/api/exam-assignments', requireTeacherOrAdmin, async (req, res) => {
     const [newRow] = await pool.query('SELECT * FROM exam_assignments WHERE id = ?', [result.insertId]);
     res.status(201).json({
       ...newRow[0],
-      question_ids: JSON.parse(newRow[0].question_ids),
-      assigned_student_ids: JSON.parse(newRow[0].assigned_student_ids)
+      question_ids: safeParseJson(newRow[0].question_ids),
+      assigned_student_ids: safeParseJson(newRow[0].assigned_student_ids)
     });
   } catch (error) {
     console.error('Create exam assignment error:', error);
@@ -3127,8 +3171,8 @@ app.put('/api/exam-assignments/:id', requireTeacherOrAdmin, async (req, res) => 
     const [updated] = await pool.query('SELECT * FROM exam_assignments WHERE id = ?', [id]);
     res.json({
       ...updated[0],
-      question_ids: typeof updated[0].question_ids === 'string' ? JSON.parse(updated[0].question_ids) : updated[0].question_ids,
-      assigned_student_ids: typeof updated[0].assigned_student_ids === 'string' ? JSON.parse(updated[0].assigned_student_ids) : updated[0].assigned_student_ids
+      question_ids: safeParseJson(updated[0].question_ids),
+      assigned_student_ids: safeParseJson(updated[0].assigned_student_ids)
     });
   } catch (error) {
     console.error('Update exam assignment error:', error);

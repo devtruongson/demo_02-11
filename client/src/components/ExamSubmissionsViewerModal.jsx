@@ -249,8 +249,8 @@ export default function ExamSubmissionsViewerModal({
                           <td className="py-3 px-4 text-right">
                             {onViewStudentDetail && (
                               <button
-                                onClick={() => onViewStudentDetail(assignment.id, sub.student_id)}
-                                className="px-3 py-1.5 rounded-lg bg-gold/15 hover:bg-gold text-amber-300 hover:text-slate-950 font-bold transition flex items-center gap-1 ml-auto"
+                                onClick={() => onViewStudentDetail(sub, assignment)}
+                                className="px-3 py-1.5 rounded-lg bg-gold/15 hover:bg-gold text-amber-300 hover:text-slate-950 font-bold transition flex items-center gap-1 ml-auto cursor-pointer"
                                 title="Xem bài làm của học sinh"
                               >
                                 <Eye className="w-3.5 h-3.5" />
