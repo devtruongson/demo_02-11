@@ -62,24 +62,26 @@ export default function Navbar({
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs transition-all">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="h-20 flex items-center justify-between gap-4">
+      <div className="container mx-auto px-3.5 sm:px-6 lg:px-8">
+        <div className="h-16 sm:h-20 flex items-center justify-between gap-3 sm:gap-4">
           {/* Brand Logo with Link */}
           <Link
             to="/"
-            className="flex items-center gap-3.5 cursor-pointer group shrink-0"
+            className="flex items-center gap-2.5 sm:gap-3.5 cursor-pointer group shrink-0 min-w-0"
           >
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-navy to-navy-light text-white flex items-center justify-center text-xl shadow-md group-hover:scale-105 transition-transform duration-200 border border-white/20">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-navy to-navy-light text-white flex items-center justify-center text-lg sm:text-xl shadow-md group-hover:scale-105 transition-transform duration-200 border border-white/20 shrink-0">
               🏛️
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-black text-xl tracking-tight text-navy">Sử Ký Số</span>
-                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-gold/15 text-gold-dark border border-gold/30">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="font-black text-lg sm:text-xl tracking-tight text-navy">Sử Ký Số</span>
+                <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full bg-gold/15 text-gold-dark border border-gold/30 shrink-0">
                   Lịch sử 10
                 </span>
               </div>
-              <p className="text-[11px] font-medium text-slate-400">Kho học liệu số & Studio 3D GDPT 2018</p>
+              <p className="hidden sm:block text-[11px] font-medium text-slate-400 truncate">
+                Kho học liệu số & Studio 3D GDPT 2018
+              </p>
             </div>
           </Link>
 
@@ -259,21 +261,20 @@ export default function Navbar({
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={onOpenLogin}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-navy hover:bg-navy-light text-white transition shadow-sm active:scale-95"
-                >
-                  <LogIn className="w-3.5 h-3.5" />
-                  <span>Đăng Nhập</span>
-                </button>
-              </div>
+              <button
+                onClick={onOpenLogin}
+                className="hidden lg:flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-navy hover:bg-navy-light text-white transition shadow-sm active:scale-95 shrink-0"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Đăng Nhập</span>
+              </button>
             )}
+
             {/* Mobile Hamburger Toggle Button */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer"
+              className="lg:hidden p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 transition cursor-pointer shrink-0"
               aria-label="Mở menu điều hướng"
             >
               {mobileMenuOpen ? <X className="w-5 h-5 text-slate-800" /> : <Menu className="w-5 h-5 text-slate-800" />}
