@@ -1,0 +1,20 @@
+{
+  "name": "su-ky-so-server",
+  "version": "1.0.0",
+  "description": "Node.js Express + MySQL Backend for Su Ky So - Kho tu lieu Lich su 10",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.5.0",
+    "mysql2": "^3.12.0"
+  }
+}

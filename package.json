@@ -1,0 +1,12 @@
+{
+  "name": "su-ky-so-project",
+  "version": "1.0.0",
+  "description": "Sử Ký Số - Kho tư liệu Lịch sử 10 & Studio 3D (React Vite + Tailwind CSS + Node.js Express + MySQL)",
+  "scripts": {
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "seed": "python seed_db.py",
+    "start": "node server/server.js"
+  }
+}
+
