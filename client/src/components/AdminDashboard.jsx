@@ -12,6 +12,9 @@ import Artifact3DEditorModal from './Artifact3DEditorModal.jsx';
 import TeacherGuideEditorModal from './TeacherGuideEditorModal.jsx';
 import QuizEditorModal from './QuizEditorModal.jsx';
 import TopicEditorModal from './TopicEditorModal.jsx';
+import ExamAssignmentModal from './ExamAssignmentModal.jsx';
+import ExamSubmissionsViewerModal from './ExamSubmissionsViewerModal.jsx';
+import ExamTakingModal from './ExamTakingModal.jsx';
 import { formatYouTubeEmbedUrl } from '../utils/slugify.js';
 
 export default function AdminDashboard({
@@ -77,6 +80,14 @@ export default function AdminDashboard({
   const [viewingContact, setViewingContact] = useState(null);
   const [adminNoteInput, setAdminNoteInput] = useState('');
   const [savingNote, setSavingNote] = useState(false);
+
+  // Exam Assignments Management State
+  const [assignmentsList, setAssignmentsList] = useState([]);
+  const [assignmentSearch, setAssignmentSearch] = useState('');
+  const [editingAssignment, setEditingAssignment] = useState(null);
+  const [isAssignmentModalOpen, setIsAssignmentModalOpen] = useState(false);
+  const [viewingSubmissionsAssignment, setViewingSubmissionsAssignment] = useState(null);
+  const [reviewingStudentExam, setReviewingStudentExam] = useState(null);
 
   // User Management State (Edit name, role, change password)
   const [editingUser, setEditingUser] = useState(null);
@@ -165,7 +176,7 @@ export default function AdminDashboard({
     setLoading(true);
     try {
       const ts = Date.now();
-      const [analyticsRes, resRes, usersRes, artRes, teacherRes, quizRes, topicsRes, contactsRes, unreadRes] = await Promise.all([
+      const [analyticsRes, resRes, usersRes, artRes, teacherRes, quizRes, topicsRes, contactsRes, unreadRes, assignmentsRes] = await Promise.all([
         fetch(`/api/analytics/overview?_t=${ts}`).then((r) => r.json()),
         fetch(`/api/resources?_t=${ts}`).then((r) => r.json()),
         fetch(`/api/users?_t=${ts}`, {
@@ -180,7 +191,10 @@ export default function AdminDashboard({
         }).then((r) => (r.ok ? r.json() : [])),
         fetch(`/api/contacts/unread-count?_t=${ts}`, {
           headers: { Authorization: `Bearer ${authToken}` }
-        }).then((r) => (r.ok ? r.json() : { unread: 0 }))
+        }).then((r) => (r.ok ? r.json() : { unread: 0 })),
+        fetch(`/api/exam-assignments?_t=${ts}`, {
+          headers: { Authorization: `Bearer ${authToken}` }
+        }).then((r) => (r.ok ? r.json() : []))
       ]);
 
       setAnalytics(analyticsRes);
@@ -192,6 +206,7 @@ export default function AdminDashboard({
       setTopicsList(topicsRes);
       setContactsList(contactsRes);
       setUnreadContactsCount(unreadRes?.unread || 0);
+      setAssignmentsList(assignmentsRes);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
     } finally {
@@ -535,6 +550,72 @@ export default function AdminDashboard({
     }
   };
 
+  // Handlers for Exam Assignments
+  const handleOpenNewAssignment = () => {
+    setEditingAssignment(null);
+    setIsAssignmentModalOpen(true);
+  };
+
+  const handleOpenEditAssignment = (item) => {
+    setEditingAssignment(item);
+    setIsAssignmentModalOpen(true);
+  };
+
+  const handleSaveAssignment = async (payload, id) => {
+    const url = id ? `/api/exam-assignments/${id}` : '/api/exam-assignments';
+    const method = id ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Lỗi khi lưu bài thi');
+    }
+
+    await fetchDashboardData();
+  };
+
+  const handleDeleteAssignment = async (id, title) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa bài kiểm tra "${title}"? Mọi kết quả bài làm của học sinh cho bài này cũng sẽ bị xóa vĩnh viễn.`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/exam-assignments/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Lỗi khi xóa bài tập');
+      }
+
+      await fetchDashboardData();
+    } catch (err) {
+      alert('Xóa bài thi thất bại: ' + err.message);
+    }
+  };
+
+  // Filter exam assignments
+  const filteredAssignments = assignmentsList.filter((item) => {
+    if (!assignmentSearch.trim()) return true;
+    const q = assignmentSearch.toLowerCase();
+    return (
+      (item.title && item.title.toLowerCase().includes(q)) ||
+      (item.description && item.description.toLowerCase().includes(q))
+    );
+  });
+
   // Filter quizzes
   const filteredQuizzes = quizzesList.filter((q) => {
     const matchLesson = quizLessonFilter === 'all' || q.lesson === quizLessonFilter;
@@ -802,6 +883,17 @@ export default function AdminDashboard({
         >
           <Award className="w-3.5 h-3.5 text-gold" />
           <span>🎯 Trắc nghiệm theo bài ({quizzesList.length})</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('assignments')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+            activeTab === 'assignments'
+              ? 'bg-navy text-white shadow-sm ring-1 ring-gold/40 font-black'
+              : 'text-slate-400 hover:text-white hover:bg-slate-900'
+          }`}
+        >
+          <Award className="w-3.5 h-3.5 text-amber-400" />
+          <span>📝 Giao Bài & Đề Thi ({assignmentsList.length})</span>
         </button>
         <button
           onClick={() => setActiveTab('topics')}
@@ -1890,6 +1982,186 @@ export default function AdminDashboard({
         </div>
       )}
 
+      {/* ================= TAB: EXAM ASSIGNMENTS (GIAO BÀI & ĐỀ THI) ================= */}
+      {activeTab === 'assignments' && (
+        <div className="space-y-6 animate-fade-in">
+          {/* Header & Controls */}
+          <div className="bg-slate-900/90 p-6 rounded-3xl border border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-gold/20 text-gold border border-gold/30">
+                  <Award className="w-3.5 h-3.5" /> Quản Lý Đề Thi & Khảo Thí
+                </span>
+                <span className="text-xs text-slate-400">({filteredAssignments.length} bài kiểm tra)</span>
+              </div>
+              <h3 className="text-xl font-extrabold text-white">
+                Khởi Tạo Bài Kiểm Tra & Giao Cho Học Sinh
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Tạo bài thi từ ngân hàng trắc nghiệm GDPT 2018, chọn danh sách học sinh cần làm và theo dõi bảng điểm tự động.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Search */}
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Tìm đề thi..."
+                  value={assignmentSearch}
+                  onChange={(e) => setAssignmentSearch(e.target.value)}
+                  className="pl-9 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-gold w-48 sm:w-60"
+                />
+              </div>
+
+              {/* Add Assignment Button */}
+              <button
+                onClick={handleOpenNewAssignment}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 text-xs font-black transition shadow-sm active:scale-95"
+              >
+                <PlusCircle className="w-4 h-4" />
+                <span>+ Tạo Đề Thi & Giao Bài</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Table of Assignments */}
+          <div className="bg-slate-900/90 rounded-3xl border border-slate-800 overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs text-slate-300">
+                <thead className="bg-slate-950 text-slate-400 text-[11px] uppercase tracking-wider font-bold border-b border-slate-800">
+                  <tr>
+                    <th className="py-4 px-4">Tên Bài Kiểm Tra</th>
+                    <th className="py-4 px-4 text-center">Thời Lượng</th>
+                    <th className="py-4 px-4 text-center">Số Câu Hỏi</th>
+                    <th className="py-4 px-4">Hạn Nộp</th>
+                    <th className="py-4 px-4">Đối Tượng Giao</th>
+                    <th className="py-4 px-4 text-center">Đã Nộp</th>
+                    <th className="py-4 px-4 text-right">Thao Tác</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/60 font-medium">
+                  {filteredAssignments.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" className="py-12 text-center text-slate-500">
+                        Chưa có đề thi nào trong danh sách. Bấm <strong>"+ Tạo Đề Thi & Giao Bài"</strong> để khởi tạo bài thi đầu tiên.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredAssignments.map((item) => {
+                      const questionCount = Array.isArray(item.question_ids) ? item.question_ids.length : 0;
+                      const studentIds = item.assigned_student_ids || ['all'];
+                      const isAll = Array.isArray(studentIds) && studentIds.includes('all');
+                      const submissionCount = item.submission_count || 0;
+                      const isExpired = item.due_date && new Date(item.due_date) < new Date();
+
+                      return (
+                        <tr key={item.id} className="hover:bg-slate-800/50 transition group">
+                          <td className="py-3.5 px-4">
+                            <strong className="text-white font-bold block text-sm group-hover:text-gold transition">
+                              {item.title}
+                            </strong>
+                            {item.description && (
+                              <p className="text-slate-400 text-[11px] line-clamp-1 max-w-sm mt-0.5 font-normal">
+                                {item.description}
+                              </p>
+                            )}
+                          </td>
+
+                          <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-slate-950 text-slate-300 border border-slate-700">
+                              <Clock className="w-3 h-3 text-slate-400" />
+                              {item.duration_minutes || 15} phút
+                            </span>
+                          </td>
+
+                          <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-amber-950 text-amber-300 border border-amber-800">
+                              {questionCount} câu
+                            </span>
+                          </td>
+
+                          <td className="py-3.5 px-4 whitespace-nowrap text-[11px]">
+                            {item.due_date ? (
+                              <div className="space-y-0.5">
+                                <span className={isExpired ? 'text-rose-400 font-bold' : 'text-slate-300 font-medium'}>
+                                  {new Date(item.due_date).toLocaleString('vi-VN', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric'
+                                  })}
+                                </span>
+                                {isExpired && (
+                                  <span className="block text-[10px] text-rose-500 font-bold uppercase">
+                                    Đã kết thúc
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-slate-500 italic">Không thời hạn</span>
+                            )}
+                          </td>
+
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            {isAll ? (
+                              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-950 text-blue-300 border border-blue-800">
+                                👥 Toàn bộ học sinh
+                              </span>
+                            ) : (
+                              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-950 text-slate-300 border border-slate-700">
+                                🎯 {studentIds.length} học sinh
+                              </span>
+                            )}
+                          </td>
+
+                          <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                              {submissionCount} bài
+                            </span>
+                          </td>
+
+                          <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                onClick={() => setViewingSubmissionsAssignment(item)}
+                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-950 hover:bg-emerald-900 text-emerald-200 border border-emerald-800/80 transition text-xs font-bold"
+                                title="Xem bảng điểm & danh sách nộp bài"
+                              >
+                                <Eye className="w-3.5 h-3.5 text-emerald-400" />
+                                <span>Bảng điểm</span>
+                              </button>
+                              <button
+                                onClick={() => handleOpenEditAssignment(item)}
+                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-gold hover:text-slate-950 text-slate-200 transition text-xs font-bold"
+                                title="Chỉnh sửa bài thi & giao bài"
+                              >
+                                <Edit3 className="w-3.5 h-3.5" />
+                                <span>Sửa</span>
+                              </button>
+                              <button
+                                onClick={() => handleDeleteAssignment(item.id, item.title)}
+                                className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-950 hover:text-rose-300 transition"
+                                title="Xóa đề thi này"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ================= TAB: TOPICS MANAGEMENT (CHỦ ĐỀ) ================= */}
       {activeTab === 'topics' && (
         <div className="space-y-6 animate-fade-in">
@@ -2779,6 +3051,39 @@ export default function AdminDashboard({
           setEditingTopic(null);
         }}
         onSave={handleSaveTopic}
+        authToken={authToken}
+      />
+
+      {/* ================= EXAM ASSIGNMENT MODAL (CREATE & EDIT) ================= */}
+      <ExamAssignmentModal
+        isOpen={isAssignmentModalOpen}
+        assignment={editingAssignment}
+        onClose={() => setIsAssignmentModalOpen(false)}
+        onSave={handleSaveAssignment}
+        authToken={authToken}
+      />
+
+      {/* ================= SUBMISSIONS VIEWER MODAL ================= */}
+      <ExamSubmissionsViewerModal
+        isOpen={Boolean(viewingSubmissionsAssignment)}
+        assignment={viewingSubmissionsAssignment}
+        onClose={() => setViewingSubmissionsAssignment(null)}
+        authToken={authToken}
+        onViewStudentDetail={(submission) => {
+          setReviewingStudentExam({
+            assignmentId: viewingSubmissionsAssignment.id,
+            studentId: submission.student_id
+          });
+        }}
+      />
+
+      {/* ================= REVIEW STUDENT EXAM MODAL ================= */}
+      <ExamTakingModal
+        isOpen={Boolean(reviewingStudentExam)}
+        assignmentId={reviewingStudentExam?.assignmentId}
+        mode="review"
+        studentId={reviewingStudentExam?.studentId}
+        onClose={() => setReviewingStudentExam(null)}
         authToken={authToken}
       />
     </div>

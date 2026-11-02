@@ -119,6 +119,42 @@ function requireAdmin(req, res, next) {
   });
 }
 
+// Require Authenticated User Middleware
+function requireAuth(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = (authHeader && authHeader.split(' ')[1]) || req.headers['x-auth-token'];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Vui lòng đăng nhập để thực hiện thao tác này.' });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err || !user) {
+      return res.status(401).json({ error: 'Phiên đăng nhập đã hết hạn hoặc không hợp lệ.' });
+    }
+    req.user = user;
+    next();
+  });
+}
+
+// Require Teacher or Admin Middleware
+function requireTeacherOrAdmin(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = (authHeader && authHeader.split(' ')[1]) || req.headers['x-auth-token'];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Yêu cầu đăng nhập tài khoản Giáo viên hoặc Quản trị viên.' });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err || !user || !['admin', 'teacher'].includes(user.role)) {
+      return res.status(403).json({ error: 'Từ chối truy cập: Thao tác này chỉ dành cho Giáo viên hoặc Admin.' });
+    }
+    req.user = user;
+    next();
+  });
+}
+
 app.use(authenticateToken);
 
 // ==========================================
@@ -2524,6 +2560,598 @@ app.delete('/api/contacts/:id', requireAdmin, async (req, res) => {
     await logActivity(req.user?.username || 'admin', 'DELETE_CONTACT', `Xóa tin nhắn liên hệ ID ${id}`);
     res.json({ message: 'Xóa tin nhắn liên hệ thành công.' });
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// EXAM ASSIGNMENTS & STUDENT HOMEWORK SYSTEM
+// ==========================================
+
+async function initExamAssignmentsTable() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS exam_assignments (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        title VARCHAR(255) NOT NULL,
+        description TEXT NULL,
+        created_by INT NOT NULL,
+        created_by_name VARCHAR(255) NULL,
+        duration_minutes INT NOT NULL DEFAULT 15,
+        due_date DATETIME NULL,
+        question_ids JSON NOT NULL,
+        assigned_student_ids JSON NOT NULL,
+        is_active TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_created_by (created_by),
+        INDEX idx_created_at (created_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS exam_submissions (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        assignment_id INT NOT NULL,
+        student_id INT NOT NULL,
+        student_name VARCHAR(255) NOT NULL,
+        student_email VARCHAR(255) NULL,
+        answers JSON NOT NULL,
+        total_questions INT NOT NULL,
+        correct_count INT NOT NULL,
+        score DECIMAL(4, 2) NOT NULL,
+        time_spent_seconds INT NOT NULL DEFAULT 0,
+        submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY uk_assignment_student (assignment_id, student_id),
+        INDEX idx_assignment (assignment_id),
+        INDEX idx_student (student_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    // Seed sample exam assignment if table is empty
+    const [rows] = await pool.query('SELECT COUNT(*) as count FROM exam_assignments');
+    if (rows[0].count === 0) {
+      console.log('Seeding initial sample exam assignment...');
+      const [sampleQuizzes] = await pool.query('SELECT id FROM quizzes LIMIT 5');
+      const qIds = sampleQuizzes.map((q) => q.id);
+
+      if (qIds.length > 0) {
+        await pool.query(
+          `INSERT INTO exam_assignments 
+           (title, description, created_by, created_by_name, duration_minutes, due_date, question_ids, assigned_student_ids)
+           VALUES (?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY), ?, ?)`,
+          [
+            'Bài kiểm tra 15 phút: Văn minh Cổ trên đất nước Việt Nam',
+            'Bài tập trắc nghiệm củng cố kiến thức văn minh Đông Sơn, Sa Huỳnh và Óc Eo. Học sinh làm bài nghiêm túc và nộp đúng hạn.',
+            1,
+            'Thầy Nguyễn Văn An (Quản trị viên)',
+            15,
+            JSON.stringify(qIds),
+            JSON.stringify(['all'])
+          ]
+        );
+        console.log('Seeded sample exam assignment successfully.');
+      }
+    }
+  } catch (err) {
+    console.error('Error initializing exam tables:', err.message);
+  }
+}
+initExamAssignmentsTable();
+
+// GET /api/users/students (Teacher or Admin: get list of students to assign)
+app.get('/api/users/students', requireTeacherOrAdmin, async (req, res) => {
+  try {
+    const [students] = await pool.query(
+      'SELECT id, username, email, full_name, role, created_at FROM users WHERE role = "student" ORDER BY full_name ASC'
+    );
+    res.json(students);
+  } catch (error) {
+    console.error('Get students error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/exam-assignments (Teacher/Admin: get all assignments; Student: get assigned assignments + submission status)
+app.get('/api/exam-assignments', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    if (userRole === 'admin' || userRole === 'teacher') {
+      // Teachers and Admins see all assignments with submission statistics
+      const [assignments] = await pool.query(`
+        SELECT 
+          ea.*,
+          (SELECT COUNT(*) FROM exam_submissions es WHERE es.assignment_id = ea.id) as submissions_count
+        FROM exam_assignments ea
+        ORDER BY ea.created_at DESC
+      `);
+
+      const formatted = assignments.map((a) => ({
+        ...a,
+        question_ids: typeof a.question_ids === 'string' ? JSON.parse(a.question_ids) : a.question_ids,
+        assigned_student_ids: typeof a.assigned_student_ids === 'string' ? JSON.parse(a.assigned_student_ids) : a.assigned_student_ids
+      }));
+
+      return res.json(formatted);
+    }
+
+    // Student view: Get assignments assigned to this student (either explicitly or via 'all')
+    const [assignments] = await pool.query(
+      `SELECT 
+        ea.id,
+        ea.title,
+        ea.description,
+        ea.created_by_name,
+        ea.duration_minutes,
+        ea.due_date,
+        ea.question_ids,
+        ea.assigned_student_ids,
+        ea.created_at,
+        es.id as submission_id,
+        es.score,
+        es.correct_count,
+        es.total_questions,
+        es.submitted_at
+       FROM exam_assignments ea
+       LEFT JOIN exam_submissions es ON es.assignment_id = ea.id AND es.student_id = ?
+       WHERE ea.is_active = 1
+       ORDER BY ea.created_at DESC`,
+      [userId]
+    );
+
+    // Filter assignments assigned to this student
+    const studentExams = assignments
+      .map((a) => {
+        const qIds = typeof a.question_ids === 'string' ? JSON.parse(a.question_ids) : a.question_ids;
+        const studentIds = typeof a.assigned_student_ids === 'string' ? JSON.parse(a.assigned_student_ids) : a.assigned_student_ids;
+        return {
+          ...a,
+          question_ids: qIds,
+          assigned_student_ids: studentIds,
+          total_questions_count: Array.isArray(qIds) ? qIds.length : 0
+        };
+      })
+      .filter((a) => {
+        const ids = a.assigned_student_ids;
+        if (!Array.isArray(ids)) return false;
+        return ids.includes('all') || ids.includes(userId) || ids.includes(String(userId));
+      });
+
+    res.json(studentExams);
+  } catch (error) {
+    console.error('Get exam assignments error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/exam-assignments/:id/take (Student taking exam - sanitized questions without correct answers)
+app.get('/api/exam-assignments/:id/take', requireAuth, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const userId = req.user.id;
+
+    const [rows] = await pool.query('SELECT * FROM exam_assignments WHERE id = ? AND is_active = 1', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy bài thi hoặc bài thi đã bị đóng.' });
+    }
+
+    const assignment = rows[0];
+    const studentIds = typeof assignment.assigned_student_ids === 'string' ? JSON.parse(assignment.assigned_student_ids) : assignment.assigned_student_ids;
+
+    // Check if student is authorized to take this exam
+    const isAssigned = Array.isArray(studentIds) && (studentIds.includes('all') || studentIds.includes(userId) || studentIds.includes(String(userId)));
+    if (!isAssigned && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Bạn không nằm trong danh sách học sinh được giao bài thi này.' });
+    }
+
+    // Check if already submitted
+    const [subs] = await pool.query('SELECT id, score, submitted_at FROM exam_submissions WHERE assignment_id = ? AND student_id = ?', [id, userId]);
+    if (subs.length > 0) {
+      return res.status(400).json({
+        error: 'Bạn đã hoàn thành bài thi này rồi!',
+        already_submitted: true,
+        submission: subs[0]
+      });
+    }
+
+    const qIds = typeof assignment.question_ids === 'string' ? JSON.parse(assignment.question_ids) : assignment.question_ids;
+    if (!Array.isArray(qIds) || qIds.length === 0) {
+      return res.status(400).json({ error: 'Đề thi chưa có câu hỏi nào.' });
+    }
+
+    // Fetch questions from quizzes table, sanitize correct_index & explanation
+    const [questions] = await pool.query(
+      `SELECT id, lesson, question, options, difficulty, order_index 
+       FROM quizzes 
+       WHERE id IN (?)`,
+      [qIds]
+    );
+
+    // Keep the order of questions as specified in question_ids
+    const questionMap = new Map();
+    questions.forEach((q) => {
+      questionMap.set(q.id, {
+        ...q,
+        options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options
+      });
+    });
+
+    const orderedQuestions = qIds.map((qid) => questionMap.get(qid)).filter(Boolean);
+
+    res.json({
+      assignment: {
+        id: assignment.id,
+        title: assignment.title,
+        description: assignment.description,
+        created_by_name: assignment.created_by_name,
+        duration_minutes: assignment.duration_minutes,
+        due_date: assignment.due_date,
+        total_questions: orderedQuestions.length
+      },
+      questions: orderedQuestions
+    });
+  } catch (error) {
+    console.error('Take exam error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /api/exam-assignments/:id/submit (Student submits exam answers)
+app.post('/api/exam-assignments/:id/submit', requireAuth, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const userId = req.user.id;
+    const { answers = {}, time_spent_seconds = 0 } = req.body;
+
+    const [rows] = await pool.query('SELECT * FROM exam_assignments WHERE id = ?', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy bài thi.' });
+    }
+
+    const assignment = rows[0];
+
+    // Check if already submitted
+    const [existing] = await pool.query('SELECT id FROM exam_submissions WHERE assignment_id = ? AND student_id = ?', [id, userId]);
+    if (existing.length > 0) {
+      return res.status(400).json({ error: 'Bạn đã nộp bài thi này trước đó rồi.' });
+    }
+
+    const qIds = typeof assignment.question_ids === 'string' ? JSON.parse(assignment.question_ids) : assignment.question_ids;
+    if (!Array.isArray(qIds) || qIds.length === 0) {
+      return res.status(400).json({ error: 'Đề thi không có câu hỏi.' });
+    }
+
+    // Fetch true answers from quizzes
+    const [trueQuestions] = await pool.query(
+      `SELECT id, lesson, question, options, correct_index, explanation, difficulty 
+       FROM quizzes 
+       WHERE id IN (?)`,
+      [qIds]
+    );
+
+    let correctCount = 0;
+    const gradedReview = trueQuestions.map((q) => {
+      const parsedOptions = typeof q.options === 'string' ? JSON.parse(q.options) : q.options;
+      const selectedIndex = answers[q.id] !== undefined ? Number(answers[q.id]) : null;
+      const isCorrect = selectedIndex !== null && selectedIndex === q.correct_index;
+      if (isCorrect) correctCount++;
+
+      return {
+        id: q.id,
+        lesson: q.lesson,
+        question: q.question,
+        options: parsedOptions,
+        user_answer: selectedIndex,
+        correct_index: q.correct_index,
+        is_correct: isCorrect,
+        explanation: q.explanation,
+        difficulty: q.difficulty
+      };
+    });
+
+    const totalQuestions = trueQuestions.length;
+    const score = Number(((correctCount / totalQuestions) * 10).toFixed(2));
+
+    const [userRows] = await pool.query('SELECT full_name, email FROM users WHERE id = ?', [userId]);
+    const studentName = userRows[0]?.full_name || req.user.username;
+    const studentEmail = userRows[0]?.email || null;
+
+    await pool.query(
+      `INSERT INTO exam_submissions 
+       (assignment_id, student_id, student_name, student_email, answers, total_questions, correct_count, score, time_spent_seconds)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        id,
+        userId,
+        studentName,
+        studentEmail,
+        JSON.stringify(answers),
+        totalQuestions,
+        correctCount,
+        score,
+        time_spent_seconds
+      ]
+    );
+
+    await logActivity(req.user.username, 'SUBMIT_EXAM', `Học sinh ${studentName} hoàn thành bài thi ID ${id} (${score}đ)`);
+
+    res.json({
+      success: true,
+      message: 'Nộp bài thi thành công!',
+      score,
+      correct_count: correctCount,
+      total_questions: totalQuestions,
+      time_spent_seconds,
+      review: gradedReview
+    });
+  } catch (error) {
+    console.error('Submit exam error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/exam-assignments/:id/result (View completed exam result & explanations)
+app.get('/api/exam-assignments/:id/result', requireAuth, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const userId = req.user.id;
+    const requestedStudentId = req.query.student_id ? Number(req.query.student_id) : userId;
+
+    // Only allow teachers/admins to see other students' results
+    const targetStudentId = (req.user.role === 'admin' || req.user.role === 'teacher') ? requestedStudentId : userId;
+
+    const [subs] = await pool.query('SELECT * FROM exam_submissions WHERE assignment_id = ? AND student_id = ?', [id, targetStudentId]);
+    if (subs.length === 0) {
+      return res.status(404).json({ error: 'Chưa có kết quả làm bài cho bài thi này.' });
+    }
+
+    const sub = subs[0];
+    const answers = typeof sub.answers === 'string' ? JSON.parse(sub.answers) : sub.answers;
+
+    const [rows] = await pool.query('SELECT title, description, duration_minutes, question_ids FROM exam_assignments WHERE id = ?', [id]);
+    const assignment = rows[0];
+    const qIds = typeof assignment.question_ids === 'string' ? JSON.parse(assignment.question_ids) : assignment.question_ids;
+
+    const [trueQuestions] = await pool.query(
+      `SELECT id, lesson, question, options, correct_index, explanation, difficulty 
+       FROM quizzes 
+       WHERE id IN (?)`,
+      [qIds]
+    );
+
+    const gradedReview = trueQuestions.map((q) => {
+      const parsedOptions = typeof q.options === 'string' ? JSON.parse(q.options) : q.options;
+      const selectedIndex = answers[q.id] !== undefined ? Number(answers[q.id]) : null;
+      const isCorrect = selectedIndex !== null && selectedIndex === q.correct_index;
+
+      return {
+        id: q.id,
+        lesson: q.lesson,
+        question: q.question,
+        options: parsedOptions,
+        user_answer: selectedIndex,
+        correct_index: q.correct_index,
+        is_correct: isCorrect,
+        explanation: q.explanation,
+        difficulty: q.difficulty
+      };
+    });
+
+    res.json({
+      assignment: {
+        id,
+        title: assignment.title,
+        description: assignment.description,
+        duration_minutes: assignment.duration_minutes
+      },
+      submission: {
+        id: sub.id,
+        student_name: sub.student_name,
+        score: sub.score,
+        correct_count: sub.correct_count,
+        total_questions: sub.total_questions,
+        time_spent_seconds: sub.time_spent_seconds,
+        submitted_at: sub.submitted_at
+      },
+      review: gradedReview
+    });
+  } catch (error) {
+    console.error('Get exam result error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/exam-assignments/:id/submissions (Teacher or Admin: view all student submissions for an assignment)
+app.get('/api/exam-assignments/:id/submissions', requireTeacherOrAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const [assignmentRows] = await pool.query('SELECT * FROM exam_assignments WHERE id = ?', [id]);
+    if (assignmentRows.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy bài thi.' });
+    }
+
+    const assignment = assignmentRows[0];
+    const assignedIds = typeof assignment.assigned_student_ids === 'string' ? JSON.parse(assignment.assigned_student_ids) : assignment.assigned_student_ids;
+
+    // Fetch all submissions
+    const [submissions] = await pool.query(
+      'SELECT id, student_id, student_name, student_email, total_questions, correct_count, score, time_spent_seconds, submitted_at FROM exam_submissions WHERE assignment_id = ? ORDER BY score DESC, submitted_at ASC',
+      [id]
+    );
+
+    // Fetch all assigned students to see who hasn't submitted
+    let studentPoolQuery = 'SELECT id, username, email, full_name FROM users WHERE role = "student"';
+    let studentPoolParams = [];
+    if (Array.isArray(assignedIds) && !assignedIds.includes('all') && assignedIds.length > 0) {
+      studentPoolQuery += ' AND id IN (?)';
+      studentPoolParams.push(assignedIds);
+    }
+    const [allAssignedStudents] = await pool.query(studentPoolQuery, studentPoolParams.length > 0 ? studentPoolParams : undefined);
+
+    const submittedStudentIds = new Set(submissions.map((s) => s.student_id));
+    const unsubmittedStudents = allAssignedStudents.filter((st) => !submittedStudentIds.has(st.id));
+
+    res.json({
+      assignment: {
+        id: assignment.id,
+        title: assignment.title,
+        duration_minutes: assignment.duration_minutes,
+        due_date: assignment.due_date,
+        total_assigned: allAssignedStudents.length,
+        submitted_count: submissions.length
+      },
+      submissions,
+      unsubmitted_students: unsubmittedStudents
+    });
+  } catch (error) {
+    console.error('Get submissions error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /api/exam-assignments (Teacher or Admin: create exam assignment)
+app.post('/api/exam-assignments', requireTeacherOrAdmin, async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      duration_minutes = 15,
+      due_date,
+      question_ids = [],
+      assigned_student_ids = ['all']
+    } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({ error: 'Vui lòng nhập tiêu đề bài kiểm tra.' });
+    }
+    if (!Array.isArray(question_ids) || question_ids.length === 0) {
+      return res.status(400).json({ error: 'Vui lòng chọn ít nhất 1 câu hỏi trắc nghiệm từ ngân hàng câu hỏi.' });
+    }
+    if (!Array.isArray(assigned_student_ids) || assigned_student_ids.length === 0) {
+      return res.status(400).json({ error: 'Vui lòng chọn đối tượng học sinh được giao bài.' });
+    }
+
+    const [userRows] = await pool.query('SELECT full_name FROM users WHERE id = ?', [req.user.id]);
+    const creatorName = userRows[0]?.full_name || req.user.username;
+
+    const [result] = await pool.query(
+      `INSERT INTO exam_assignments 
+       (title, description, created_by, created_by_name, duration_minutes, due_date, question_ids, assigned_student_ids)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        title.trim(),
+        description ? description.trim() : null,
+        req.user.id,
+        creatorName,
+        Number(duration_minutes) || 15,
+        due_date || null,
+        JSON.stringify(question_ids),
+        JSON.stringify(assigned_student_ids)
+      ]
+    );
+
+    await logActivity(req.user.username, 'CREATE_EXAM', `Tạo và giao bài kiểm tra: ${title.trim()}`);
+
+    const [newRow] = await pool.query('SELECT * FROM exam_assignments WHERE id = ?', [result.insertId]);
+    res.status(201).json({
+      ...newRow[0],
+      question_ids: JSON.parse(newRow[0].question_ids),
+      assigned_student_ids: JSON.parse(newRow[0].assigned_student_ids)
+    });
+  } catch (error) {
+    console.error('Create exam assignment error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT /api/exam-assignments/:id (Teacher or Admin: update exam assignment)
+app.put('/api/exam-assignments/:id', requireTeacherOrAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const {
+      title,
+      description,
+      duration_minutes,
+      due_date,
+      question_ids,
+      assigned_student_ids,
+      is_active
+    } = req.body;
+
+    const [exists] = await pool.query('SELECT id, title FROM exam_assignments WHERE id = ?', [id]);
+    if (exists.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy bài kiểm tra cần sửa.' });
+    }
+
+    const updates = [];
+    const params = [];
+
+    if (title !== undefined) {
+      updates.push('title = ?');
+      params.push(title.trim());
+    }
+    if (description !== undefined) {
+      updates.push('description = ?');
+      params.push(description ? description.trim() : null);
+    }
+    if (duration_minutes !== undefined) {
+      updates.push('duration_minutes = ?');
+      params.push(Number(duration_minutes) || 15);
+    }
+    if (due_date !== undefined) {
+      updates.push('due_date = ?');
+      params.push(due_date || null);
+    }
+    if (question_ids !== undefined) {
+      updates.push('question_ids = ?');
+      params.push(JSON.stringify(question_ids));
+    }
+    if (assigned_student_ids !== undefined) {
+      updates.push('assigned_student_ids = ?');
+      params.push(JSON.stringify(assigned_student_ids));
+    }
+    if (is_active !== undefined) {
+      updates.push('is_active = ?');
+      params.push(is_active ? 1 : 0);
+    }
+
+    if (updates.length > 0) {
+      params.push(id);
+      await pool.query(`UPDATE exam_assignments SET ${updates.join(', ')} WHERE id = ?`, params);
+    }
+
+    await logActivity(req.user.username, 'UPDATE_EXAM', `Cập nhật bài kiểm tra ID ${id}: ${title || exists[0].title}`);
+
+    const [updated] = await pool.query('SELECT * FROM exam_assignments WHERE id = ?', [id]);
+    res.json({
+      ...updated[0],
+      question_ids: typeof updated[0].question_ids === 'string' ? JSON.parse(updated[0].question_ids) : updated[0].question_ids,
+      assigned_student_ids: typeof updated[0].assigned_student_ids === 'string' ? JSON.parse(updated[0].assigned_student_ids) : updated[0].assigned_student_ids
+    });
+  } catch (error) {
+    console.error('Update exam assignment error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE /api/exam-assignments/:id (Teacher or Admin: delete assignment)
+app.delete('/api/exam-assignments/:id', requireTeacherOrAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const [exists] = await pool.query('SELECT id, title FROM exam_assignments WHERE id = ?', [id]);
+    if (exists.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy bài kiểm tra cần xóa.' });
+    }
+
+    await pool.query('DELETE FROM exam_submissions WHERE assignment_id = ?', [id]);
+    await pool.query('DELETE FROM exam_assignments WHERE id = ?', [id]);
+    await logActivity(req.user.username, 'DELETE_EXAM', `Xóa bài kiểm tra ID ${id}: ${exists[0].title}`);
+
+    res.json({ message: 'Xóa bài kiểm tra và kết quả nộp bài thành công.' });
+  } catch (error) {
+    console.error('Delete exam assignment error:', error);
     res.status(500).json({ error: error.message });
   }
 });
