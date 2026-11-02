@@ -1,23 +1,143 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, NavLink, Link } from 'react-router-dom';
 import {
   GraduationCap, CheckCircle2, FileText, Sparkles, Layers, BookOpen,
-  ExternalLink, Lightbulb, HelpCircle, Award
+  ExternalLink, Lightbulb, HelpCircle, Award, PlusCircle, Edit3, Trash2,
+  ShieldCheck, RefreshCw, AlertCircle
 } from 'lucide-react';
+import TeacherGuideEditorModal from './TeacherGuideEditorModal.jsx';
 
-export default function TeachersView({ onExploreTopic }) {
+export default function TeachersView({ currentUser, authToken }) {
   const { tab = 'cam-nang' } = useParams();
+  const [materials, setMaterials] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+
+  const isAdmin = currentUser?.role === 'admin';
 
   const teacherTabs = [
-    { to: '/giao-vien/cam-nang', id: 'cam-nang', label: 'Cẩm Nang Sư Phạm', icon: BookOpen },
-    { to: '/giao-vien/ke-hoach-5512', id: 'ke-hoach-5512', label: 'Kế Hoạch Bài Dạy 5512', icon: FileText },
-    { to: '/giao-vien/ngan-hang-cau-hoi', id: 'ngan-hang-cau-hoi', label: 'Ngân Hàng Câu Hỏi & Đề Kiểm Tra', icon: HelpCircle }
+    { to: '/giao-vien/cam-nang', id: 'cam-nang', category: 'cam_nang', label: 'Cẩm Nang Sư Phạm', icon: BookOpen },
+    { to: '/giao-vien/ke-hoach-5512', id: 'ke-hoach-5512', category: 'ke_hoach_5512', label: 'Kế Hoạch Bài Dạy 5512', icon: FileText },
+    { to: '/giao-vien/ngan-hang-cau-hoi', id: 'ngan-hang-cau-hoi', category: 'ngan_hang_cau_hoi', label: 'Ngân Hàng Câu Hỏi & Đề Kiểm Tra', icon: HelpCircle }
   ];
+
+  const currentTabObj = teacherTabs.find((t) => t.id === tab) || teacherTabs[0];
+  const currentCategory = currentTabObj.category;
+
+  const fetchMaterials = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/teacher-materials?_t=${Date.now()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setMaterials(data);
+      }
+    } catch (err) {
+      console.error('Lỗi khi tải tài liệu sư phạm:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMaterials();
+  }, []);
+
+  const handleOpenAdd = () => {
+    setEditingItem(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (item) => {
+    setEditingItem(item);
+    setIsModalOpen(true);
+  };
+
+  const handleSaveMaterial = async (payload, id) => {
+    const url = id ? `/api/teacher-materials/${id}` : '/api/teacher-materials';
+    const method = id ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Lỗi lưu tài liệu');
+    }
+
+    await fetchMaterials();
+  };
+
+  const handleDeleteMaterial = async (id, title) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa mục "${title}" khỏi hệ thống?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/teacher-materials/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Lỗi khi xóa tài liệu');
+      }
+
+      await fetchMaterials();
+    } catch (err) {
+      alert('Xóa thất bại: ' + err.message);
+    }
+  };
+
+  // Filter materials for current tab
+  const tabMaterials = materials.filter((m) => m.category === currentCategory);
+
+  // Helper colors for Cam Nang cards
+  const getPillarColorClass = (idx) => {
+    const colors = [
+      { bg: 'bg-blue-50', text: 'text-blue-600', ring: 'ring-blue-100' },
+      { bg: 'bg-emerald-50', text: 'text-emerald-600', ring: 'ring-emerald-100' },
+      { bg: 'bg-amber-50', text: 'text-amber-600', ring: 'ring-amber-100' },
+      { bg: 'bg-purple-50', text: 'text-purple-600', ring: 'ring-purple-100' }
+    ];
+    return colors[idx % colors.length];
+  };
+
+  // Helper colors for question cards
+  const getQuestionStyle = (idx) => {
+    const styles = [
+      { bg: 'bg-blue-50/70', border: 'border-blue-200/70', text: 'text-blue-700' },
+      { bg: 'bg-emerald-50/70', border: 'border-emerald-200/70', text: 'text-emerald-700' },
+      { bg: 'bg-amber-50/70', border: 'border-amber-200/70', text: 'text-amber-700' }
+    ];
+    return styles[idx % styles.length];
+  };
+
+  // Parse extra_data safely
+  const parseExtra = (extra) => {
+    if (!extra) return {};
+    if (typeof extra === 'object') return extra;
+    try {
+      return JSON.parse(extra);
+    } catch {
+      return {};
+    }
+  };
 
   return (
     <div className="space-y-8 animate-fade-in max-w-5xl mx-auto">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-navy to-navy-light text-white p-8 rounded-3xl shadow-xl border border-white/10">
+      <div className="bg-gradient-to-r from-navy to-navy-light text-white p-8 rounded-3xl shadow-xl border border-white/10 relative overflow-hidden">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-gold/20 text-gold-light border border-gold/30 mb-3">
           <GraduationCap className="w-4 h-4" /> Không Gian Sư Phạm Lịch Sử 10
         </div>
@@ -51,66 +171,88 @@ export default function TeachersView({ onExploreTopic }) {
         </div>
       </div>
 
-      {/* TAB 1: CẨM NANG SƯ PHẠM */}
+      {/* Admin Quick Action Bar */}
+      {isAdmin && (
+        <div className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-300/40">
+          <div className="flex items-center gap-2 text-xs text-amber-900 font-bold">
+            <ShieldCheck className="w-4 h-4 text-amber-600" />
+            <span>Chế độ Quản trị viên: Bạn có thể trực tiếp sửa, xóa hoặc bổ sung tài liệu sư phạm cho tab này.</span>
+          </div>
+
+          <button
+            onClick={handleOpenAdd}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 text-xs font-black transition shadow-sm active:scale-95 shrink-0"
+          >
+            <PlusCircle className="w-3.5 h-3.5" />
+            <span>Thêm mục mới</span>
+          </button>
+        </div>
+      )}
+
+      {/* Loading state */}
+      {loading && tabMaterials.length === 0 && (
+        <div className="p-12 text-center text-slate-400 text-xs font-bold flex items-center justify-center gap-2">
+          <RefreshCw className="w-4 h-4 animate-spin text-gold" />
+          <span>Đang nạp dữ liệu sư phạm...</span>
+        </div>
+      )}
+
+      {/* ================= TAB 1: CẨM NANG SƯ PHẠM ================= */}
       {tab === 'cam-nang' && (
         <div className="space-y-6">
-          {/* 4 Pillars of Historical Competence */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-black">
-                1
-              </div>
-              <h3 className="font-extrabold text-base text-slate-800">
-                Tìm hiểu và Giải mã Tư liệu Lịch sử
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                Sử dụng các hiện vật (như Trống đồng Ngọc Lũ, Bia Võ Cạnh, Nhẫn vàng Óc Eo) để học sinh trực tiếp quan sát, nhận diện nguồn gốc, chất liệu và bối cảnh lịch sử thay vì chỉ đọc qua kênh chữ SGK.
-              </p>
-            </div>
+            {tabMaterials.map((item, idx) => {
+              const color = getPillarColorClass(idx);
+              return (
+                <div
+                  key={item.id}
+                  className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm space-y-3 relative group transition hover:shadow-md"
+                >
+                  {/* Admin Edit/Delete Controls */}
+                  {isAdmin && (
+                    <div className="absolute top-4 right-4 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
+                      <button
+                        onClick={() => handleOpenEdit(item)}
+                        title="Chỉnh sửa nội dung này"
+                        className="p-1.5 rounded-lg bg-slate-100 hover:bg-gold/30 text-slate-700 hover:text-slate-950 transition border border-slate-200"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteMaterial(item.id, item.title)}
+                        title="Xóa mục này"
+                        className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-rose-600 transition border border-slate-200"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
 
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black">
-                2
-              </div>
-              <h3 className="font-extrabold text-base text-slate-800">
-                Tái hiện & Nhận thức Không gian – Thời gian
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                Kết hợp Quả cầu 3D Hải trình Đông Nam Á để học sinh định vị các cảng thị cổ (Óc Eo, Srivijaya), nhận thức được vai trò của gió mùa và các tuyến giao thương đường biển trong việc tiếp nhận tôn giáo.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-black">
-                3
-              </div>
-              <h3 className="font-extrabold text-base text-slate-800">
-                Tư duy Phản biện & So sánh Lịch sử
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                So sánh sự tiếp biến tôn giáo: cách người Campuchia xây dựng Angkor Wat, người Indonesia xây Borobudur, người Chăm điêu khắc đài thờ Mỹ Sơn và người Việt tiếp thu Phật giáo Đại thừa.
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-sm space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-black">
-                4
-              </div>
-              <h3 className="font-extrabold text-base text-slate-800">
-                Giáo dục Ý thức Bảo tồn Di sản
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                Nâng cao trách nhiệm công dân đối với việc giữ gìn và phát huy các bảo vật quốc gia, di sản văn hóa thế giới trước tác động của chiến tranh, thời gian và thương mại hóa.
-              </p>
-            </div>
+                  <div className={`w-10 h-10 rounded-xl ${color.bg} ${color.text} flex items-center justify-center font-black`}>
+                    {item.badge || idx + 1}
+                  </div>
+                  <h3 className="font-extrabold text-base text-slate-800 pr-12">
+                    {item.title}
+                  </h3>
+                  {item.subtitle && (
+                    <p className="text-[11px] font-bold text-gold-dark">
+                      {item.subtitle}
+                    </p>
+                  )}
+                  <p className="text-xs text-slate-600 leading-relaxed font-normal whitespace-pre-line">
+                    {item.content}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {/* TAB 2: KẾ HOẠCH BÀI DẠY 5512 */}
+      {/* ================= TAB 2: KẾ HOẠCH BÀI DẠY 5512 ================= */}
       {tab === 'ke-hoach-5512' && (
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-6">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-4">
             <div>
               <span className="text-xs font-bold text-gold-dark uppercase tracking-wider">
                 Khung kế hoạch bài dạy mẫu (Phụ lục IV Công văn 5512/BGDĐT)
@@ -121,47 +263,73 @@ export default function TeachersView({ onExploreTopic }) {
             </div>
             <Link
               to="/kho-tu-lieu?topic=4"
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-navy text-white hover:bg-navy-light transition shadow"
+              className="px-4 py-2 rounded-xl text-xs font-bold bg-navy text-white hover:bg-navy-light transition shadow text-center inline-block"
             >
               Mở kho tư liệu Chủ đề 4
             </Link>
           </div>
 
           <div className="space-y-4 text-xs">
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70">
-              <h4 className="font-bold text-sm text-navy mb-1.5 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span>Hoạt động 1: Khởi động (Xác định vấn đề học tập)</span>
-              </h4>
-              <p className="text-slate-600 leading-relaxed">
-                <strong>Kỹ thuật:</strong> Trình chiếu mô hình 3D Trống đồng Ngọc Lũ và Quả cầu 3D Hải trình biển. Yêu cầu học sinh quan sát trong 2 phút và viết ra 3 điều ấn tượng nhất về trình độ của người xưa.
-              </p>
-            </div>
+            {tabMaterials.map((act) => {
+              const extra = parseExtra(act.extra_data);
+              return (
+                <div
+                  key={act.id}
+                  className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 relative group transition hover:border-slate-300 hover:bg-slate-50/80"
+                >
+                  {isAdmin && (
+                    <div className="absolute top-3 right-3 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
+                      <button
+                        onClick={() => handleOpenEdit(act)}
+                        title="Chỉnh sửa hoạt động này"
+                        className="p-1.5 rounded-lg bg-white hover:bg-gold/30 text-slate-700 hover:text-slate-950 transition border border-slate-200 shadow-xs"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteMaterial(act.id, act.title)}
+                        title="Xóa hoạt động này"
+                        className="p-1.5 rounded-lg bg-white hover:bg-rose-100 text-slate-700 hover:text-rose-600 transition border border-slate-200 shadow-xs"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
 
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70">
-              <h4 className="font-bold text-sm text-navy mb-1.5 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span>Hoạt động 2: Hình thành kiến thức mới (Khám phá tư liệu)</span>
-              </h4>
-              <p className="text-slate-600 leading-relaxed">
-                <strong>Phương pháp chuyên gia:</strong> Chia lớp thành 4 nhóm nghiên cứu 4 trạm di sản số: Trạm 1 (Angkor Wat), Trạm 2 (Borobudur), Trạm 3 (Thánh địa Mỹ Sơn), Trạm 4 (Óc Eo Phù Nam). Học sinh tổng hợp phiếu học tập qua website.
-              </p>
-            </div>
+                  <h4 className="font-bold text-sm text-navy mb-1.5 flex items-center gap-2 pr-14">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                    <span>{act.title}</span>
+                  </h4>
 
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70">
-              <h4 className="font-bold text-sm text-navy mb-1.5 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span>Hoạt động 3: Luyện tập & Đánh giá năng lực</span>
-              </h4>
-              <p className="text-slate-600 leading-relaxed">
-                Học sinh làm bài trắc nghiệm tương tác trực tuyến trên hệ thống, phân tích các bức phù điêu để giải mã ảnh hưởng của văn hóa Ấn Độ.
-              </p>
-            </div>
+                  {extra.technique && (
+                    <div className="mb-2 text-slate-700 font-bold bg-white p-2.5 rounded-xl border border-slate-200/80">
+                      {extra.technique}
+                    </div>
+                  )}
+
+                  <p className="text-slate-600 leading-relaxed whitespace-pre-line">
+                    {act.content}
+                  </p>
+
+                  {extra.topic_url && (
+                    <div className="mt-2 pt-2 border-t border-slate-200/60">
+                      <Link
+                        to={extra.topic_url}
+                        className="inline-flex items-center gap-1 font-bold text-navy hover:text-gold-dark transition text-[11px]"
+                      >
+                        <span>Mở tư liệu tham khảo liên kết</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {/* TAB 3: NGÂN HÀNG CÂU HỎI TRẮC NGHIỆM */}
+      {/* ================= TAB 3: NGÂN HÀNG CÂU HỎI TRẮC NGHIỆM ================= */}
       {tab === 'ngan-hang-cau-hoi' && (
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-6">
           <div>
@@ -174,38 +342,62 @@ export default function TeachersView({ onExploreTopic }) {
           </div>
 
           <div className="space-y-4 text-xs">
-            <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/70 space-y-2">
-              <span className="font-bold text-blue-700 uppercase tracking-wider text-[10px]">Cấp độ 1: Nhận biết</span>
-              <p className="font-bold text-slate-800">
-                Câu 1: Bản khắc chữ Phạn (Sanskrit) cổ nhất tìm thấy ở Đông Nam Á có tên là gì?
-              </p>
-              <div className="text-slate-600 pl-3">
-                A. Bia Ramkhamhaeng • <strong>B. Bia Võ Cạnh (Khánh Hòa) [Đúng]</strong> • C. Bia Đồng Yên Châu • D. Bia Tiến sĩ Văn Miếu
-              </div>
-            </div>
+            {tabMaterials.map((q, idx) => {
+              const qStyle = getQuestionStyle(idx);
+              const extra = parseExtra(q.extra_data);
+              return (
+                <div
+                  key={q.id}
+                  className={`p-4 rounded-2xl ${qStyle.bg} border ${qStyle.border} space-y-2 relative group transition`}
+                >
+                  {isAdmin && (
+                    <div className="absolute top-3 right-3 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
+                      <button
+                        onClick={() => handleOpenEdit(q)}
+                        title="Chỉnh sửa câu hỏi này"
+                        className="p-1.5 rounded-lg bg-white hover:bg-gold/30 text-slate-700 hover:text-slate-950 transition border border-slate-200 shadow-xs"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteMaterial(q.id, q.title)}
+                        title="Xóa câu hỏi này"
+                        className="p-1.5 rounded-lg bg-white hover:bg-rose-100 text-slate-700 hover:text-rose-600 transition border border-slate-200 shadow-xs"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
 
-            <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/70 space-y-2">
-              <span className="font-bold text-emerald-700 uppercase tracking-wider text-[10px]">Cấp độ 2: Thông hiểu</span>
-              <p className="font-bold text-slate-800">
-                Câu 2: Hình ảnh ngôi sao 14 cánh ở tâm mặt Trống đồng Ngọc Lũ thể hiện tín ngưỡng gì của cư dân Việt cổ?
-              </p>
-              <div className="text-slate-600 pl-3">
-                A. Sùng bái thần núi • <strong>B. Tín ngưỡng sùng bái Mặt Trời và nông nghiệp lúa nước [Đúng]</strong> • C. Tín ngưỡng phồn thực • D. Thờ cúng tổ tiên
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/70 space-y-2">
-              <span className="font-bold text-amber-700 uppercase tracking-wider text-[10px]">Cấp độ 3 & 4: Vận dụng & Vận dụng cao</span>
-              <p className="font-bold text-slate-800">
-                Câu 3: Việc phát hiện đồng tiền vàng La Mã thế kỷ II tại di chỉ Óc Eo (An Giang) chứng minh điều gì về nền kinh tế Phù Nam?
-              </p>
-              <div className="text-slate-600 pl-3">
-                <strong>Đáp án định hướng:</strong> Chứng minh Phù Nam là một quốc gia thương mại hàng hải quốc tế hùng mạnh, nắm giữ trục xoay hải trình Con đường Tơ lụa trên biển kết nối trực tiếp với phương Tây và Nam Á.
-              </div>
-            </div>
+                  <span className={`font-bold ${qStyle.text} uppercase tracking-wider text-[10px]`}>
+                    {q.badge || q.subtitle || `Câu hỏi ${idx + 1}`}
+                  </span>
+                  <p className="font-bold text-slate-800 pr-14">
+                    {q.title}
+                  </p>
+                  <div className="text-slate-600 pl-3 leading-relaxed whitespace-pre-line">
+                    {q.content}
+                  </div>
+                  {extra.answer && (
+                    <div className="mt-2 text-[11px] font-bold text-emerald-800 bg-emerald-100/70 p-2 rounded-xl border border-emerald-200">
+                      ✓ Đáp án: {extra.answer}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
+
+      {/* Editor Modal for Admin */}
+      <TeacherGuideEditorModal
+        isOpen={isModalOpen}
+        material={editingItem}
+        defaultCategory={currentCategory}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveMaterial}
+      />
     </div>
   );
 }

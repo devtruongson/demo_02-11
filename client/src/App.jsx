@@ -15,7 +15,7 @@ import TeachersView from './components/TeachersView.jsx';
 import StudentsView from './components/StudentsView.jsx';
 import AboutView from './components/AboutView.jsx';
 import { createResourceSlug } from './utils/slugify.js';
-import { Filter, Layers, Box, Search, RotateCcw, ArrowRight, BookOpen, Sparkles, AlertCircle, LayoutDashboard } from 'lucide-react';
+import { Filter, Layers, Box, Search, RotateCcw, ArrowRight, BookOpen, Sparkles, AlertCircle, LayoutDashboard, Globe, ShieldCheck } from 'lucide-react';
 
 const API_BASE = '/api';
 
@@ -262,7 +262,7 @@ export default function App() {
       )}
 
       {/* Main Container Wrapper */}
-      <div className={isDashboard ? 'min-h-screen bg-slate-950 flex-1 flex flex-col px-4 sm:px-8 lg:px-12 py-4' : 'container mx-auto px-4 sm:px-6 lg:px-8 flex-1 flex my-4 gap-6'}>
+      <div className={isDashboard ? 'min-h-screen bg-slate-950 flex-1 flex flex-col px-3 sm:px-8 lg:px-12 py-3 sm:py-4' : 'container mx-auto px-3 sm:px-6 lg:px-8 flex-1 flex my-2 sm:my-4 gap-4 sm:gap-6'}>
         {/* Left Sidebar: HIDDEN on detail view and on dashboard */}
         {!isDetailPage && !isDashboard && (
           <Sidebar
@@ -288,72 +288,200 @@ export default function App() {
                   />
 
                   {/* 3D Interactive Highlight Teaser */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-                    <div className="lg:col-span-7 bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-sm flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-gold/20 text-gold-dark border border-gold/40">
-                            ✨ Tính Năng Nổi Bật
-                          </span>
-                          <span className="text-xs text-slate-400 font-bold">• Trải nghiệm tương tác 3D 360°</span>
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch">
+                    <div className="lg:col-span-7 bg-white p-5 sm:p-6 lg:p-7 rounded-3xl border border-slate-200/90 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                      {/* Subtle decorative glow */}
+                      <div className="absolute -top-16 -right-16 w-48 h-48 bg-gold/10 rounded-full blur-2xl pointer-events-none" />
+
+                      <div className="relative z-10 space-y-3.5 sm:space-y-4">
+                        {/* Header & Badges */}
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-2.5">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-black uppercase tracking-wider bg-gold/20 text-gold-dark border border-gold/40 shadow-xs">
+                              <Sparkles className="w-3.5 h-3.5 text-gold-dark shrink-0" />
+                              Tính Năng Nổi Bật
+                            </span>
+                            <span className="text-[11px] sm:text-xs text-slate-500 font-bold inline-flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                              Tương tác 3D 360° & Quả cầu số
+                            </span>
+                          </div>
+
+                          <h3 className="text-xl sm:text-2xl lg:text-[26px] font-black text-slate-900 tracking-tight leading-snug">
+                            Studio Di Sản 3D & Hải Trình Cổ Đại
+                          </h3>
+
+                          <p className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                            Số hóa bảo vật chuẩn bảo tàng quốc gia: tương tác xoay 360°, bóc tách đa tầng hoa văn, đo đạc kích thước khảo cổ học và khám phá con đường thương mại trên biển Đông Nam Á cổ đại.
+                          </p>
                         </div>
-                        <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                          Studio Di Sản 3D & Hải Trình Cổ Đại
-                        </h3>
-                        <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-                          Trải nghiệm xoay 360 độ các bảo vật quốc gia: Trống đồng Ngọc Lũ, Đại tháp Borobudur, Bia Võ Cạnh, Đài thờ Mỹ Sơn và khám phá con đường thương mại trên biển qua quả cầu 3D.
-                        </p>
+
+                        {/* Feature Highlights Grid - Fills whitespace cleanly on Desktop & Stacks gracefully on Mobile */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-2.5 pt-0.5">
+                          <div className="p-2.5 sm:p-3 rounded-2xl bg-amber-50/70 border border-amber-200/60 flex items-center sm:flex-col sm:items-start gap-2.5 transition hover:bg-amber-50">
+                            <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-800 flex items-center justify-center shrink-0">
+                              <Box className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <h5 className="text-xs font-bold text-slate-900 truncate">Cổ vật 3D 360°</h5>
+                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">Xoay & bóc tách hoa văn</p>
+                            </div>
+                          </div>
+
+                          <div className="p-2.5 sm:p-3 rounded-2xl bg-sky-50/70 border border-sky-200/60 flex items-center sm:flex-col sm:items-start gap-2.5 transition hover:bg-sky-50">
+                            <div className="w-8 h-8 rounded-xl bg-sky-500/15 text-sky-800 flex items-center justify-center shrink-0">
+                              <Globe className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <h5 className="text-xs font-bold text-slate-900 truncate">Hải Trình Biển</h5>
+                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">Quả cầu thương mại cổ</p>
+                            </div>
+                          </div>
+
+                          <div className="p-2.5 sm:p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200/60 flex items-center sm:flex-col sm:items-start gap-2.5 transition hover:bg-emerald-50">
+                            <div className="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-800 flex items-center justify-center shrink-0">
+                              <ShieldCheck className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <h5 className="text-xs font-bold text-slate-900 truncate">Chuẩn GDPT 2018</h5>
+                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">Phục vụ dạy học Lịch sử 10</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Quick Artifacts Tag Strip */}
+                        <div className="pt-0.5 flex flex-wrap items-center gap-1.5 text-[11px]">
+                          <span className="text-slate-400 font-bold shrink-0">Bảo vật 3D:</span>
+                          <Link
+                            to="/studio-3d/co-vat/dong_son_drum"
+                            className="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-gold/20 hover:text-navy font-semibold text-slate-700 transition"
+                          >
+                            Trống Ngọc Lũ
+                          </Link>
+                          <Link
+                            to="/studio-3d/co-vat/borobudur"
+                            className="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-gold/20 hover:text-navy font-semibold text-slate-700 transition"
+                          >
+                            Tháp Borobudur
+                          </Link>
+                          <Link
+                            to="/studio-3d/co-vat/my_son_altar"
+                            className="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-gold/20 hover:text-navy font-semibold text-slate-700 transition"
+                          >
+                            Đài thờ Linga-Yoni
+                          </Link>
+                          <Link
+                            to="/studio-3d/co-vat/vo_canh_stele"
+                            className="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-gold/20 hover:text-navy font-semibold text-slate-700 transition"
+                          >
+                            Bia Võ Cạnh
+                          </Link>
+                          <Link
+                            to="/studio-3d/co-vat/that_luang"
+                            className="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-gold/20 hover:text-navy font-semibold text-slate-700 transition"
+                          >
+                            Thạt Luổng
+                          </Link>
+                        </div>
                       </div>
 
-                      <div className="mt-6 flex flex-wrap items-center gap-3">
+                      {/* Action Buttons - Perfectly Responsive on Mobile & Desktop */}
+                      <div className="mt-4 sm:mt-5 pt-3.5 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                         <Link
                           to="/studio-3d"
-                          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-navy text-white hover:bg-navy-light transition shadow active:scale-95"
+                          className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs sm:text-sm font-black bg-navy text-white hover:bg-navy-light transition shadow hover:shadow-md active:scale-[0.98] w-full"
                         >
-                          <Box className="w-4 h-4 text-gold" />
+                          <Box className="w-4 h-4 text-gold shrink-0" />
                           <span>Trải nghiệm Studio 3D</span>
+                          <ArrowRight className="w-3.5 h-3.5 ml-auto sm:ml-0 text-white/70" />
                         </Link>
                         <Link
                           to="/kho-tu-lieu?topic=4"
-                          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+                          className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 transition active:scale-[0.98] w-full"
                         >
-                          <BookOpen className="w-4 h-4" />
+                          <BookOpen className="w-4 h-4 text-slate-600 shrink-0" />
                           <span>Xem tư liệu Đông Nam Á</span>
                         </Link>
                       </div>
                     </div>
 
-                    <div className="lg:col-span-5 bg-gradient-to-br from-slate-900 to-navy-dark text-white p-6 rounded-3xl border border-white/10 shadow-lg flex flex-col justify-between">
-                      <div>
-                        <span className="text-xs font-black uppercase tracking-wider text-gold-light">
-                          Thống kê kho học liệu
-                        </span>
-                        <h4 className="text-lg font-black mt-1">Dữ Liệu Đã Được Thẩm Định</h4>
-                        <div className="grid grid-cols-2 gap-3 mt-4 text-xs">
-                          <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10">
-                            <span className="text-slate-400 block font-medium">Chủ đề học tập:</span>
-                            <strong className="text-xl font-black text-gold">{stats?.topics || 7}</strong>
+                    <div className="lg:col-span-5 bg-gradient-to-br from-slate-900 via-navy-dark to-[#0f1d38] text-white p-5 sm:p-6 lg:p-7 rounded-3xl border border-white/10 shadow-lg flex flex-col justify-between relative overflow-hidden">
+                      {/* Glow */}
+                      <div className="absolute top-0 right-0 w-40 h-40 bg-gold/10 rounded-full blur-3xl pointer-events-none" />
+
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-gold-light">
+                            Thống kê kho học liệu
+                          </span>
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-emerald-400 border border-emerald-400/30 flex items-center gap-1.5 shrink-0">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-ping" />
+                            Thời gian thực
+                          </span>
+                        </div>
+
+                        <h4 className="text-base sm:text-lg font-black mt-1.5 text-white leading-tight">
+                          Dữ Liệu Đã Được Thẩm Định Sư Phạm
+                        </h4>
+
+                        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mt-4">
+                          {/* Stat 1 */}
+                          <div className="p-3 sm:p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 transition">
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="text-[11px] sm:text-xs text-slate-300 font-medium truncate">Chủ đề bài học</span>
+                              <BookOpen className="w-3.5 h-3.5 text-gold/80 shrink-0" />
+                            </div>
+                            <strong className="text-xl sm:text-2xl font-black text-gold block mt-1 tracking-tight">
+                              {stats?.topics || 7}
+                            </strong>
+                            <span className="text-[10px] text-slate-400 mt-0.5 block truncate">Chương trình SGK</span>
                           </div>
-                          <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10">
-                            <span className="text-slate-400 block font-medium">Tư liệu khảo cổ:</span>
-                            <strong className="text-xl font-black text-emerald-400">{stats?.resources || 32}</strong>
+
+                          {/* Stat 2 */}
+                          <div className="p-3 sm:p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 transition">
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="text-[11px] sm:text-xs text-slate-300 font-medium truncate">Tư liệu số hóa</span>
+                              <Layers className="w-3.5 h-3.5 text-emerald-400/80 shrink-0" />
+                            </div>
+                            <strong className="text-xl sm:text-2xl font-black text-emerald-400 block mt-1 tracking-tight">
+                              {stats?.resources || 32}
+                            </strong>
+                            <span className="text-[10px] text-slate-400 mt-0.5 block truncate">Ảnh & văn bản gốc</span>
                           </div>
-                          <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10">
-                            <span className="text-slate-400 block font-medium">Mô hình 3D:</span>
-                            <strong className="text-xl font-black text-amber-300">{stats?.artifacts_3d || 5}</strong>
+
+                          {/* Stat 3 */}
+                          <div className="p-3 sm:p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 transition">
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="text-[11px] sm:text-xs text-slate-300 font-medium truncate">Bảo vật 3D</span>
+                              <Box className="w-3.5 h-3.5 text-amber-300/80 shrink-0" />
+                            </div>
+                            <strong className="text-xl sm:text-2xl font-black text-amber-300 block mt-1 tracking-tight">
+                              {stats?.artifacts_3d || 5}
+                            </strong>
+                            <span className="text-[10px] text-slate-400 mt-0.5 block truncate">Tương tác 360°</span>
                           </div>
-                          <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10">
-                            <span className="text-slate-400 block font-medium">Tổng lượt tương tác:</span>
-                            <strong className="text-xl font-black text-cyan-300">
+
+                          {/* Stat 4 */}
+                          <div className="p-3 sm:p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 transition">
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="text-[11px] sm:text-xs text-slate-300 font-medium truncate">Lượt tương tác</span>
+                              <Sparkles className="w-3.5 h-3.5 text-cyan-300/80 shrink-0" />
+                            </div>
+                            <strong className="text-xl sm:text-2xl font-black text-cyan-300 block mt-1 tracking-tight">
                               {stats?.total_views ? stats.total_views.toLocaleString() : '12,480'}
                             </strong>
+                            <span className="text-[10px] text-slate-400 mt-0.5 block truncate">Giáo viên & HS</span>
                           </div>
                         </div>
                       </div>
 
-                      <p className="mt-4 text-[11px] text-slate-300">
-                        Bám sát Chương trình Giáo dục Phổ thông 2018 môn Lịch sử lớp 10.
-                      </p>
+                      <div className="mt-4 pt-3.5 border-t border-white/10 flex items-center justify-between gap-2 text-[11px] text-slate-300">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          <span className="truncate">Chuẩn GDPT 2018 Lịch sử 10</span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-mono shrink-0">Phiên bản 2.0</span>
+                      </div>
                     </div>
                   </div>
 
@@ -569,6 +697,7 @@ export default function App() {
                 <ResourceDetailView
                   allResources={resources}
                   currentUser={currentUser}
+                  authToken={authToken}
                   onEdit={(res) => {
                     setEditorResource(res);
                     setIsEditorOpen(true);
@@ -613,7 +742,7 @@ export default function App() {
             />
             <Route
               path="/giao-vien/:tab"
-              element={<TeachersView />}
+              element={<TeachersView currentUser={currentUser} authToken={authToken} />}
             />
 
             {/* ================= ROUTE: STUDENTS WITH REAL SLUGS ================= */}
@@ -623,7 +752,7 @@ export default function App() {
             />
             <Route
               path="/hoc-sinh/:tab"
-              element={<StudentsView />}
+              element={<StudentsView currentUser={currentUser} authToken={authToken} />}
             />
 
             {/* ================= ROUTE: ABOUT ================= */}

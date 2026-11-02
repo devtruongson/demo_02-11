@@ -4,10 +4,13 @@ import {
   TrendingUp, Users, BookOpen, Box, Eye, Activity, ShieldCheck,
   RefreshCw, PlusCircle, Edit3, Trash2, Calendar, Award, ArrowUpRight, Search, Filter,
   ArrowLeft, LogOut, X, ExternalLink, Film, Image, MapPin, Sparkles, CheckCircle2,
-  ChevronRight, LayoutList, LayoutGrid, KeyRound, EyeOff, UserCheck, AlertCircle
+  ChevronRight, LayoutList, LayoutGrid, KeyRound, EyeOff, UserCheck, AlertCircle,
+  GraduationCap, HelpCircle, FileText
 } from 'lucide-react';
 import ThreeArtifactViewer from './ThreeArtifactViewer.jsx';
 import Artifact3DEditorModal from './Artifact3DEditorModal.jsx';
+import TeacherGuideEditorModal from './TeacherGuideEditorModal.jsx';
+import QuizEditorModal from './QuizEditorModal.jsx';
 import { formatYouTubeEmbedUrl } from '../utils/slugify.js';
 
 export default function AdminDashboard({
@@ -41,6 +44,20 @@ export default function AdminDashboard({
   const [editingArtifact3D, setEditingArtifact3D] = useState(null);
   const [isArtifactModalOpen, setIsArtifactModalOpen] = useState(false);
   const [artifactSearch, setArtifactSearch] = useState('');
+
+  // Teacher Materials Management State
+  const [teacherMaterials, setTeacherMaterials] = useState([]);
+  const [teacherCategoryFilter, setTeacherCategoryFilter] = useState('all');
+  const [teacherSearch, setTeacherSearch] = useState('');
+  const [editingTeacherMaterial, setEditingTeacherMaterial] = useState(null);
+  const [isTeacherModalOpen, setIsTeacherModalOpen] = useState(false);
+
+  // Quizzes Management State
+  const [quizzesList, setQuizzesList] = useState([]);
+  const [quizLessonFilter, setQuizLessonFilter] = useState('all');
+  const [quizSearch, setQuizSearch] = useState('');
+  const [editingQuiz, setEditingQuiz] = useState(null);
+  const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
 
   // User Management State (Edit name, role, change password)
   const [editingUser, setEditingUser] = useState(null);
@@ -129,19 +146,23 @@ export default function AdminDashboard({
     setLoading(true);
     try {
       const ts = Date.now();
-      const [analyticsRes, resRes, usersRes, artRes] = await Promise.all([
+      const [analyticsRes, resRes, usersRes, artRes, teacherRes, quizRes] = await Promise.all([
         fetch(`/api/analytics/overview?_t=${ts}`).then((r) => r.json()),
         fetch(`/api/resources?_t=${ts}`).then((r) => r.json()),
         fetch(`/api/users?_t=${ts}`, {
           headers: { Authorization: `Bearer ${authToken}` }
         }).then((r) => (r.ok ? r.json() : [])),
-        fetch(`/api/3d-artifacts?_t=${ts}`).then((r) => (r.ok ? r.json() : []))
+        fetch(`/api/3d-artifacts?_t=${ts}`).then((r) => (r.ok ? r.json() : [])),
+        fetch(`/api/teacher-materials?_t=${ts}`).then((r) => (r.ok ? r.json() : [])),
+        fetch(`/api/quizzes?_t=${ts}`).then((r) => (r.ok ? r.json() : []))
       ]);
 
       setAnalytics(analyticsRes);
       setResources(resRes);
       setUsers(usersRes);
       setArtifacts3dList(artRes);
+      setTeacherMaterials(teacherRes);
+      setQuizzesList(quizRes);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
     } finally {
@@ -210,6 +231,135 @@ export default function AdminDashboard({
       alert('Xóa bảo vật thất bại: ' + err.message);
     }
   };
+
+  // Handlers for Teacher Materials
+  const handleOpenNewTeacherMaterial = () => {
+    setEditingTeacherMaterial(null);
+    setIsTeacherModalOpen(true);
+  };
+
+  const handleOpenEditTeacherMaterial = (item) => {
+    setEditingTeacherMaterial(item);
+    setIsTeacherModalOpen(true);
+  };
+
+  const handleSaveTeacherMaterial = async (formData, id) => {
+    const url = id ? `/api/teacher-materials/${id}` : '/api/teacher-materials';
+    const method = id ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`
+      },
+      body: JSON.stringify(formData)
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Lỗi lưu tài liệu giáo viên');
+    }
+    await fetchDashboardData();
+  };
+
+  const handleDeleteTeacherMaterial = async (id, title) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa mục "${title}" khỏi hệ thống?`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/teacher-materials/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Lỗi khi xóa tài liệu');
+      }
+      await fetchDashboardData();
+    } catch (err) {
+      alert('Xóa tài liệu thất bại: ' + err.message);
+    }
+  };
+
+  // Filter Teacher Materials
+  const filteredTeacherMaterials = teacherMaterials.filter((m) => {
+    const matchCategory = teacherCategoryFilter === 'all' || m.category === teacherCategoryFilter;
+    if (!matchCategory) return false;
+    if (!teacherSearch.trim()) return true;
+    const q = teacherSearch.toLowerCase();
+    return (
+      (m.title && m.title.toLowerCase().includes(q)) ||
+      (m.subtitle && m.subtitle.toLowerCase().includes(q)) ||
+      (m.content && m.content.toLowerCase().includes(q)) ||
+      (m.badge && m.badge.toLowerCase().includes(q))
+    );
+  });
+
+  // Handlers for Quizzes
+  const handleOpenNewQuiz = () => {
+    setEditingQuiz(null);
+    setIsQuizModalOpen(true);
+  };
+
+  const handleOpenEditQuiz = (q) => {
+    setEditingQuiz(q);
+    setIsQuizModalOpen(true);
+  };
+
+  const handleSaveQuiz = async (formData, id) => {
+    const url = id ? `/api/quizzes/${id}` : '/api/quizzes';
+    const method = id ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`
+      },
+      body: JSON.stringify(formData)
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Lỗi lưu câu hỏi trắc nghiệm');
+    }
+    await fetchDashboardData();
+  };
+
+  const handleDeleteQuiz = async (id, question) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa câu hỏi "${question}"?`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/quizzes/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Lỗi xóa câu hỏi');
+      }
+      await fetchDashboardData();
+    } catch (err) {
+      alert('Xóa câu hỏi thất bại: ' + err.message);
+    }
+  };
+
+  // Filter quizzes
+  const filteredQuizzes = quizzesList.filter((q) => {
+    const matchLesson = quizLessonFilter === 'all' || q.lesson === quizLessonFilter;
+    if (!matchLesson) return false;
+    if (!quizSearch.trim()) return true;
+    const query = quizSearch.toLowerCase();
+    const matchQ = q.question && q.question.toLowerCase().includes(query);
+    const matchL = q.lesson && q.lesson.toLowerCase().includes(query);
+    const matchExp = q.explanation && q.explanation.toLowerCase().includes(query);
+    return matchQ || matchL || matchExp;
+  });
+
+  // Unique lessons list for filter dropdown
+  const uniqueLessons = Array.from(new Set(quizzesList.map((q) => q.lesson))).filter(Boolean);
 
   // Filter 3D artifacts
   const filteredArtifacts = artifacts3dList.filter((art) => {
@@ -405,6 +555,28 @@ export default function AdminDashboard({
           }`}
         >
           <span>👥 Người dùng & Phân quyền ({users.length})</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('teachers')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+            activeTab === 'teachers'
+              ? 'bg-navy text-white shadow-sm ring-1 ring-gold/40 font-black'
+              : 'text-slate-400 hover:text-white hover:bg-slate-900'
+          }`}
+        >
+          <GraduationCap className="w-3.5 h-3.5 text-gold" />
+          <span>🎓 Dành cho Giáo viên ({teacherMaterials.length})</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('quizzes')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+            activeTab === 'quizzes'
+              ? 'bg-navy text-white shadow-sm ring-1 ring-gold/40 font-black'
+              : 'text-slate-400 hover:text-white hover:bg-slate-900'
+          }`}
+        >
+          <Award className="w-3.5 h-3.5 text-gold" />
+          <span>🎯 Trắc nghiệm theo bài ({quizzesList.length})</span>
         </button>
       </div>
 
@@ -985,6 +1157,443 @@ export default function AdminDashboard({
         </div>
       )}
 
+      {/* ================= TAB 5: TEACHER MATERIALS MANAGEMENT ================= */}
+      {activeTab === 'teachers' && (
+        <div className="space-y-6 animate-fade-in">
+          {/* Header & Controls */}
+          <div className="bg-slate-900/90 p-6 rounded-3xl border border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-gold/20 text-gold border border-gold/30">
+                  <GraduationCap className="w-3.5 h-3.5" /> Nghiệp Vụ Sư Phạm GDPT 2018
+                </span>
+                <span className="text-xs text-slate-400">({filteredTeacherMaterials.length} mục)</span>
+              </div>
+              <h3 className="text-xl font-extrabold text-white">
+                Quản Lý Tài Liệu & Nghiệp Vụ Sư Phạm Cho Giáo Viên
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Chỉnh sửa toàn diện nội dung Cẩm nang sư phạm, Khung bài dạy 5512 và Ngân hàng câu hỏi trắc nghiệm đánh giá năng lực.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2.5">
+              <Link
+                to="/giao-vien"
+                target="_blank"
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition border border-slate-700"
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-gold" />
+                <span>Xem giao diện Giáo viên (Live)</span>
+              </Link>
+              <button
+                onClick={handleOpenNewTeacherMaterial}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 text-xs font-black transition shadow-md active:scale-95"
+              >
+                <PlusCircle className="w-4 h-4" />
+                <span>Thêm nội dung sư phạm</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Filter Bar & Search */}
+          <div className="bg-slate-900/90 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+            {/* Category Pills */}
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              <button
+                onClick={() => setTeacherCategoryFilter('all')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                  teacherCategoryFilter === 'all'
+                    ? 'bg-gold text-slate-950 font-black'
+                    : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                }`}
+              >
+                Tất cả ({teacherMaterials.length})
+              </button>
+              <button
+                onClick={() => setTeacherCategoryFilter('cam_nang')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                  teacherCategoryFilter === 'cam_nang'
+                    ? 'bg-blue-600 text-white font-black'
+                    : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                }`}
+              >
+                📖 Cẩm nang ({teacherMaterials.filter((m) => m.category === 'cam_nang').length})
+              </button>
+              <button
+                onClick={() => setTeacherCategoryFilter('ke_hoach_5512')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                  teacherCategoryFilter === 'ke_hoach_5512'
+                    ? 'bg-emerald-600 text-white font-black'
+                    : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                }`}
+              >
+                📑 Kế hoạch 5512 ({teacherMaterials.filter((m) => m.category === 'ke_hoach_5512').length})
+              </button>
+              <button
+                onClick={() => setTeacherCategoryFilter('ngan_hang_cau_hoi')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                  teacherCategoryFilter === 'ngan_hang_cau_hoi'
+                    ? 'bg-amber-600 text-white font-black'
+                    : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                }`}
+              >
+                ❓ Ngân hàng câu hỏi ({teacherMaterials.filter((m) => m.category === 'ngan_hang_cau_hoi').length})
+              </button>
+            </div>
+
+            {/* Search */}
+            <div className="relative w-full sm:w-72">
+              <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={teacherSearch}
+                onChange={(e) => setTeacherSearch(e.target.value)}
+                placeholder="Tìm nội dung, hoạt động, câu hỏi..."
+                className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-gold"
+              />
+              {teacherSearch && (
+                <button
+                  onClick={() => setTeacherSearch('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Table of Materials */}
+          <div className="bg-slate-900/90 rounded-3xl border border-slate-800 shadow-sm overflow-hidden">
+            <table className="w-full text-left text-xs text-slate-300">
+              <thead className="bg-slate-950/80 text-[11px] uppercase tracking-wider text-slate-400 border-b border-slate-800">
+                <tr>
+                  <th className="py-3 px-4">Chuyên mục</th>
+                  <th className="py-3 px-4">Huy hiệu / STT</th>
+                  <th className="py-3 px-4">Tiêu đề & Chuyên đề</th>
+                  <th className="py-3 px-4">Nội dung chi tiết</th>
+                  <th className="py-3 px-4">Thông tin bổ sung</th>
+                  <th className="py-3 px-4 text-center">Thứ tự</th>
+                  <th className="py-3 px-4 text-right">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800">
+                {filteredTeacherMaterials.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-8 text-center text-slate-500 font-semibold">
+                      Không tìm thấy nội dung sư phạm nào phù hợp với bộ lọc.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredTeacherMaterials.map((item) => {
+                    let extra = {};
+                    if (item.extra_data) {
+                      try {
+                        extra = typeof item.extra_data === 'string' ? JSON.parse(item.extra_data) : item.extra_data;
+                      } catch (e) {
+                        extra = {};
+                      }
+                    }
+
+                    const categoryBadge = () => {
+                      switch (item.category) {
+                        case 'cam_nang':
+                          return (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-950 text-blue-400 border border-blue-800">
+                              <BookOpen className="w-3 h-3" /> Cẩm nang
+                            </span>
+                          );
+                        case 'ke_hoach_5512':
+                          return (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">
+                              <FileText className="w-3 h-3" /> Kế hoạch 5512
+                            </span>
+                          );
+                        case 'ngan_hang_cau_hoi':
+                          return (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-950 text-amber-400 border border-amber-800">
+                              <HelpCircle className="w-3 h-3" /> Câu hỏi
+                            </span>
+                          );
+                        default:
+                          return <span className="text-slate-400">{item.category}</span>;
+                      }
+                    };
+
+                    return (
+                      <tr key={item.id} className="hover:bg-slate-800/50 transition group">
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          {categoryBadge()}
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <span className="px-2 py-0.5 rounded-lg bg-slate-950 border border-slate-800 text-[11px] font-bold text-gold">
+                            {item.badge || item.order_index}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <strong className="text-white font-bold block text-sm group-hover:text-gold transition">
+                            {item.title}
+                          </strong>
+                          {item.subtitle && (
+                            <span className="text-[11px] text-gold-light line-clamp-1">
+                              {item.subtitle}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <p className="text-slate-300 text-xs line-clamp-2 max-w-sm font-normal">
+                            {item.content}
+                          </p>
+                        </td>
+                        <td className="py-3.5 px-4 text-[11px]">
+                          {extra.technique && (
+                            <span className="block text-slate-300 line-clamp-1 font-medium">
+                              🛠️ {extra.technique}
+                            </span>
+                          )}
+                          {extra.answer && (
+                            <span className="block text-emerald-400 line-clamp-1 font-bold">
+                              ✓ {extra.answer}
+                            </span>
+                          )}
+                          {extra.topic_url && (
+                            <span className="block text-slate-400 font-mono text-[10px]">
+                              🔗 {extra.topic_url}
+                            </span>
+                          )}
+                          {!extra.technique && !extra.answer && !extra.topic_url && (
+                            <span className="text-slate-500">—</span>
+                          )}
+                        </td>
+                        <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-400">
+                          {item.order_index}
+                        </td>
+                        <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              onClick={() => handleOpenEditTeacherMaterial(item)}
+                              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-gold hover:text-slate-950 text-slate-200 transition text-xs font-bold"
+                              title="Chỉnh sửa nội dung này"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                              <span>Sửa</span>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteTeacherMaterial(item.id, item.title)}
+                              className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-950 hover:text-rose-300 transition"
+                              title="Xóa nội dung này"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ================= TAB 6: QUIZZES MANAGEMENT ================= */}
+      {activeTab === 'quizzes' && (
+        <div className="space-y-6 animate-fade-in">
+          {/* Header & Controls */}
+          <div className="bg-slate-900/90 p-6 rounded-3xl border border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-gold/20 text-gold border border-gold/30">
+                  <Award className="w-3.5 h-3.5" /> Khảo Thí & Đánh Giá Năng Lực
+                </span>
+                <span className="text-xs text-slate-400">({filteredQuizzes.length} câu hỏi)</span>
+              </div>
+              <h3 className="text-xl font-extrabold text-white">
+                Ngân Hàng Trắc Nghiệm Theo Từng Bài Học Lịch Sử 10
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Quản lý các câu hỏi trắc nghiệm tương tác cho từng chuyên đề, phục vụ ôn tập trực tiếp trên trang chi tiết và góc học tập của học sinh.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2.5">
+              <Link
+                to="/hoc-sinh/luyen-tap-trac-nghiem"
+                target="_blank"
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition border border-slate-700"
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-gold" />
+                <span>Xem thử thách Học sinh (Live)</span>
+              </Link>
+              <button
+                onClick={handleOpenNewQuiz}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 text-xs font-black transition shadow-md active:scale-95"
+              >
+                <PlusCircle className="w-4 h-4" />
+                <span>Thêm câu hỏi mới</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Filter Bar & Search */}
+          <div className="bg-slate-900/90 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+            {/* Lesson Filter Dropdown / Pills */}
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <span className="text-xs font-bold text-slate-400 shrink-0">Lọc theo bài:</span>
+              <select
+                value={quizLessonFilter}
+                onChange={(e) => setQuizLessonFilter(e.target.value)}
+                className="px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs font-bold focus:outline-none focus:ring-2 focus:ring-gold"
+              >
+                <option value="all">Tất cả các bài ({quizzesList.length} câu)</option>
+                {uniqueLessons.map((les) => {
+                  const count = quizzesList.filter((q) => q.lesson === les).length;
+                  return (
+                    <option key={les} value={les}>
+                      {les} ({count} câu)
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
+            {/* Search Input */}
+            <div className="relative w-full sm:w-80">
+              <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={quizSearch}
+                onChange={(e) => setQuizSearch(e.target.value)}
+                placeholder="Tìm nội dung câu hỏi, bài học..."
+                className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-gold"
+              />
+              {quizSearch && (
+                <button
+                  onClick={() => setQuizSearch('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Table of Quizzes */}
+          <div className="bg-slate-900/90 rounded-3xl border border-slate-800 shadow-sm overflow-hidden">
+            <table className="w-full text-left text-xs text-slate-300">
+              <thead className="bg-slate-950/80 text-[11px] uppercase tracking-wider text-slate-400 border-b border-slate-800">
+                <tr>
+                  <th className="py-3 px-4">Bài học</th>
+                  <th className="py-3 px-4">Cấp độ</th>
+                  <th className="py-3 px-4">Nội dung câu hỏi</th>
+                  <th className="py-3 px-4">4 Phương án & Đáp án</th>
+                  <th className="py-3 px-4">Giải thích sử liệu</th>
+                  <th className="py-3 px-4 text-center">Thứ tự</th>
+                  <th className="py-3 px-4 text-right">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800">
+                {filteredQuizzes.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-8 text-center text-slate-500 font-semibold">
+                      Không tìm thấy câu hỏi trắc nghiệm nào phù hợp với bộ lọc.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredQuizzes.map((q) => {
+                    const opts = Array.isArray(q.options)
+                      ? q.options
+                      : (typeof q.options === 'string' ? JSON.parse(q.options || '[]') : []);
+
+                    const getDiffPill = (diff) => {
+                      switch (diff) {
+                        case 'nhan_biet':
+                          return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-950 text-blue-400 border border-blue-800">Nhận biết</span>;
+                        case 'thong_hieu':
+                          return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">Thông hiểu</span>;
+                        case 'van_dung':
+                          return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-950 text-amber-400 border border-amber-800">Vận dụng</span>;
+                        case 'van_dung_cao':
+                          return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-950 text-purple-400 border border-purple-800">Vận dụng cao</span>;
+                        default:
+                          return <span className="text-slate-400">{diff}</span>;
+                      }
+                    };
+
+                    return (
+                      <tr key={q.id} className="hover:bg-slate-800/50 transition group">
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <span className="font-bold text-slate-200 block max-w-xs truncate">
+                            {q.lesson}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono">
+                            Chủ đề {q.topic_id} {q.resource_id ? `• Hiện vật #${q.resource_id}` : ''}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          {getDiffPill(q.difficulty)}
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <strong className="text-white font-bold block text-sm group-hover:text-gold transition">
+                            {q.question}
+                          </strong>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <div className="space-y-1 text-[11px] max-w-xs">
+                            {opts.map((opt, i) => (
+                              <div
+                                key={i}
+                                className={`flex items-start gap-1.5 px-2 py-0.5 rounded ${
+                                  q.correct_index === i
+                                    ? 'bg-emerald-950/80 text-emerald-300 font-bold border border-emerald-800/80'
+                                    : 'text-slate-400'
+                                }`}
+                              >
+                                <span className="font-mono">{String.fromCharCode(65 + i)}.</span>
+                                <span className="truncate">{opt}</span>
+                                {q.correct_index === i && <span className="ml-auto text-[10px] text-emerald-400 shrink-0">✓ Đúng</span>}
+                              </div>
+                            ))}
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <p className="text-slate-400 text-xs line-clamp-2 max-w-xs font-normal">
+                            {q.explanation || '—'}
+                          </p>
+                        </td>
+                        <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-400">
+                          {q.order_index}
+                        </td>
+                        <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              onClick={() => handleOpenEditQuiz(q)}
+                              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-gold hover:text-slate-950 text-slate-200 transition text-xs font-bold"
+                              title="Chỉnh sửa câu hỏi này"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                              <span>Sửa</span>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteQuiz(q.id, q.question)}
+                              className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-950 hover:text-rose-300 transition"
+                              title="Xóa câu hỏi này"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {/* ================= MODAL: EDIT USER (HỌ TÊN, ROLE & CHANGE PASSWORD) ================= */}
       {editingUser && (
         <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
@@ -1355,6 +1964,31 @@ export default function AdminDashboard({
         }}
         onSave={handleSaveArtifact3D}
         authToken={authToken}
+      />
+
+      {/* ================= TEACHER GUIDE EDITOR MODAL ================= */}
+      <TeacherGuideEditorModal
+        material={editingTeacherMaterial}
+        isOpen={isTeacherModalOpen}
+        onClose={() => {
+          setIsTeacherModalOpen(false);
+          setEditingTeacherMaterial(null);
+        }}
+        onSave={handleSaveTeacherMaterial}
+        defaultCategory={teacherCategoryFilter !== 'all' ? teacherCategoryFilter : 'cam_nang'}
+      />
+
+      {/* ================= QUIZ EDITOR MODAL ================= */}
+      <QuizEditorModal
+        quiz={editingQuiz}
+        isOpen={isQuizModalOpen}
+        onClose={() => {
+          setIsQuizModalOpen(false);
+          setEditingQuiz(null);
+        }}
+        onSave={handleSaveQuiz}
+        defaultLesson={quizLessonFilter !== 'all' ? quizLessonFilter : ''}
+        allResources={resources}
       />
     </div>
   );

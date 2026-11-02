@@ -17,7 +17,7 @@ export default function Sidebar({ stats, currentUser }) {
   ];
 
   return (
-    <aside className="w-64 bg-white border-r border-slate-200/80 p-4 flex flex-col justify-between shrink-0 min-h-[calc(100vh-80px)]">
+    <aside className="hidden lg:flex w-64 bg-white border border-slate-200/80 rounded-3xl p-4 flex-col justify-between shrink-0 min-h-[calc(100vh-120px)] shadow-xs">
       <div>
         <div className="text-[11px] font-black uppercase tracking-wider text-slate-400 px-3 py-2">
           Không gian khám phá

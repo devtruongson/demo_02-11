@@ -33,6 +33,7 @@
 
 
 
-.sketchfab-embed-wrapper div,p{
-    display: none !important;
+.sketchfab-embed-wrapper div,
+.sketchfab-embed-wrapper p {
+  display: none !important;
 }

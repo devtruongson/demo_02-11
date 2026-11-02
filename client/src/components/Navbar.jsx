@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
+import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Landmark, Compass, BookOpen, GraduationCap, Users, Box,
-  ShieldCheck, User, LogOut, LayoutDashboard, LogIn, ChevronDown, UserCheck
+  ShieldCheck, User, LogOut, LayoutDashboard, LogIn, ChevronDown, UserCheck,
+  Menu, X, Info, Sparkles
 } from 'lucide-react';
 
 export default function Navbar({
@@ -12,11 +14,30 @@ export default function Navbar({
   onOpenProfile
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   const isAdmin = currentUser?.role === 'admin';
   const isTeacher = currentUser?.role === 'teacher';
+
+  // Close mobile drawer on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
 
   // Standard Navigation tabs (Dashboard is accessed from Profile dropdown as requested)
   const navItems = [
@@ -248,9 +269,187 @@ export default function Navbar({
                 </button>
               </div>
             )}
+            {/* Mobile Hamburger Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer"
+              aria-label="Mở menu điều hướng"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5 text-slate-800" /> : <Menu className="w-5 h-5 text-slate-800" />}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Slide-Out Navigation Drawer via React Portal directly into document.body */}
+      {typeof document !== 'undefined' && createPortal(
+        <div
+          className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-300 ${
+            mobileMenuOpen ? 'visible opacity-100' : 'invisible opacity-0 pointer-events-none'
+          }`}
+        >
+          {/* Backdrop */}
+          <div
+            className={`fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity duration-300 ${
+              mobileMenuOpen ? 'opacity-100' : 'opacity-0'
+            }`}
+            onClick={() => setMobileMenuOpen(false)}
+          />
+
+          {/* Drawer Content */}
+          <div
+            className={`fixed top-0 left-0 bottom-0 w-[290px] max-w-[85vw] h-full bg-white shadow-2xl flex flex-col justify-between z-10 p-5 overflow-y-auto transform transition-transform duration-300 ease-in-out ${
+              mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}
+          >
+            <div className="space-y-5">
+              {/* Drawer Header with Logo & Close */}
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                <Link
+                  to="/"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-navy text-white flex items-center justify-center text-lg shadow-sm">
+                    🏛️
+                  </div>
+                  <div>
+                    <span className="font-black text-base text-navy block">Sử Ký Số</span>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase block">Lịch sử 10 GDPT 2018</span>
+                  </div>
+                </Link>
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-1.5 rounded-xl bg-slate-100 text-slate-500 hover:text-slate-900"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Navigation Links */}
+              <div>
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 px-2 block mb-2">
+                  Danh mục khám phá
+                </span>
+                <div className="space-y-1">
+                  {navItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <NavLink
+                        key={item.to}
+                        to={item.to}
+                        end={item.end}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={({ isActive }) =>
+                          `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition ${
+                            isActive
+                              ? 'bg-navy text-white shadow-sm'
+                              : 'text-slate-700 hover:bg-slate-100'
+                          }`
+                        }
+                      >
+                        {({ isActive }) => (
+                          <>
+                            <div className="flex items-center gap-3">
+                              <Icon className={`w-4 h-4 ${isActive ? 'text-gold' : 'text-slate-400'}`} />
+                              <span>{item.label}</span>
+                            </div>
+                            {item.badge && (
+                              <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-gold text-slate-950">
+                                {item.badge}
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </NavLink>
+                    );
+                  })}
+
+                  <NavLink
+                    to="/gioi-thieu"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition ${
+                        isActive
+                          ? 'bg-navy text-white shadow-sm'
+                          : 'text-slate-700 hover:bg-slate-100'
+                      }`
+                    }
+                  >
+                    <div className="flex items-center gap-3">
+                      <Info className="w-4 h-4 text-slate-400" />
+                      <span>Giới thiệu dự án</span>
+                    </div>
+                  </NavLink>
+
+                  {isAdmin && (
+                    <NavLink
+                      to="/dashboard"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={({ isActive }) =>
+                        `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition ${
+                          isActive
+                            ? 'bg-amber-600 text-white shadow-sm'
+                            : 'text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200'
+                        }`
+                      }
+                    >
+                      <div className="flex items-center gap-3">
+                        <LayoutDashboard className="w-4 h-4" />
+                        <span>Bảng Quản Trị</span>
+                      </div>
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-200 text-amber-900">
+                        Admin
+                      </span>
+                    </NavLink>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Drawer Footer */}
+            <div className="pt-4 border-t border-slate-100">
+              {currentUser ? (
+                <div className="space-y-2">
+                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-black text-slate-900 truncate">
+                        {currentUser.full_name || currentUser.username}
+                      </p>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase">
+                        {isAdmin ? 'Quản trị viên' : isTeacher ? 'Giáo viên' : 'Học sinh'}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        onLogout();
+                      }}
+                      className="p-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100"
+                      title="Đăng xuất"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenLogin();
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-navy text-white text-xs font-bold flex items-center justify-center gap-2 shadow"
+                >
+                  <LogIn className="w-4 h-4 text-gold" />
+                  <span>Đăng Nhập Tài Khoản</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </header>
   );
 }

@@ -7,12 +7,15 @@ import {
   Play, Film, Globe2, Clock, FileText, Copy, Check, Printer, Target, GraduationCap
 } from 'lucide-react';
 import ThreeArtifactViewer from './ThreeArtifactViewer.jsx';
+import QuizInteractiveComponent from './QuizInteractiveComponent.jsx';
+import QuizEditorModal from './QuizEditorModal.jsx';
 import { parseIdFromSlug, createResourceSlug, formatYouTubeEmbedUrl } from '../utils/slugify.js';
 
 export default function ResourceDetailView({
   resource: initialResource,
   allResources = [],
   currentUser,
+  authToken,
   onEdit,
   onDelete
 }) {
@@ -22,6 +25,11 @@ export default function ResourceDetailView({
   const [resource, setResource] = useState(initialResource || null);
   const [loading, setLoading] = useState(!initialResource);
   const [error, setError] = useState(null);
+
+  // Quizzes for this resource / lesson
+  const [resourceQuizzes, setResourceQuizzes] = useState([]);
+  const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
+  const [editingQuiz, setEditingQuiz] = useState(null);
 
   const [activeMediaTab, setActiveMediaTab] = useState('gallery'); // 'gallery' | 'video' | '3d'
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
@@ -87,6 +95,79 @@ export default function ResourceDetailView({
       }
     }
   }, [allResources, slug]);
+
+  const fetchQuizzes = async (resId) => {
+    const targetId = resId || resource?.id;
+    if (!targetId) return;
+    try {
+      const res = await fetch(`/api/quizzes/by-resource/${targetId}?_t=${Date.now()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setResourceQuizzes(data);
+      }
+    } catch (err) {
+      console.error('Lỗi nạp bài trắc nghiệm:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (resource?.id) {
+      fetchQuizzes(resource.id);
+    }
+  }, [resource?.id, resource?.lesson]);
+
+  const handleOpenAddQuiz = () => {
+    setEditingQuiz(null);
+    setIsQuizModalOpen(true);
+  };
+
+  const handleOpenEditQuiz = (q) => {
+    setEditingQuiz(q);
+    setIsQuizModalOpen(true);
+  };
+
+  const handleSaveQuiz = async (payload, id) => {
+    const url = id ? `/api/quizzes/${id}` : '/api/quizzes';
+    const method = id ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Lỗi lưu câu hỏi');
+    }
+    if (resource?.id) {
+      await fetchQuizzes(resource.id);
+    }
+  };
+
+  const handleDeleteQuiz = async (id, question) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa câu hỏi "${question}"?`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/quizzes/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Lỗi xóa câu hỏi');
+      }
+      if (resource?.id) {
+        await fetchQuizzes(resource.id);
+      }
+    } catch (err) {
+      alert('Xóa câu hỏi thất bại: ' + err.message);
+    }
+  };
 
   const setDefaultMediaTab = (data) => {
     if (data.model_3d) {
@@ -574,6 +655,19 @@ export default function ResourceDetailView({
               </p>
             </div>
           )}
+
+          {/* 🎯 Interactive Lesson Quiz Section */}
+          <div className="pt-2">
+            <QuizInteractiveComponent
+              quizzes={resourceQuizzes}
+              lessonTitle={resource.lesson || resource.title}
+              isAdmin={isAdmin}
+              onEditQuiz={handleOpenEditQuiz}
+              onDeleteQuiz={handleDeleteQuiz}
+              onAddQuiz={handleOpenAddQuiz}
+              onRefresh={() => fetchQuizzes(resource.id)}
+            />
+          </div>
         </div>
 
         {/* Right Column: Pedagogical Tools, Fast Facts, GDPT 2018 & Topic Feed */}
@@ -915,6 +1009,20 @@ export default function ResourceDetailView({
           </div>
         </div>
       )}
+
+      {/* Quiz Editor Modal for Admin */}
+      <QuizEditorModal
+        quiz={editingQuiz}
+        isOpen={isQuizModalOpen}
+        onClose={() => {
+          setIsQuizModalOpen(false);
+          setEditingQuiz(null);
+        }}
+        onSave={handleSaveQuiz}
+        defaultLesson={resource?.lesson || ''}
+        defaultResourceId={resource?.id || null}
+        allResources={allResources}
+      />
     </div>
   );
 }
