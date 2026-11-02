@@ -9,6 +9,7 @@ import ResourceDetailView from './components/ResourceDetailView.jsx';
 import ResourceEditorModal from './components/ResourceEditorModal.jsx';
 import LoginModal from './components/LoginModal.jsx';
 import ProfileModal from './components/ProfileModal.jsx';
+import BannerManagerModal from './components/BannerManagerModal.jsx';
 import AdminDashboard from './components/AdminDashboard.jsx';
 import Studio3DView from './components/Studio3DView.jsx';
 import TeachersView from './components/TeachersView.jsx';
@@ -27,6 +28,7 @@ export default function App() {
   const [topics, setTopics] = useState([]);
   const [resources, setResources] = useState([]);
   const [artifacts3d, setArtifacts3d] = useState([]);
+  const [bannerSlides, setBannerSlides] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -41,6 +43,7 @@ export default function App() {
   });
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('sukyso_token') || '');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isBannerModalOpen, setIsBannerModalOpen] = useState(false);
 
   // Filters read from Search Params for /kho-tu-lieu
   const searchQuery = searchParams.get('q') || '';
@@ -104,17 +107,19 @@ export default function App() {
     setLoading(true);
     try {
       const ts = Date.now();
-      const [topicsRes, resRes, artRes, statsRes] = await Promise.all([
+      const [topicsRes, resRes, artRes, statsRes, bannerRes] = await Promise.all([
         fetch(`${API_BASE}/topics?_t=${ts}`).then((r) => (r.ok ? r.json() : [])),
         fetch(`${API_BASE}/resources?_t=${ts}`).then((r) => (r.ok ? r.json() : [])),
         fetch(`${API_BASE}/3d-artifacts?_t=${ts}`).then((r) => (r.ok ? r.json() : [])),
         fetch(`${API_BASE}/stats?_t=${ts}`).then((r) => (r.ok ? r.json() : null)),
+        fetch(`${API_BASE}/banner-slides?_t=${ts}`).then((r) => (r.ok ? r.json() : [])),
       ]);
 
       setTopics(topicsRes);
       setResources(resRes);
       setArtifacts3d(artRes);
       setStats(statsRes);
+      setBannerSlides(bannerRes);
     } catch (err) {
       console.error('Lỗi nạp dữ liệu từ backend:', err);
     } finally {
@@ -289,6 +294,9 @@ export default function App() {
                     setSearchQuery={setInputSearch}
                     onSearchSubmit={handleSearchSubmit}
                     onOpenStudio3D={() => navigate('/studio-3d')}
+                    bannerSlides={bannerSlides}
+                    onOpenBannerConfig={() => setIsBannerModalOpen(true)}
+                    isAdmin={currentUser?.role === 'admin'}
                   />
 
                   {/* 3D Interactive Highlight Teaser */}
@@ -835,6 +843,7 @@ export default function App() {
                     onLogout={handleLogout}
                     artifacts3d={artifacts3d}
                     onArtifacts3DChange={fetchInitialData}
+                    onOpenBannerConfig={() => setIsBannerModalOpen(true)}
                   />
                 ) : (
                   <Navigate to="/" replace />
@@ -880,6 +889,16 @@ export default function App() {
         authToken={authToken}
         onProfileUpdated={handleProfileUpdated}
       />
+
+      {/* Banner Carousel Manager Modal */}
+      {isBannerModalOpen && (
+        <BannerManagerModal
+          isOpen={isBannerModalOpen}
+          onClose={() => setIsBannerModalOpen(false)}
+          authToken={authToken}
+          onSlidesUpdated={fetchInitialData}
+        />
+      )}
     </div>
   );
 }

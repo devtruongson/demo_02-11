@@ -2024,6 +2024,183 @@ app.delete('/api/student-tasks/:id', requireAdmin, async (req, res) => {
   }
 });
 
+// ==========================================
+// BANNER SLIDES MANAGEMENT SYSTEM
+// ==========================================
+async function initBannerSlidesTable() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS banner_slides (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        title VARCHAR(255) NULL,
+        subtitle VARCHAR(255) NULL,
+        image_url TEXT NOT NULL,
+        link_url VARCHAR(255) NULL,
+        order_index INT DEFAULT 0,
+        is_active TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    const [rows] = await pool.query('SELECT COUNT(*) as count FROM banner_slides');
+    if (rows[0].count === 0) {
+      console.log('Seeding initial banner slides...');
+      const seedSlides = [
+        {
+          title: 'Văn hóa Đông Sơn & Trống Đồng Ngọc Lũ',
+          subtitle: 'Kỳ quan kỹ thuật đúc đồng và đỉnh cao văn minh Sông Hồng',
+          image_url: 'https://images.unsplash.com/photo-1599707367072-cd6ada2bc375?q=80&w=1600&auto=format&fit=crop',
+          link_url: '/studio-3d/co-vat/dong_son_drum',
+          order_index: 1,
+          is_active: 1
+        },
+        {
+          title: 'Quần Thể Di Sản Kiến Trúc Đông Nam Á',
+          subtitle: 'Hải trình giao lưu thương mại và văn hóa biển cổ đại',
+          image_url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop',
+          link_url: '/kho-tu-lieu?topic=4',
+          order_index: 2,
+          is_active: 1
+        },
+        {
+          title: 'Studio Bảo Vật 3D Khảo Cổ Học Lịch Sử 10',
+          subtitle: 'Tương tác 360 độ, bóc tách hoa văn và đo đạc niên đại số',
+          image_url: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=1600&auto=format&fit=crop',
+          link_url: '/studio-3d',
+          order_index: 3,
+          is_active: 1
+        }
+      ];
+
+      for (const s of seedSlides) {
+        await pool.query(
+          `INSERT INTO banner_slides (title, subtitle, image_url, link_url, order_index, is_active)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [s.title, s.subtitle, s.image_url, s.link_url, s.order_index, s.is_active]
+        );
+      }
+      console.log('Seeded banner slides successfully.');
+    }
+  } catch (err) {
+    console.error('Error initializing banner_slides table:', err.message);
+  }
+}
+initBannerSlidesTable();
+
+// GET /api/banner-slides (Public - only active slides)
+app.get('/api/banner-slides', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM banner_slides WHERE is_active = 1 ORDER BY order_index ASC, id ASC'
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error('Get banner slides error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/banner-slides/all (Admin - all slides including inactive)
+app.get('/api/banner-slides/all', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM banner_slides ORDER BY order_index ASC, id ASC'
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error('Get all banner slides error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /api/banner-slides (Admin only)
+app.post('/api/banner-slides', requireAdmin, async (req, res) => {
+  try {
+    const { title, subtitle, image_url, link_url, order_index, is_active } = req.body;
+    if (!image_url || !image_url.trim()) {
+      return res.status(400).json({ error: 'Vui lòng cung cấp đường dẫn ảnh (image_url) cho banner.' });
+    }
+
+    const [result] = await pool.query(
+      `INSERT INTO banner_slides (title, subtitle, image_url, link_url, order_index, is_active)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        title ? title.trim() : null,
+        subtitle ? subtitle.trim() : null,
+        image_url.trim(),
+        link_url ? link_url.trim() : null,
+        Number(order_index) || 0,
+        is_active === false || is_active === 0 ? 0 : 1
+      ]
+    );
+
+    await logActivity(req.user?.username || 'admin', 'CREATE_BANNER', `Thêm slide banner mới ID ${result.insertId}`);
+    const [created] = await pool.query('SELECT * FROM banner_slides WHERE id = ?', [result.insertId]);
+    res.status(201).json(created[0]);
+  } catch (error) {
+    console.error('Create banner slide error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT /api/banner-slides/:id (Admin only)
+app.put('/api/banner-slides/:id', requireAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { title, subtitle, image_url, link_url, order_index, is_active } = req.body;
+    if (!image_url || !image_url.trim()) {
+      return res.status(400).json({ error: 'Vui lòng cung cấp đường dẫn ảnh cho banner.' });
+    }
+
+    await pool.query(
+      `UPDATE banner_slides
+       SET title = ?, subtitle = ?, image_url = ?, link_url = ?, order_index = ?, is_active = ?
+       WHERE id = ?`,
+      [
+        title ? title.trim() : null,
+        subtitle ? subtitle.trim() : null,
+        image_url.trim(),
+        link_url ? link_url.trim() : null,
+        Number(order_index) || 0,
+        is_active === false || is_active === 0 ? 0 : 1,
+        id
+      ]
+    );
+
+    await logActivity(req.user?.username || 'admin', 'UPDATE_BANNER', `Cập nhật slide banner ID ${id}`);
+    const [updated] = await pool.query('SELECT * FROM banner_slides WHERE id = ?', [id]);
+    res.json(updated[0]);
+  } catch (error) {
+    console.error('Update banner slide error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT /api/banner-slides/:id/toggle (Admin only)
+app.put('/api/banner-slides/:id/toggle', requireAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    await pool.query('UPDATE banner_slides SET is_active = NOT is_active WHERE id = ?', [id]);
+    const [updated] = await pool.query('SELECT * FROM banner_slides WHERE id = ?', [id]);
+    res.json(updated[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE /api/banner-slides/:id (Admin only)
+app.delete('/api/banner-slides/:id', requireAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    await pool.query('DELETE FROM banner_slides WHERE id = ?', [id]);
+    await logActivity(req.user?.username || 'admin', 'DELETE_BANNER', `Xóa slide banner ID ${id}`);
+    res.json({ message: 'Xóa slide banner thành công.' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Serve frontend static build if exists (SPA fallback)
 const clientDistPath = path.join(__dirname, '..', 'client', 'dist');
 if (fs.existsSync(clientDistPath)) {

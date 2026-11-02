@@ -5,7 +5,7 @@ import {
   RefreshCw, PlusCircle, Edit3, Trash2, Calendar, Award, ArrowUpRight, Search, Filter,
   ArrowLeft, LogOut, X, ExternalLink, Film, Image, MapPin, Sparkles, CheckCircle2,
   ChevronRight, LayoutList, LayoutGrid, KeyRound, EyeOff, UserCheck, AlertCircle,
-  GraduationCap, HelpCircle, FileText
+  GraduationCap, HelpCircle, FileText, Sliders
 } from 'lucide-react';
 import ThreeArtifactViewer from './ThreeArtifactViewer.jsx';
 import Artifact3DEditorModal from './Artifact3DEditorModal.jsx';
@@ -22,7 +22,8 @@ export default function AdminDashboard({
   onLogout,
   refreshTrigger,
   artifacts3d = [],
-  onArtifacts3DChange = null
+  onArtifacts3DChange = null,
+  onOpenBannerConfig = null
 }) {
   const [analytics, setAnalytics] = useState(null);
   const [resources, setResources] = useState([]);
@@ -441,6 +442,16 @@ export default function AdminDashboard({
 
         {/* Action Controls & Admin Profile */}
         <div className="flex items-center gap-3">
+          {onOpenBannerConfig && (
+            <button
+              onClick={onOpenBannerConfig}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition border border-white/15 cursor-pointer shadow-xs active:scale-95"
+              title="Cấu hình Banner trang chủ (Carousel)"
+            >
+              <Sliders className="w-3.5 h-3.5 text-amber-300" />
+              <span>Banner Carousel</span>
+            </button>
+          )}
           <button
             onClick={fetchDashboardData}
             className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white transition border border-slate-800"
@@ -496,6 +507,16 @@ export default function AdminDashboard({
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
+          {onOpenBannerConfig && (
+            <button
+              onClick={onOpenBannerConfig}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition border border-white/15 cursor-pointer shadow-xs active:scale-95"
+              title="Cấu hình Banner trang chủ (Carousel)"
+            >
+              <Sliders className="w-3.5 h-3.5 text-amber-300" />
+              <span>Banner Carousel</span>
+            </button>
+          )}
           <button
             onClick={fetchDashboardData}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition border border-white/15"
@@ -578,6 +599,15 @@ export default function AdminDashboard({
           <Award className="w-3.5 h-3.5 text-gold" />
           <span>🎯 Trắc nghiệm theo bài ({quizzesList.length})</span>
         </button>
+        {onOpenBannerConfig && (
+          <button
+            onClick={onOpenBannerConfig}
+            className="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-900 border border-slate-800 cursor-pointer"
+          >
+            <Sliders className="w-3.5 h-3.5 text-amber-300" />
+            <span>🖼️ Banner Carousel</span>
+          </button>
+        )}
       </div>
 
       {/* ================= TAB 1: OVERVIEW & ANALYTICS ================= */}
