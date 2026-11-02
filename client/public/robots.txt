@@ -1,0 +1,4 @@
+# Chặn toàn bộ web crawlers / bọ tìm kiếm (Googlebot, Bingbot, Yandex...)
+User-agent: *
+Disallow: /
+

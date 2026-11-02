@@ -972,6 +972,18 @@ app.delete('/api/3d-artifacts/:id', requireAdmin, async (req, res) => {
   }
 });
 
+// Serve frontend static build if exists (SPA fallback)
+const clientDistPath = path.join(__dirname, '..', 'client', 'dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+      return next();
+    }
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
+
 app.listen(PORT, () => {
   console.log(`🚀 Su Ky So Backend running on http://localhost:${PORT}`);
   console.log(`📦 Connected to MySQL: ${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`);

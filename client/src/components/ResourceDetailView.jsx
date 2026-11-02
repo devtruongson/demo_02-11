@@ -576,13 +576,20 @@ export default function ResourceDetailView({
           )}
         </div>
 
-        {/* Right Column: Source References & Quick Meta */}
+        {/* Right Column: Pedagogical Tools, Fast Facts, GDPT 2018 & Topic Feed */}
         <div className="lg:col-span-4 space-y-6">
-          {/* Source Attribution Box */}
+          {/* 1. NGUỒN TƯ LIỆU & THẨM ĐỊNH HỌC THUẬT */}
           <div className="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-sm space-y-4 text-xs">
-            <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-400">
-              Nguồn Tư Liệu & Thẩm Định
-            </h4>
+            <div className="flex items-center justify-between">
+              <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-400">
+                Nguồn Tư Liệu & Thẩm Định
+              </h4>
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                <span>Chuẩn GDPT 2018</span>
+              </span>
+            </div>
+
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-1">
               <span className="text-slate-400 block">Cơ quan lưu giữ / Nguồn ảnh:</span>
               <strong className="text-slate-900 block font-bold text-sm">
@@ -595,10 +602,10 @@ export default function ResourceDetailView({
                 href={resource.url}
                 target="_blank"
                 rel="noreferrer"
-                className="w-full py-3 rounded-xl bg-navy hover:bg-navy-light text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-sm group"
+                className="w-full py-2.5 rounded-xl bg-navy hover:bg-navy-light text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-sm group"
               >
                 <span>Xem tài liệu gốc tại nguồn</span>
-                <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </a>
             )}
 
@@ -611,7 +618,131 @@ export default function ResourceDetailView({
             </div>
           </div>
 
-          {/* Quick 3D Launcher if Available */}
+          {/* 2. CHỈ MỤC HỒ SƠ & THÔNG SỐ KHẢO CỔ NHANH (FAST FACTS) */}
+          <div className="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-sm space-y-3.5 text-xs">
+            <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              <Bookmark className="w-3.5 h-3.5 text-gold-dark" />
+              <span>Chỉ Mục Học Liệu & Khảo Cổ</span>
+            </h4>
+
+            <div className="divide-y divide-slate-100 text-xs">
+              <div className="py-2.5 flex items-center justify-between gap-2">
+                <span className="text-slate-500">Mã tư liệu số:</span>
+                <span className="font-mono font-bold text-slate-900 px-2 py-0.5 rounded bg-slate-100">
+                  #{resource.id}
+                </span>
+              </div>
+              <div className="py-2.5 flex items-center justify-between gap-2">
+                <span className="text-slate-500">Chủ đề chương trình:</span>
+                <span className="font-bold text-navy text-right">
+                  Chủ đề {resource.topic_id}
+                </span>
+              </div>
+              <div className="py-2.5 flex items-start justify-between gap-2">
+                <span className="text-slate-500 shrink-0">Bài học / Chuyên đề:</span>
+                <span className="font-bold text-slate-900 text-right line-clamp-2">
+                  {resource.lesson || 'Lịch sử 10'}
+                </span>
+              </div>
+              <div className="py-2.5 flex items-center justify-between gap-2">
+                <span className="text-slate-500">Thời kỳ / Niên đại:</span>
+                <span className="font-bold text-slate-900 text-right">
+                  {resource.period || 'Cổ – trung đại'}
+                </span>
+              </div>
+              <div className="py-2.5 flex items-center justify-between gap-2">
+                <span className="text-slate-500">Khu vực / Tọa độ:</span>
+                <span className="font-bold text-slate-900 text-right line-clamp-1">
+                  {resource.place || 'Đông Nam Á'}
+                </span>
+              </div>
+              <div className="py-2.5 flex items-center justify-between gap-2">
+                <span className="text-slate-500">Định dạng số hóa:</span>
+                <span className="font-bold text-slate-900 text-right capitalize">
+                  {resource.type === '3d' ? 'Mô hình 3D xoay 360°' : resource.type === 'video' ? 'Phim tài liệu 4K' : 'Bản đồ / Ảnh khảo cổ'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. YÊU CẦU CẦN ĐẠT & NĂNG LỰC ĐẶC THÙ (GDPT 2018) */}
+          <div className="bg-gradient-to-br from-slate-900 to-navy-dark text-white p-6 rounded-3xl border border-white/10 shadow-md space-y-3.5 text-xs">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-gold/20 text-gold flex items-center justify-center font-bold border border-gold/30 shrink-0">
+                <GraduationCap className="w-4 h-4" />
+              </div>
+              <div>
+                <h4 className="font-black text-sm text-white leading-tight">Yêu Cầu Cần Đạt</h4>
+                <span className="text-[10px] text-gold font-bold">Chuẩn Năng Lực Lịch Sử 10</span>
+              </div>
+            </div>
+
+            <div className="space-y-2 text-[11px] leading-relaxed pt-1">
+              <div className="flex items-start gap-2 bg-white/5 p-2.5 rounded-xl border border-white/10">
+                <Target className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                <span><strong>Tìm hiểu lịch sử:</strong> Khai thác dữ liệu từ nguồn lược đồ và hiện vật gốc để xác lập không gian phát triển.</span>
+              </div>
+              <div className="flex items-start gap-2 bg-white/5 p-2.5 rounded-xl border border-white/10">
+                <Lightbulb className="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
+                <span><strong>Nhận thức & Tư duy:</strong> Phân tích mối liên hệ giữa điều kiện tự nhiên và sự hình thành mạng lưới đô thị cổ.</span>
+              </div>
+              <div className="flex items-start gap-2 bg-white/5 p-2.5 rounded-xl border border-white/10">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                <span><strong>Vận dụng kiến thức:</strong> Tự tin thuyết trình, thảo luận dự án học tập về các nền văn minh cổ đại.</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 4. CÔNG CỤ HỌC THUẬT & TRÍCH DẪN SƯ PHẠM */}
+          <div className="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-sm space-y-3 text-xs">
+            <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-navy" />
+              <span>Công Cụ Nghiên Cứu & Trích Dẫn</span>
+            </h4>
+
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={handleCopyCitation}
+                className="w-full py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-between border border-slate-200 transition group cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <Copy className="w-3.5 h-3.5 text-slate-400 group-hover:text-navy transition" />
+                  <span>{copiedCitation ? 'Đã sao chép trích dẫn APA!' : 'Sao chép trích dẫn học thuật (APA)'}</span>
+                </div>
+                {copiedCitation ? (
+                  <Check className="w-4 h-4 text-emerald-600" />
+                ) : (
+                  <span className="text-[10px] text-slate-400 font-mono">APA 7</span>
+                )}
+              </button>
+
+              <Link
+                to="/studio-3d/hai-trinh-bien"
+                className="w-full py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-between border border-slate-200 transition group"
+              >
+                <div className="flex items-center gap-2">
+                  <Globe2 className="w-3.5 h-3.5 text-blue-500" />
+                  <span>Đối chiếu Quả Cầu 3D Hải Trình</span>
+                </div>
+                <ArrowLeft className="w-3.5 h-3.5 rotate-180 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="w-full py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-between border border-slate-200 transition cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <Printer className="w-3.5 h-3.5 text-slate-400" />
+                  <span>In / Lưu hồ sơ tư liệu bài học</span>
+                </div>
+                <span className="text-[10px] text-slate-400">PDF</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 5. QUICK 3D LAUNCHER (IF 3D AVAILABLE) */}
           {resource.model_3d && activeMediaTab !== '3d' && (
             <div className="bg-gradient-to-br from-slate-900 to-navy text-white p-6 rounded-3xl border border-slate-800 shadow-md space-y-3">
               <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-gold/20 text-gold border border-gold/30 inline-block">
@@ -633,6 +764,60 @@ export default function ResourceDetailView({
                 <Box className="w-4 h-4" />
                 <span>Mở Studio 3D Xoay 360°</span>
               </button>
+            </div>
+          )}
+
+          {/* 6. ĐỀ XUẤT TƯ LIỆU CÙNG BÀI HỌC (MINI SIDEBAR FEED) */}
+          {finalRelated.length > 0 && (
+            <div className="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-sm space-y-3.5 text-xs">
+              <div className="flex items-center justify-between">
+                <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-400">
+                  Tư Liệu Cùng Chủ Đề
+                </h4>
+                <Link to="/kho-tu-lieu" className="text-[11px] font-bold text-navy hover:underline">
+                  Xem tất cả
+                </Link>
+              </div>
+
+              <div className="space-y-2.5">
+                {finalRelated.slice(0, 3).map((item) => {
+                  const itemSlug = createResourceSlug(item.id, item.title);
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => {
+                        navigate(`/tu-lieu/${itemSlug}`);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="p-2.5 rounded-2xl border border-slate-100 hover:border-gold/60 hover:bg-slate-50/80 transition flex items-center gap-3 cursor-pointer group"
+                    >
+                      <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-900 shrink-0">
+                        <img
+                          src={item.img}
+                          alt={item.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h5 className="font-bold text-xs text-slate-900 group-hover:text-navy line-clamp-1">
+                          {item.title}
+                        </h5>
+                        <span className="text-[10px] text-slate-400 block mt-0.5 line-clamp-1">
+                          {item.place || item.period}
+                        </span>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 uppercase">
+                            {item.type}
+                          </span>
+                          <span className="text-[10px] text-slate-400 flex items-center gap-0.5">
+                            <Eye className="w-3 h-3" /> {item.views || 0}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
