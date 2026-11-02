@@ -31,28 +31,28 @@ export default function Sidebar({ stats, currentUser }) {
                 to={item.to}
                 end={item.end}
                 className={({ isActive }) =>
-                  `w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition ${
+                  `w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition ${
                     isActive
-                      ? 'bg-navy text-white shadow-sm'
-                      : 'text-slate-600 hover:text-navy hover:bg-slate-100/70'
+                      ? 'bg-slate-900 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
                     <div className="flex items-center gap-3">
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-gold' : 'text-slate-400'}`} />
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                       <span>{item.label}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       {item.badge && (
-                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-gold text-slate-950">
+                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'}`}>
                           {item.badge}
                         </span>
                       )}
                       {item.count !== undefined && (
                         <span
-                          className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${
+                          className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
                             isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
                           }`}
                         >
@@ -68,14 +68,14 @@ export default function Sidebar({ stats, currentUser }) {
         </div>
       </div>
 
-      {/* Pedagogical Tip */}
-      <div className="mt-6 p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200/70 text-amber-900 text-xs leading-relaxed">
-        <div className="flex items-center gap-1.5 font-bold text-amber-800 mb-1">
-          <Lightbulb className="w-4 h-4 text-amber-600" />
-          <span>Mẹo sư phạm Lịch sử</span>
+      {/* Pedagogical Tip - Human, academic, clean styling */}
+      <div className="mt-6 p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-slate-700 text-xs leading-relaxed">
+        <div className="flex items-center gap-1.5 font-semibold text-slate-900 mb-1">
+          <Lightbulb className="w-3.5 h-3.5 text-slate-600" />
+          <span>Gợi ý sư phạm</span>
         </div>
-        <p className="text-[11px] text-amber-950/80">
-          Kết hợp quan sát ảnh hiện vật, lược đồ địa lý và mô hình 3D xoay 360° để giúp học sinh tự phát hiện tri thức thay vì truyền thụ một chiều.
+        <p className="text-[11px] text-slate-500 leading-normal">
+          Kết hợp quan sát ảnh hiện vật, lược đồ địa lý và mô hình 3D xoay 360° để giúp học sinh tự phát hiện tri thức lịch sử.
         </p>
       </div>
     </aside>

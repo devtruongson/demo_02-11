@@ -7,13 +7,13 @@ export default function ResourceCard({ resource, onSelect, onOpen3D }) {
   const getTypeBadge = (type) => {
     switch (type) {
       case '3d':
-        return { label: 'Mô hình 3D', icon: Box, color: 'bg-amber-500 text-slate-950 font-black' };
+        return { label: 'Mô hình 3D', icon: Box, color: 'bg-slate-900/85 backdrop-blur-md text-amber-300 border border-amber-400/30' };
       case 'video':
-        return { label: 'Video bài học', icon: Video, color: 'bg-rose-500 text-white' };
+        return { label: 'Video bài học', icon: Video, color: 'bg-slate-900/85 backdrop-blur-md text-rose-300 border border-rose-400/30' };
       case 'text':
-        return { label: 'Văn bản / Bia ký', icon: FileText, color: 'bg-emerald-600 text-white' };
+        return { label: 'Văn bản / Bia ký', icon: FileText, color: 'bg-slate-900/85 backdrop-blur-md text-emerald-300 border border-emerald-400/30' };
       default:
-        return { label: 'Hình ảnh khảo cổ', icon: Image, color: 'bg-navy text-white' };
+        return { label: 'Hình ảnh khảo cổ', icon: Image, color: 'bg-slate-900/85 backdrop-blur-md text-slate-200 border border-white/20' };
     }
   };
 
@@ -105,10 +105,10 @@ export default function ResourceCard({ resource, onSelect, onOpen3D }) {
 
           {/* Pedagogical Tip preview */}
           {resource.tip && (
-            <div className="mt-3 p-2.5 rounded-xl bg-amber-50/70 border border-amber-200/60 text-[11px] text-amber-900 leading-normal flex items-start gap-1.5">
-              <Lightbulb className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+            <div className="mt-3 p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-[11px] text-slate-700 leading-normal flex items-start gap-1.5">
+              <Lightbulb className="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5" />
               <span className="line-clamp-2">
-                <strong>Gợi ý sư phạm:</strong> {resource.tip}
+                <strong className="text-slate-900 font-semibold">Gợi ý sư phạm:</strong> {resource.tip}
               </span>
             </div>
           )}

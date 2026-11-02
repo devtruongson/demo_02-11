@@ -67,20 +67,20 @@ export default function Navbar({
           {/* Brand Logo with Link */}
           <Link
             to="/"
-            className="flex items-center gap-2.5 sm:gap-3.5 cursor-pointer group shrink-0 min-w-0"
+            className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group shrink-0 min-w-0"
           >
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-navy to-navy-light text-white flex items-center justify-center text-lg sm:text-xl shadow-md group-hover:scale-105 transition-transform duration-200 border border-white/20 shrink-0">
-              🏛️
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-xs shrink-0">
+              <Landmark className="w-4 h-4 sm:w-5 sm:h-5 text-amber-200" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <span className="font-black text-lg sm:text-xl tracking-tight text-navy">Sử Ký Số</span>
-                <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-1.5 sm:px-2 py-0.5 rounded-full bg-gold/15 text-gold-dark border border-gold/30 shrink-0">
+                <span className="font-bold text-lg sm:text-xl tracking-tight text-slate-900">Sử Ký Số</span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
                   Lịch sử 10
                 </span>
               </div>
-              <p className="hidden sm:block text-[11px] font-medium text-slate-400 truncate">
-                Kho học liệu số & Studio 3D GDPT 2018
+              <p className="hidden sm:block text-[11px] font-normal text-slate-500 truncate">
+                Học liệu số & Studio 3D GDPT 2018
               </p>
             </div>
           </Link>
@@ -312,12 +312,12 @@ export default function Navbar({
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-2.5"
                 >
-                  <div className="w-9 h-9 rounded-xl bg-navy text-white flex items-center justify-center text-lg shadow-sm">
-                    🏛️
+                  <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center shadow-xs shrink-0">
+                    <Landmark className="w-4 h-4 text-amber-200" />
                   </div>
                   <div>
-                    <span className="font-black text-base text-navy block">Sử Ký Số</span>
-                    <span className="text-[10px] text-slate-400 font-bold uppercase block">Lịch sử 10 GDPT 2018</span>
+                    <span className="font-bold text-sm text-slate-900 block">Sử Ký Số</span>
+                    <span className="text-[10px] text-slate-400 font-medium block">Lịch sử 10 GDPT 2018</span>
                   </div>
                 </Link>
                 <button
