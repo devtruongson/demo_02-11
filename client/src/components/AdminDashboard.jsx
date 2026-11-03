@@ -5,7 +5,8 @@ import {
   RefreshCw, PlusCircle, Edit3, Trash2, Calendar, Award, ArrowUpRight, Search, Filter,
   ArrowLeft, LogOut, X, ExternalLink, Film, Image, MapPin, Sparkles, CheckCircle2,
   ChevronRight, LayoutList, LayoutGrid, KeyRound, EyeOff, UserCheck, AlertCircle,
-  GraduationCap, HelpCircle, FileText, Sliders, Mail, Phone, MessageSquare, Send, CheckCircle, Clock, Compass, FolderPlus
+  GraduationCap, HelpCircle, FileText, Sliders, Mail, Phone, MessageSquare, Send, CheckCircle, Clock, Compass, FolderPlus,
+  BarChart3, SlidersHorizontal, Landmark, GripVertical, ArrowUpDown, ChevronUp, ChevronDown
 } from 'lucide-react';
 import ThreeArtifactViewer from './ThreeArtifactViewer.jsx';
 import Artifact3DEditorModal from './Artifact3DEditorModal.jsx';
@@ -279,6 +280,98 @@ export default function AdminDashboard({
       if (onTopicsChange) await onTopicsChange();
     } catch (err) {
       alert('Không thể xóa chủ đề: ' + err.message);
+    }
+  };
+
+  // Topic Drag-and-Drop & Reorder State
+  const [reorderingTopics, setReorderingTopics] = useState(false);
+  const [reorderSuccessMsg, setReorderSuccessMsg] = useState('');
+  const [draggedTopicIndex, setDraggedTopicIndex] = useState(null);
+  const [dragOverTopicIndex, setDragOverTopicIndex] = useState(null);
+  const [topicsViewMode, setTopicsViewMode] = useState('grid'); // 'grid' | 'list'
+
+  const handleDragStartTopic = (e, index) => {
+    setDraggedTopicIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', String(index));
+  };
+
+  const handleDragEnterTopic = (e, index) => {
+    e.preventDefault();
+    if (draggedTopicIndex === null || draggedTopicIndex === index) return;
+    setDragOverTopicIndex(index);
+  };
+
+  const handleDragOverTopic = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDropTopic = async (e, targetIndex) => {
+    e.preventDefault();
+    if (draggedTopicIndex === null || draggedTopicIndex === targetIndex) {
+      setDraggedTopicIndex(null);
+      setDragOverTopicIndex(null);
+      return;
+    }
+
+    const updated = [...topicsList];
+    const [moved] = updated.splice(draggedTopicIndex, 1);
+    updated.splice(targetIndex, 0, moved);
+
+    setTopicsList(updated);
+    setDraggedTopicIndex(null);
+    setDragOverTopicIndex(null);
+
+    await saveNewTopicsOrder(updated);
+  };
+
+  const handleDragEndTopic = () => {
+    setDraggedTopicIndex(null);
+    setDragOverTopicIndex(null);
+  };
+
+  const handleMoveTopicStep = async (index, direction) => {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= topicsList.length) return;
+
+    const updated = [...topicsList];
+    const temp = updated[index];
+    updated[index] = updated[targetIndex];
+    updated[targetIndex] = temp;
+
+    setTopicsList(updated);
+    await saveNewTopicsOrder(updated);
+  };
+
+  const saveNewTopicsOrder = async (orderedList) => {
+    try {
+      setReorderingTopics(true);
+      const orderedIds = orderedList.map((t) => t.id);
+      const res = await fetch('/api/topics/reorder', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`
+        },
+        body: JSON.stringify({ ordered_ids: orderedIds })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Lỗi khi lưu thứ tự chủ đề');
+      }
+
+      setReorderSuccessMsg('✓ Đã cập nhật và lưu thứ tự sắp xếp chủ đề thành công!');
+      setTimeout(() => setReorderSuccessMsg(''), 3500);
+
+      if (onTopicsChange) await onTopicsChange();
+    } catch (err) {
+      console.error('Reorder error:', err);
+      alert('Không thể lưu thứ tự: ' + err.message);
+      await fetchDashboardData();
+    } finally {
+      setReorderingTopics(false);
     }
   };
 
@@ -706,13 +799,32 @@ export default function AdminDashboard({
   const previewPhotos = previewResource ? getPreviewPhotos(previewResource) : [];
   const previewYoutubeUrl = previewResource ? formatYouTubeEmbedUrl(previewResource.video_url) : null;
 
+  // Modern Admin Tabs Configuration
+  const adminTabs = [
+    { id: 'overview', label: 'Tổng quan', icon: BarChart3, count: null },
+    { id: 'resources', label: 'Kho tư liệu', icon: BookOpen, count: resources.length },
+    { id: 'artifacts3d', label: 'Bảo vật 3D', icon: Box, count: artifacts3dList.length },
+    { id: 'topics', label: 'Chủ đề SGK', icon: Compass, count: topicsList.length },
+    { id: 'teachers', label: 'Sư phạm 5512', icon: GraduationCap, count: teacherMaterials.length },
+    { id: 'quizzes', label: 'Ngân hàng câu hỏi', icon: HelpCircle, count: quizzesList.length },
+    { id: 'assignments', label: 'Giao bài & Đề thi', icon: Award, count: assignmentsList.length },
+    { id: 'users', label: 'Người dùng', icon: Users, count: users.length },
+    {
+      id: 'contacts',
+      label: 'Hộp thư liên hệ',
+      icon: Mail,
+      count: contactsList.length,
+      unreadBadge: unreadContactsCount
+    }
+  ];
+
   return (
     <div className="space-y-6 animate-fade-in pb-16">
       {/* ================= DEDICATED ADMIN TOPBAR (NO CLIENT MENU ITEMS) ================= */}
       <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-md border-b border-slate-800 px-4 sm:px-8 py-3.5 flex items-center justify-between gap-4 text-white -mx-4 sm:-mx-8 lg:-mx-12 -mt-4 mb-6 shadow-xl">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-navy to-navy-light text-white flex items-center justify-center font-black text-sm border border-white/20 shadow-sm">
-            🏛️
+            <Landmark className="w-4 h-4 text-amber-300" />
           </div>
           <div>
             <span className="font-extrabold text-sm text-white block leading-tight">
@@ -821,116 +933,60 @@ export default function AdminDashboard({
       </div>
 
       {/* ================= ADMIN TABS SWITCHER ================= */}
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
-        <button
-          onClick={() => setActiveTab('overview')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
-            activeTab === 'overview'
-              ? 'bg-navy text-white shadow-sm ring-1 ring-gold/40 font-black'
-              : 'text-slate-400 hover:text-white hover:bg-slate-900'
-          }`}
-        >
-          📊 Tổng quan & Phân tích (Analytics)
-        </button>
-        <button
-          onClick={() => setActiveTab('resources')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-            activeTab === 'resources'
-              ? 'bg-navy text-white shadow-sm ring-1 ring-gold/40 font-black'
-              : 'text-slate-400 hover:text-white hover:bg-slate-900'
-          }`}
-        >
-          <span>📚 Quản lý tư liệu ({resources.length})</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('artifacts3d')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-            activeTab === 'artifacts3d'
-              ? 'bg-navy text-white shadow-sm ring-1 ring-gold/40 font-black'
-              : 'text-slate-400 hover:text-white hover:bg-slate-900'
-          }`}
-        >
-          <span>🏺 Bảo vật 3D ({artifacts3dList.length})</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('users')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-            activeTab === 'users'
-              ? 'bg-navy text-white shadow-sm ring-1 ring-gold/40 font-black'
-              : 'text-slate-400 hover:text-white hover:bg-slate-900'
-          }`}
-        >
-          <span>👥 Người dùng & Phân quyền ({users.length})</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('teachers')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-            activeTab === 'teachers'
-              ? 'bg-navy text-white shadow-sm ring-1 ring-gold/40 font-black'
-              : 'text-slate-400 hover:text-white hover:bg-slate-900'
-          }`}
-        >
-          <GraduationCap className="w-3.5 h-3.5 text-gold" />
-          <span>🎓 Dành cho Giáo viên ({teacherMaterials.length})</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('quizzes')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-            activeTab === 'quizzes'
-              ? 'bg-navy text-white shadow-sm ring-1 ring-gold/40 font-black'
-              : 'text-slate-400 hover:text-white hover:bg-slate-900'
-          }`}
-        >
-          <Award className="w-3.5 h-3.5 text-gold" />
-          <span>🎯 Trắc nghiệm theo bài ({quizzesList.length})</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('assignments')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-            activeTab === 'assignments'
-              ? 'bg-navy text-white shadow-sm ring-1 ring-gold/40 font-black'
-              : 'text-slate-400 hover:text-white hover:bg-slate-900'
-          }`}
-        >
-          <Award className="w-3.5 h-3.5 text-amber-400" />
-          <span>📝 Giao Bài & Đề Thi ({assignmentsList.length})</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('topics')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-            activeTab === 'topics'
-              ? 'bg-navy text-white shadow-sm ring-1 ring-gold/40 font-black'
-              : 'text-slate-400 hover:text-white hover:bg-slate-900'
-          }`}
-        >
-          <Compass className="w-3.5 h-3.5 text-gold" />
-          <span>📂 Quản lý Chủ đề ({topicsList.length})</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('contacts')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-            activeTab === 'contacts'
-              ? 'bg-navy text-white shadow-sm ring-1 ring-gold/40 font-black'
-              : 'text-slate-400 hover:text-white hover:bg-slate-900'
-          }`}
-        >
-          <Mail className="w-3.5 h-3.5 text-gold" />
-          <span>📬 Hộp thư Liên hệ ({contactsList.length})</span>
-          {unreadContactsCount > 0 && (
-            <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[10px] font-black animate-pulse">
-              {unreadContactsCount} mới
-            </span>
+      <div className="bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-800/80 p-1.5 shadow-sm">
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-0.5">
+          {adminTabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  isActive
+                    ? 'bg-slate-800 text-white shadow-xs border border-slate-700/80 ring-1 ring-white/10 font-bold'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border border-transparent'
+                }`}
+              >
+                <Icon
+                  className={`w-3.5 h-3.5 shrink-0 transition-colors ${
+                    isActive ? 'text-amber-400' : 'text-slate-500'
+                  }`}
+                />
+                <span>{tab.label}</span>
+
+                {tab.unreadBadge !== undefined && tab.unreadBadge > 0 ? (
+                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500 text-white leading-none shadow-xs animate-pulse">
+                    {tab.unreadBadge} mới
+                  </span>
+                ) : tab.count !== null && tab.count !== undefined ? (
+                  <span
+                    className={`px-1.5 py-0.5 rounded-md text-[11px] font-mono leading-none border transition-colors ${
+                      isActive
+                        ? 'bg-amber-400/15 text-amber-300 border-amber-400/30 font-bold'
+                        : 'bg-slate-950/60 text-slate-400 border-slate-800'
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+
+          {onOpenBannerConfig && (
+            <div className="ml-auto pl-2 border-l border-slate-800/80 flex items-center shrink-0">
+              <button
+                onClick={onOpenBannerConfig}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:text-amber-200 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/25 transition cursor-pointer whitespace-nowrap shadow-xs active:scale-95"
+                title="Cấu hình Banner trang chủ (Carousel)"
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                <span>Banner Carousel</span>
+              </button>
+            </div>
           )}
-        </button>
-        {onOpenBannerConfig && (
-          <button
-            onClick={onOpenBannerConfig}
-            className="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-900 border border-slate-800 cursor-pointer"
-          >
-            <Sliders className="w-3.5 h-3.5 text-amber-300" />
-            <span>🖼️ Banner Carousel</span>
-          </button>
-        )}
+        </div>
       </div>
 
       {/* ================= TAB 1: OVERVIEW & ANALYTICS ================= */}
@@ -2165,6 +2221,7 @@ export default function AdminDashboard({
       {/* ================= TAB: TOPICS MANAGEMENT (CHỦ ĐỀ) ================= */}
       {activeTab === 'topics' && (
         <div className="space-y-6 animate-fade-in">
+          {/* Header Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/90 p-6 rounded-3xl border border-slate-800">
             <div>
               <div className="flex items-center gap-2 mb-1">
@@ -2172,17 +2229,51 @@ export default function AdminDashboard({
                   GDPT 2018 Lịch Sử 10
                 </span>
                 <span className="text-xs text-slate-400">• Tổng số: {topicsList.length} chủ đề</span>
+                <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                  <ArrowUpDown className="w-3 h-3 text-gold" />
+                  Kéo thả sắp xếp
+                </span>
               </div>
-              <h3 className="text-xl font-extrabold text-white">Quản Lý Danh Sách & Tên Chủ Đề</h3>
+              <h3 className="text-xl font-extrabold text-white">Quản Lý & Sắp Xếp Thứ Tự Chủ Đề</h3>
               <p className="text-xs text-slate-400 mt-1">
-                Cho phép đổi tên chủ đề, biên tập nội dung tóm tắt và cập nhật ảnh bìa đại diện trực quan.
+                Kéo thả (Drag & Drop) thẻ hoặc bấm nút ↑ ↓ để thay đổi thứ tự ưu tiên hiển thị trên Trang chủ, Kho tư liệu và Menu.
               </p>
             </div>
 
             <div className="flex items-center gap-2.5">
+              {/* View Mode Toggle */}
+              <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setTopicsViewMode('grid')}
+                  className={`p-2 rounded-lg transition text-xs font-bold flex items-center gap-1.5 ${
+                    topicsViewMode === 'grid'
+                      ? 'bg-slate-800 text-gold shadow-sm'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Chế độ xem dạng Thẻ Lưới (Grid)"
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                  <span className="hidden sm:inline">Lưới</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTopicsViewMode('list')}
+                  className={`p-2 rounded-lg transition text-xs font-bold flex items-center gap-1.5 ${
+                    topicsViewMode === 'list'
+                      ? 'bg-slate-800 text-gold shadow-sm'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Chế độ xem dạng Danh Sách (List)"
+                >
+                  <LayoutList className="w-4 h-4" />
+                  <span className="hidden sm:inline">Danh sách</span>
+                </button>
+              </div>
+
               <button
                 onClick={handleOpenNewTopic}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 text-xs font-black transition shadow-sm active:scale-95"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 text-xs font-black transition shadow-sm active:scale-95 shrink-0"
               >
                 <PlusCircle className="w-4 h-4" />
                 <span>Thêm Chủ Đề Mới</span>
@@ -2190,8 +2281,23 @@ export default function AdminDashboard({
             </div>
           </div>
 
-          {/* Search bar */}
-          <div className="flex items-center gap-3 bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
+          {/* Alert banners for saving state */}
+          {reorderingTopics && (
+            <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold animate-pulse">
+              <RefreshCw className="w-4 h-4 animate-spin text-gold" />
+              <span>Đang lưu và đồng bộ thứ tự chủ đề mới lên máy chủ...</span>
+            </div>
+          )}
+
+          {reorderSuccessMsg && (
+            <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold animate-fade-in">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span>{reorderSuccessMsg}</span>
+            </div>
+          )}
+
+          {/* Reorder Guidance & Search Bar */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
             <div className="relative flex-1">
               <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
@@ -2201,76 +2307,293 @@ export default function AdminDashboard({
                 placeholder="Tìm chủ đề theo tên hoặc nội dung..."
                 className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-gold"
               />
+              {topicSearch && (
+                <button
+                  type="button"
+                  onClick={() => setTopicSearch('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-950/60 px-3 py-2 rounded-xl border border-slate-800/80 shrink-0">
+              <GripVertical className="w-3.5 h-3.5 text-gold" />
+              <span>
+                {topicSearch.trim() ? (
+                  <span className="text-amber-400 font-semibold">⚠️ Xóa tìm kiếm để kéo thả sắp xếp</span>
+                ) : (
+                  <span>Kéo tay cầm <strong className="text-white">⠿</strong> hoặc bấm <strong className="text-white">↑ ↓</strong> để đổi vị trí</span>
+                )}
+              </span>
             </div>
           </div>
 
-          {/* Topics Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filteredTopics.map((topic) => {
-              const count = resources.filter((r) => r.topic_id === topic.id).length;
-              return (
-                <div
-                  key={topic.id}
-                  className="bg-slate-900/90 rounded-2xl border border-slate-800 overflow-hidden flex flex-col justify-between hover:border-slate-700 transition group shadow-sm"
+          {/* Topics Grid or List */}
+          {filteredTopics.length === 0 ? (
+            <div className="text-center py-16 bg-slate-900/50 rounded-3xl border border-slate-800">
+              <Compass className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+              <p className="text-slate-400 text-sm font-semibold">Không tìm thấy chủ đề nào phù hợp</p>
+              {topicSearch && (
+                <button
+                  onClick={() => setTopicSearch('')}
+                  className="mt-3 px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-bold transition"
                 >
-                  <div>
-                    {/* Topic Cover Image */}
-                    <div className="relative h-40 bg-slate-950 overflow-hidden">
-                      <img
-                        src={topic.img || 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=600&q=80'}
-                        alt={topic.title}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=600&q=80';
-                        }}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
-                      <div className="absolute top-3 left-3 bg-slate-950/90 backdrop-blur-md text-gold text-xs font-black px-2.5 py-1 rounded-lg border border-gold/30">
-                        Chủ đề #{topic.id}
+                  Xóa bộ lọc tìm kiếm
+                </button>
+              )}
+            </div>
+          ) : topicsViewMode === 'grid' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filteredTopics.map((topic, index) => {
+                const count = resources.filter((r) => r.topic_id === topic.id).length;
+                const canReorder = !topicSearch.trim();
+                const isDragging = draggedTopicIndex === index;
+                const isDragOver = dragOverTopicIndex === index;
+
+                return (
+                  <div
+                    key={topic.id}
+                    draggable={canReorder}
+                    onDragStart={(e) => handleDragStartTopic(e, index)}
+                    onDragEnter={(e) => handleDragEnterTopic(e, index)}
+                    onDragOver={handleDragOverTopic}
+                    onDrop={(e) => handleDropTopic(e, index)}
+                    onDragEnd={handleDragEndTopic}
+                    className={`bg-slate-900/90 rounded-2xl border transition-all duration-200 overflow-hidden flex flex-col justify-between group shadow-sm ${
+                      isDragging
+                        ? 'opacity-40 border-gold scale-95 ring-2 ring-gold/40'
+                        : isDragOver
+                        ? 'border-amber-400 ring-2 ring-amber-400/60 bg-amber-400/5 translate-y-[-2px]'
+                        : 'border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <div>
+                      {/* Drag Handle & Reorder Controls Topbar */}
+                      <div className="px-3.5 py-2 bg-slate-950 border-b border-slate-800/80 flex items-center justify-between gap-2 select-none">
+                        <div
+                          className={`flex items-center gap-1.5 ${
+                            canReorder
+                              ? 'cursor-grab active:cursor-grabbing text-gold hover:text-amber-300'
+                              : 'text-slate-500 cursor-not-allowed'
+                          } transition`}
+                          title={canReorder ? 'Nhấn giữ và kéo thả để di chuyển vị trí' : 'Xóa tìm kiếm để kích hoạt kéo thả'}
+                        >
+                          <GripVertical className="w-4 h-4 text-gold shrink-0" />
+                          <span className="text-[11px] font-black uppercase tracking-wider text-amber-300">
+                            Vị trí #{index + 1}
+                          </span>
+                        </div>
+
+                        {/* Step Movement Buttons */}
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleMoveTopicStep(index, -1);
+                            }}
+                            disabled={!canReorder || index === 0}
+                            className="p-1 rounded-lg bg-slate-800/90 hover:bg-gold/20 text-slate-300 hover:text-gold disabled:opacity-25 disabled:cursor-not-allowed transition"
+                            title="Di chuyển lên trên"
+                          >
+                            <ChevronUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleMoveTopicStep(index, 1);
+                            }}
+                            disabled={!canReorder || index === filteredTopics.length - 1}
+                            className="p-1 rounded-lg bg-slate-800/90 hover:bg-gold/20 text-slate-300 hover:text-gold disabled:opacity-25 disabled:cursor-not-allowed transition"
+                            title="Di chuyển xuống dưới"
+                          >
+                            <ChevronDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
-                      <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-md border border-white/10 flex items-center gap-1">
-                        <BookOpen className="w-3 h-3 text-gold" />
-                        <span>{count} tư liệu</span>
+
+                      {/* Topic Cover Image */}
+                      <div className="relative h-40 bg-slate-950 overflow-hidden">
+                        <img
+                          src={topic.img || 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=600&q=80'}
+                          alt={topic.title}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=600&q=80';
+                          }}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
+                        <div className="absolute top-3 left-3 bg-slate-950/90 backdrop-blur-md text-gold text-xs font-black px-2.5 py-1 rounded-lg border border-gold/30 shadow-sm flex items-center gap-1.5">
+                          <Compass className="w-3 h-3 text-gold" />
+                          <span>Chủ đề #{index + 1}</span>
+                        </div>
+                        <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-md border border-white/10 flex items-center gap-1 shadow-sm">
+                          <BookOpen className="w-3 h-3 text-gold" />
+                          <span>{count} tư liệu</span>
+                        </div>
+                      </div>
+
+                      {/* Topic Info */}
+                      <div className="p-4 space-y-2">
+                        <h4 className="font-extrabold text-sm text-white group-hover:text-gold transition">
+                          {topic.title}
+                        </h4>
+                        <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed">
+                          {topic.description || 'Chưa có tóm tắt nội dung chủ đề.'}
+                        </p>
                       </div>
                     </div>
 
-                    {/* Topic Info */}
-                    <div className="p-4 space-y-2">
-                      <h4 className="font-extrabold text-sm text-white group-hover:text-gold transition">
-                        {topic.title}
-                      </h4>
-                      <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed">
-                        {topic.description || 'Chưa có tóm tắt nội dung chủ đề.'}
-                      </p>
+                    {/* Actions Footer */}
+                    <div className="p-3.5 bg-slate-950/70 border-t border-slate-800/80 flex items-center justify-between gap-2">
+                      <span className="text-[11px] text-slate-500 font-mono">ID: {topic.id}</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleOpenEditTopic(topic)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gold/15 hover:bg-gold text-amber-300 hover:text-slate-950 text-xs font-bold transition cursor-pointer"
+                          title="Đổi tên & chỉnh sửa chủ đề"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                          <span>Đổi tên / Sửa</span>
+                        </button>
+                        <button
+                          onClick={() => handleDeleteTopic(topic)}
+                          className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white transition cursor-pointer"
+                          title="Xóa chủ đề này"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
+                );
+              })}
+            </div>
+          ) : (
+            /* List View Mode */
+            <div className="bg-slate-900/90 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
+              <div className="divide-y divide-slate-800/80">
+                {filteredTopics.map((topic, index) => {
+                  const count = resources.filter((r) => r.topic_id === topic.id).length;
+                  const canReorder = !topicSearch.trim();
+                  const isDragging = draggedTopicIndex === index;
+                  const isDragOver = dragOverTopicIndex === index;
 
-                  {/* Actions Footer */}
-                  <div className="p-3.5 bg-slate-950/70 border-t border-slate-800/80 flex items-center justify-between gap-2">
-                    <span className="text-[11px] text-slate-500 font-mono">ID: {topic.id}</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleOpenEditTopic(topic)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gold/15 hover:bg-gold text-amber-300 hover:text-slate-950 text-xs font-bold transition cursor-pointer"
-                        title="Đổi tên & chỉnh sửa chủ đề"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                        <span>Đổi tên / Sửa</span>
-                      </button>
-                      <button
-                        onClick={() => handleDeleteTopic(topic)}
-                        className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white transition cursor-pointer"
-                        title="Xóa chủ đề này"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                  return (
+                    <div
+                      key={topic.id}
+                      draggable={canReorder}
+                      onDragStart={(e) => handleDragStartTopic(e, index)}
+                      onDragEnter={(e) => handleDragEnterTopic(e, index)}
+                      onDragOver={handleDragOverTopic}
+                      onDrop={(e) => handleDropTopic(e, index)}
+                      onDragEnd={handleDragEndTopic}
+                      className={`p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all duration-200 group ${
+                        isDragging
+                          ? 'opacity-40 bg-gold/10'
+                          : isDragOver
+                          ? 'bg-amber-400/10 border-l-4 border-amber-400'
+                          : 'hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        {/* Drag Handle */}
+                        <div
+                          className={`p-1.5 rounded-lg ${
+                            canReorder
+                              ? 'cursor-grab active:cursor-grabbing text-gold hover:bg-gold/20'
+                              : 'text-slate-600 cursor-not-allowed'
+                          } transition shrink-0`}
+                          title={canReorder ? 'Nhấn giữ và kéo thả để di chuyển thứ tự' : 'Xóa tìm kiếm để kích hoạt kéo thả'}
+                        >
+                          <GripVertical className="w-5 h-5" />
+                        </div>
+
+                        {/* Order Number Badge */}
+                        <div className="w-8 h-8 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center font-mono font-black text-xs text-amber-300 shrink-0">
+                          #{index + 1}
+                        </div>
+
+                        {/* Up/Down buttons */}
+                        <div className="flex flex-col gap-0.5 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => handleMoveTopicStep(index, -1)}
+                            disabled={!canReorder || index === 0}
+                            className="p-1 rounded bg-slate-950 hover:bg-gold/20 text-slate-400 hover:text-gold disabled:opacity-20 disabled:cursor-not-allowed transition"
+                            title="Lên trên 1 nấc"
+                          >
+                            <ChevronUp className="w-3 h-3" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleMoveTopicStep(index, 1)}
+                            disabled={!canReorder || index === filteredTopics.length - 1}
+                            className="p-1 rounded bg-slate-950 hover:bg-gold/20 text-slate-400 hover:text-gold disabled:opacity-20 disabled:cursor-not-allowed transition"
+                            title="Xuống dưới 1 nấc"
+                          >
+                            <ChevronDown className="w-3 h-3" />
+                          </button>
+                        </div>
+
+                        {/* Thumbnail */}
+                        <div className="w-16 h-12 rounded-xl bg-slate-950 overflow-hidden shrink-0 border border-slate-800">
+                          <img
+                            src={topic.img || 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=600&q=80'}
+                            alt={topic.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+
+                        {/* Title & Info */}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-extrabold text-sm text-white group-hover:text-gold transition truncate">
+                              {topic.title}
+                            </h4>
+                            <span className="text-[10px] text-slate-500 font-mono shrink-0">ID: {topic.id}</span>
+                          </div>
+                          <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">
+                            {topic.description || 'Chưa có tóm tắt nội dung chủ đề.'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Right: Badges & Actions */}
+                      <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800/60">
+                        <span className="px-2.5 py-1 rounded-lg bg-slate-950 text-gold text-xs font-bold border border-slate-800 flex items-center gap-1">
+                          <BookOpen className="w-3.5 h-3.5 text-gold" />
+                          <span>{count} tư liệu</span>
+                        </span>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleOpenEditTopic(topic)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gold/15 hover:bg-gold text-amber-300 hover:text-slate-950 text-xs font-bold transition cursor-pointer"
+                            title="Đổi tên & chỉnh sửa chủ đề"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Đổi tên / Sửa</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteTopic(topic)}
+                            className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white transition cursor-pointer"
+                            title="Xóa chủ đề này"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

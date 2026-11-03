@@ -645,7 +645,7 @@ app.get('/api/topics', async (req, res) => {
       FROM topics t
       LEFT JOIN resources r ON t.id = r.topic_id
       GROUP BY t.id
-      ORDER BY t.id ASC
+      ORDER BY t.order_index ASC, t.id ASC
     `);
     res.json(rows);
   } catch (error) {
@@ -668,79 +668,39 @@ app.get('/api/topics/:id', async (req, res) => {
   }
 });
 
-// POST /api/topics (requireAdmin) - Create new topic
-app.post('/api/topics', requireAdmin, async (req, res) => {
+// PUT /api/topics/reorder (requireAdmin) - Reorder topics drag & drop
+app.put('/api/topics/reorder', requireAdmin, async (req, res) => {
   try {
-    const { title, description, img } = req.body;
-    if (!title || !title.trim()) {
-      return res.status(400).json({ error: 'Vui lòng nhập tên chủ đề học tập.' });
+    const { ordered_ids } = req.body;
+    if (!Array.isArray(ordered_ids) || ordered_ids.length === 0) {
+      return res.status(400).json({ error: 'Danh sách ID chủ đề không hợp lệ.' });
     }
 
-    const [result] = await pool.query(
-      'INSERT INTO topics (title, description, img) VALUES (?, ?, ?)',
-      [title.trim(), description ? description.trim() : '', img ? img.trim() : '']
-    );
+    const connection = await pool.getConnection();
+    try {
+      await connection.beginTransaction();
+      for (let i = 0; i < ordered_ids.length; i++) {
+        await connection.query('UPDATE topics SET order_index = ? WHERE id = ?', [i + 1, ordered_ids[i]]);
+      }
+      await connection.commit();
+    } catch (err) {
+      await connection.rollback();
+      throw err;
+    } finally {
+      connection.release();
+    }
 
-    await logActivity(req.user?.username || 'admin', 'CREATE_TOPIC', `Tạo chủ đề mới ID ${result.insertId}: ${title.trim()}`);
-    const [created] = await pool.query('SELECT * FROM topics WHERE id = ?', [result.insertId]);
-    res.status(201).json(created[0]);
+    await logActivity(req.user?.username || 'admin', 'REORDER_TOPICS', `Cập nhật thứ tự sắp xếp cho ${ordered_ids.length} chủ đề`);
+    const [rows] = await pool.query(`
+      SELECT t.*, COUNT(r.id) AS resource_count
+      FROM topics t
+      LEFT JOIN resources r ON t.id = r.topic_id
+      GROUP BY t.id
+      ORDER BY t.order_index ASC, t.id ASC
+    `);
+    res.json({ success: true, topics: rows });
   } catch (error) {
-    console.error('Create topic error:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// PUT /api/topics/:id (requireAdmin) - Update / Rename topic
-app.put('/api/topics/:id', requireAdmin, async (req, res) => {
-  try {
-    const id = Number(req.params.id);
-    const { title, description, img } = req.body;
-
-    if (!title || !title.trim()) {
-      return res.status(400).json({ error: 'Vui lòng nhập tên chủ đề học tập.' });
-    }
-
-    const [exists] = await pool.query('SELECT id, title FROM topics WHERE id = ?', [id]);
-    if (exists.length === 0) {
-      return res.status(404).json({ error: 'Không tìm thấy chủ đề học tập cần chỉnh sửa.' });
-    }
-
-    await pool.query(
-      'UPDATE topics SET title = ?, description = ?, img = ? WHERE id = ?',
-      [title.trim(), description ? description.trim() : '', img ? img.trim() : '', id]
-    );
-
-    await logActivity(req.user?.username || 'admin', 'UPDATE_TOPIC', `Đổi tên/Cập nhật chủ đề ID ${id}: ${title.trim()}`);
-    const [updated] = await pool.query('SELECT * FROM topics WHERE id = ?', [id]);
-    res.json(updated[0]);
-  } catch (error) {
-    console.error('Update topic error:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// DELETE /api/topics/:id (requireAdmin) - Delete topic
-app.delete('/api/topics/:id', requireAdmin, async (req, res) => {
-  try {
-    const id = Number(req.params.id);
-    const [exists] = await pool.query('SELECT id, title FROM topics WHERE id = ?', [id]);
-    if (exists.length === 0) {
-      return res.status(404).json({ error: 'Không tìm thấy chủ đề học tập cần xóa.' });
-    }
-
-    // Check if any resources use this topic
-    const [resourcesCount] = await pool.query('SELECT COUNT(*) as count FROM resources WHERE topic_id = ?', [id]);
-    if (resourcesCount[0].count > 0) {
-      return res.status(400).json({
-        error: `Không thể xóa chủ đề "${exists[0].title}" vì đang có ${resourcesCount[0].count} tư liệu thuộc chủ đề này. Vui lòng chuyển các tư liệu sang chủ đề khác trước khi xóa.`
-      });
-    }
-
-    await pool.query('DELETE FROM topics WHERE id = ?', [id]);
-    await logActivity(req.user?.username || 'admin', 'DELETE_TOPIC', `Xóa chủ đề ID ${id}: ${exists[0].title}`);
-    res.json({ message: 'Xóa chủ đề thành công.' });
-  } catch (error) {
-    console.error('Delete topic error:', error);
+    console.error('Reorder topics error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -753,9 +713,12 @@ app.post('/api/topics', requireAdmin, async (req, res) => {
       return res.status(400).json({ error: 'Vui lòng nhập tên chủ đề học tập.' });
     }
 
+    const [maxOrderRows] = await pool.query('SELECT COALESCE(MAX(order_index), 0) + 1 AS next_order FROM topics');
+    const nextOrder = maxOrderRows[0]?.next_order || 1;
+
     const [result] = await pool.query(
-      'INSERT INTO topics (title, description, img) VALUES (?, ?, ?)',
-      [title.trim(), description ? description.trim() : '', img ? img.trim() : '']
+      'INSERT INTO topics (title, description, img, order_index) VALUES (?, ?, ?, ?)',
+      [title.trim(), description ? description.trim() : '', img ? img.trim() : '', nextOrder]
     );
 
     await logActivity(req.user?.username || 'admin', 'CREATE_TOPIC', `Tạo chủ đề mới ID ${result.insertId}: ${title.trim()}`);

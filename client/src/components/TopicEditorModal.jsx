@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { X, Upload, Link as LinkIcon, Compass, RefreshCw, AlertCircle, Image as ImageIcon } from 'lucide-react';
+import { AlertCircle, Compass, Link as LinkIcon, RefreshCw, Upload, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function TopicEditorModal({
   isOpen,
@@ -93,8 +93,8 @@ export default function TopicEditorModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in !m-0">
+      <div className="bg-white rounded-3xl pt-4 w-full max-w-lg shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="px-6 py-4.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
           <div className="flex items-center gap-3">

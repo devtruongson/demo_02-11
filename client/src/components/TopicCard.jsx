@@ -24,7 +24,7 @@ export default function TopicCard({ topic, onSelect, isAdmin = false, onEdit = n
         
         {/* Number Badge */}
         <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md text-navy text-xs font-black px-2.5 py-1 rounded-lg shadow-sm border border-slate-100">
-          Chủ đề {topic.id}
+          Chủ đề {topic.order_index || topic.id}
         </div>
 
         {/* Count Badge */}
