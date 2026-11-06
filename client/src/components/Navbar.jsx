@@ -4,7 +4,7 @@ import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Landmark, Compass, BookOpen, GraduationCap, Users, Box,
   ShieldCheck, User, LogOut, LayoutDashboard, LogIn, ChevronDown, UserCheck,
-  Menu, X, Info, Sparkles, Mail
+  Menu, X, Info, Sparkles, Mail, MessageSquare, Flame
 } from 'lucide-react';
 
 export default function Navbar({
@@ -39,14 +39,15 @@ export default function Navbar({
     };
   }, [mobileMenuOpen]);
 
-  // Standard Navigation tabs (Dashboard is accessed from Profile dropdown as requested)
+  // Standard Navigation tabs - Role personalized as requested in Feedback
   const navItems = [
     { to: '/', label: 'Trang chủ', icon: Landmark, end: true },
-    { to: '/chu-de', label: 'Chủ đề', icon: Compass },
+    { to: '/chu-de', label: 'Chủ đề học tập', icon: Compass },
     { to: '/kho-tu-lieu', label: 'Kho tư liệu', icon: BookOpen },
-    { to: '/studio-3d', label: 'Studio 3D', icon: Box, badge: 'Mới' },
-    { to: '/giao-vien', label: 'Giáo viên', icon: GraduationCap },
-    { to: '/hoc-sinh', label: 'Học sinh', icon: Users },
+    { to: '/studio-3d', label: 'Studio 3D', icon: Box, badge: '360°' },
+    { to: '/khong-gian-chung', label: 'Không gian học tập', icon: MessageSquare, badge: 'Mới' },
+    ...(isTeacher || isAdmin ? [{ to: '/giao-vien', label: 'Lớp học & Giao bài', icon: GraduationCap, badge: 'Giáo viên' }] : []),
+    ...(currentUser?.role === 'student' ? [{ to: '/hoc-sinh', label: 'Góc học tập', icon: Users, badge: `🔥 ${currentUser?.streak_count || 1}d` }] : []),
     { to: '/lien-he', label: 'Liên hệ', icon: Mail },
   ];
 
@@ -177,7 +178,7 @@ export default function Navbar({
                           </p>
                         </div>
                       </div>
-                      <div className="mt-2">
+                      <div className="mt-2 flex items-center justify-between gap-2">
                         <span
                           className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
                             isAdmin
@@ -189,6 +190,13 @@ export default function Navbar({
                         >
                           {isAdmin ? 'Tài khoản Quản trị viên' : isTeacher ? 'Tài khoản Giáo viên' : 'Tài khoản Học sinh'}
                         </span>
+
+                        {currentUser.role === 'student' && (
+                          <span className="flex items-center gap-1 text-[10px] font-black text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200">
+                            <Flame className="w-3 h-3 fill-orange-500 text-orange-500" />
+                            <span>{currentUser.streak_count || 1}d Streak</span>
+                          </span>
+                        )}
                       </div>
                     </div>
 

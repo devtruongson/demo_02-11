@@ -230,7 +230,7 @@ app.post('/api/upload/model-3d', upload.single('model3d'), (req, res) => {
 // POST /api/auth/register
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { username, email, password, full_name } = req.body;
+    const { username, email, password, full_name, role } = req.body;
 
     if (!username || !email || !password || !full_name) {
       return res.status(400).json({ error: 'Vui lòng điền đầy đủ tất cả các trường thông tin.' });
@@ -250,12 +250,15 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ error: 'Tên đăng nhập hoặc Email này đã tồn tại trong hệ thống.' });
     }
 
+    // Role: only allow 'student' or 'teacher' (admin cannot be created publicly)
+    const assignedRole = role === 'teacher' ? 'teacher' : 'student';
+
     // Hash password with bcrypt
     const password_hash = await bcrypt.hash(password, 10);
 
     const [result] = await pool.query(
-      'INSERT INTO users (username, email, password_hash, full_name, role) VALUES (?, ?, ?, ?, "student")',
-      [username.trim(), email.trim(), password_hash, full_name.trim()]
+      'INSERT INTO users (username, email, password_hash, full_name, role, streak_count, last_login_date) VALUES (?, ?, ?, ?, ?, 1, CURDATE())',
+      [username.trim(), email.trim(), password_hash, full_name.trim(), assignedRole]
     );
 
     const newUser = {
@@ -263,11 +266,12 @@ app.post('/api/auth/register', async (req, res) => {
       username: username.trim(),
       email: email.trim(),
       full_name: full_name.trim(),
-      role: 'student'
+      role: assignedRole,
+      streak_count: 1
     };
 
     const token = jwt.sign(newUser, JWT_SECRET, { expiresIn: '7d' });
-    await logActivity(newUser.username, 'REGISTER', `Đăng ký tài khoản học sinh mới: ${newUser.full_name}`);
+    await logActivity(newUser.username, 'REGISTER', `Đăng ký tài khoản mới vai trò: ${assignedRole} - ${newUser.full_name}`);
 
     res.status(201).json({
       success: true,
@@ -278,6 +282,81 @@ app.post('/api/auth/register', async (req, res) => {
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ error: 'Lỗi máy chủ khi đăng ký tài khoản: ' + error.message });
+  }
+});
+
+// POST /api/auth/social-login (Google, Gmail, Facebook Login)
+app.post('/api/auth/social-login', async (req, res) => {
+  try {
+    const { provider, email, full_name, role = 'student', avatar } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Email không hợp lệ từ dịch vụ xác thực.' });
+    }
+
+    // Check if user exists by email
+    const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email.trim()]);
+    let user;
+    let currentStreak = 1;
+
+    if (rows.length > 0) {
+      user = rows[0];
+      currentStreak = user.streak_count || 1;
+      if (user.role === 'student') {
+        const today = new Date().toISOString().slice(0, 10);
+        if (user.last_login_date) {
+          const lastLogin = new Date(user.last_login_date).toISOString().slice(0, 10);
+          const diffDays = Math.round((new Date(today) - new Date(lastLogin)) / (1000 * 60 * 60 * 24));
+          if (diffDays === 1) currentStreak += 1;
+          else if (diffDays > 1) currentStreak = 1;
+        }
+        await pool.query('UPDATE users SET streak_count = ?, last_login_date = CURDATE(), avatar = COALESCE(?, avatar) WHERE id = ?', [currentStreak, avatar || null, user.id]);
+      }
+    } else {
+      // Create new user via social auth
+      const cleanBase = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '');
+      const baseUsername = `${cleanBase}_${Math.floor(100 + Math.random() * 900)}`;
+      const randomPass = await bcrypt.hash(Math.random().toString(36) + 'Secret@2026', 10);
+      const chosenRole = role === 'teacher' ? 'teacher' : 'student';
+
+      const [insertRes] = await pool.query(
+        'INSERT INTO users (username, email, password_hash, full_name, role, streak_count, last_login_date, avatar) VALUES (?, ?, ?, ?, ?, 1, CURDATE(), ?)',
+        [baseUsername, email.trim(), randomPass, full_name || baseUsername, chosenRole, avatar || null]
+      );
+
+      user = {
+        id: insertRes.insertId,
+        username: baseUsername,
+        email: email.trim(),
+        full_name: full_name || baseUsername,
+        role: chosenRole,
+        streak_count: 1,
+        avatar: avatar || null
+      };
+      currentStreak = 1;
+    }
+
+    const payload = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      full_name: user.full_name,
+      role: user.role,
+      streak_count: currentStreak,
+      avatar: avatar || user.avatar || null
+    };
+
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+    await logActivity(user.username, 'SOCIAL_LOGIN', `Đăng nhập qua ${provider || 'Google/Facebook'}: vai trò ${user.role}`);
+
+    res.json({
+      success: true,
+      message: `Đăng nhập thành công qua ${provider === 'facebook' ? 'Facebook' : 'Google'}`,
+      token,
+      user: payload
+    });
+  } catch (error) {
+    console.error('Social login error:', error);
+    res.status(500).json({ error: 'Lỗi đăng nhập mạng xã hội: ' + error.message });
   }
 });
 
@@ -307,12 +386,33 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(401).json({ error: 'Mật khẩu đăng nhập không chính xác.' });
     }
 
+    // Update streak for students
+    let currentStreak = user.streak_count || 1;
+    if (user.role === 'student') {
+      const today = new Date().toISOString().slice(0, 10);
+      if (user.last_login_date) {
+        const lastLogin = new Date(user.last_login_date).toISOString().slice(0, 10);
+        const diffDays = Math.round((new Date(today) - new Date(lastLogin)) / (1000 * 60 * 60 * 24));
+        if (diffDays === 1) {
+          currentStreak += 1;
+        } else if (diffDays > 1) {
+          currentStreak = 1;
+        }
+      }
+      await pool.query(
+        'UPDATE users SET streak_count = ?, last_login_date = CURDATE() WHERE id = ?',
+        [currentStreak, user.id]
+      );
+    }
+
     const payload = {
       id: user.id,
       username: user.username,
       email: user.email,
       full_name: user.full_name,
-      role: user.role
+      role: user.role,
+      streak_count: currentStreak,
+      avatar: user.avatar || null
     };
 
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
@@ -327,6 +427,189 @@ app.post('/api/auth/login', async (req, res) => {
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Lỗi đăng nhập: ' + error.message });
+  }
+});
+
+// GET /api/students/streak-leaderboard
+app.get('/api/students/streak-leaderboard', async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT id, username, full_name, avatar, streak_count, created_at,
+             (SELECT COUNT(*) FROM exam_submissions es WHERE es.student_id = users.id) as exams_completed
+      FROM users
+      WHERE role = 'student'
+      ORDER BY streak_count DESC, id ASC
+      LIMIT 15
+    `);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ==========================================
+// TEACHER CLASS MANAGEMENT & STUDENT ASSIGNMENT
+// ==========================================
+
+// GET /api/teacher/classes
+app.get('/api/teacher/classes', requireTeacherOrAdmin, async (req, res) => {
+  try {
+    const teacherId = req.user.id;
+    const sql = req.user.role === 'admin'
+      ? `SELECT c.*, u.full_name as teacher_name, COUNT(cs.student_id) as student_count
+         FROM classes c
+         LEFT JOIN users u ON c.teacher_id = u.id
+         LEFT JOIN class_students cs ON c.id = cs.class_id
+         GROUP BY c.id ORDER BY c.created_at DESC`
+      : `SELECT c.*, u.full_name as teacher_name, COUNT(cs.student_id) as student_count
+         FROM classes c
+         LEFT JOIN users u ON c.teacher_id = u.id
+         LEFT JOIN class_students cs ON c.id = cs.class_id
+         WHERE c.teacher_id = ?
+         GROUP BY c.id ORDER BY c.created_at DESC`;
+    const params = req.user.role === 'admin' ? [] : [teacherId];
+    const [rows] = await pool.query(sql, params);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/teacher/classes
+app.post('/api/teacher/classes', requireTeacherOrAdmin, async (req, res) => {
+  try {
+    const { name, grade = 'Lớp 10', description } = req.body;
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Vui lòng nhập tên lớp học.' });
+    }
+    const code = 'LS' + Math.random().toString(36).substring(2, 7).toUpperCase();
+    const [result] = await pool.query(
+      'INSERT INTO classes (teacher_id, name, grade, description, code) VALUES (?, ?, ?, ?, ?)',
+      [req.user.id, name.trim(), grade, description || null, code]
+    );
+    res.status(201).json({
+      success: true,
+      classItem: {
+        id: result.insertId,
+        teacher_id: req.user.id,
+        name: name.trim(),
+        grade,
+        description,
+        code,
+        student_count: 0
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/teacher/classes/:id/students
+app.get('/api/teacher/classes/:id/students', requireTeacherOrAdmin, async (req, res) => {
+  try {
+    const classId = req.params.id;
+    const [students] = await pool.query(`
+      SELECT u.id, u.username, u.full_name, u.email, u.streak_count, cs.joined_at,
+             (SELECT COUNT(*) FROM exam_submissions es WHERE es.student_id = u.id) as exams_completed,
+             (SELECT ROUND(AVG(es.score), 1) FROM exam_submissions es WHERE es.student_id = u.id) as avg_score
+      FROM class_students cs
+      JOIN users u ON cs.student_id = u.id
+      WHERE cs.class_id = ?
+      ORDER BY u.full_name ASC
+    `, [classId]);
+    res.json(students);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/teacher/students-pool (all students pool)
+app.get('/api/teacher/students-pool', requireTeacherOrAdmin, async (req, res) => {
+  try {
+    const [students] = await pool.query(`
+      SELECT id, username, full_name, email, streak_count
+      FROM users
+      WHERE role = 'student'
+      ORDER BY full_name ASC
+    `);
+    res.json(students);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/teacher/classes/:id/add-student
+app.post('/api/teacher/classes/:id/add-student', requireTeacherOrAdmin, async (req, res) => {
+  try {
+    const classId = req.params.id;
+    const { student_id } = req.body;
+    if (!student_id) {
+      return res.status(400).json({ error: 'Vui lòng chọn học sinh.' });
+    }
+    await pool.query('INSERT IGNORE INTO class_students (class_id, student_id) VALUES (?, ?)', [classId, student_id]);
+    res.json({ success: true, message: 'Đã thêm học sinh vào lớp học thành công' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/teacher/classes/:id/students/:studentId
+app.delete('/api/teacher/classes/:id/students/:studentId', requireTeacherOrAdmin, async (req, res) => {
+  try {
+    const { id: classId, studentId } = req.params;
+    await pool.query('DELETE FROM class_students WHERE class_id = ? AND student_id = ?', [classId, studentId]);
+    res.json({ success: true, message: 'Đã xóa học sinh khỏi lớp học' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ==========================================
+// COLLABORATIVE STUDY SPACE (KHÔNG GIAN HỌC TẬP CHUNG)
+// ==========================================
+
+// GET /api/study-space/messages
+app.get('/api/study-space/messages', async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT id, user_id, user_name, user_role, topic_title, message, likes, created_at
+      FROM study_space_messages
+      ORDER BY id DESC
+      LIMIT 60
+    `);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/study-space/messages
+app.post('/api/study-space/messages', requireAuth, async (req, res) => {
+  try {
+    const { topic_title, message } = req.body;
+    if (!message || !message.trim()) {
+      return res.status(400).json({ error: 'Nội dung tin nhắn không được để trống.' });
+    }
+    const [result] = await pool.query(
+      'INSERT INTO study_space_messages (user_id, user_name, user_role, topic_title, message) VALUES (?, ?, ?, ?, ?)',
+      [req.user.id, req.user.full_name || req.user.username, req.user.role || 'student', topic_title || 'Thảo luận chung', message.trim()]
+    );
+    const [newMsg] = await pool.query('SELECT * FROM study_space_messages WHERE id = ?', [result.insertId]);
+    res.status(201).json({ success: true, message: newMsg[0] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/study-space/messages/:id/like
+app.post('/api/study-space/messages/:id/like', async (req, res) => {
+  try {
+    const msgId = req.params.id;
+    await pool.query('UPDATE study_space_messages SET likes = likes + 1 WHERE id = ?', [msgId]);
+    const [rows] = await pool.query('SELECT likes FROM study_space_messages WHERE id = ?', [msgId]);
+    res.json({ success: true, likes: rows[0]?.likes || 0 });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -2426,7 +2709,8 @@ app.post('/api/contacts', async (req, res) => {
       return res.status(400).json({ error: 'Vui lòng nhập nội dung tin nhắn hoặc câu hỏi liên hệ.' });
     }
 
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null;
+    const rawIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || null;
+    const ip = Array.isArray(rawIp) ? rawIp[0] : (typeof rawIp === 'string' ? rawIp.split(',')[0].trim() : null);
 
     const [result] = await pool.query(
       `INSERT INTO contacts (full_name, email, phone, content, status, ip_address)
@@ -2436,7 +2720,7 @@ app.post('/api/contacts', async (req, res) => {
         email ? email.trim() : null,
         phone.trim(),
         content.trim(),
-        typeof ip === 'string' ? ip.slice(0, 50) : null
+        typeof ip === 'string' ? ip.slice(0, 250) : null
       ]
     );
 

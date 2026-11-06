@@ -17,6 +17,11 @@ import StudentsView from './components/StudentsView.jsx';
 import AboutView from './components/AboutView.jsx';
 import ContactView from './components/ContactView.jsx';
 import TopicEditorModal from './components/TopicEditorModal.jsx';
+import Footer from './components/Footer.jsx';
+import CoreFeaturesShowcase from './components/CoreFeaturesShowcase.jsx';
+import WhyChooseUsSection from './components/WhyChooseUsSection.jsx';
+import CollaborativeStudySpace from './components/CollaborativeStudySpace.jsx';
+import AuthPage from './components/AuthPage.jsx';
 import { createResourceSlug } from './utils/slugify.js';
 import { Filter, Layers, Box, Search, RotateCcw, ArrowRight, BookOpen, Sparkles, AlertCircle, LayoutDashboard, Globe, ShieldCheck, Users, X, PlusCircle, Edit3 } from 'lucide-react';
 
@@ -45,6 +50,7 @@ export default function App() {
   });
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('sukyso_token') || '');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [loginModalRole, setLoginModalRole] = useState('student');
   const [isBannerModalOpen, setIsBannerModalOpen] = useState(false);
 
   // Filters read from Search Params for /kho-tu-lieu
@@ -72,6 +78,19 @@ export default function App() {
   // Is this the full-width detail page or full-screen dashboard?
   const isDetailPage = location.pathname.startsWith('/tu-lieu/');
   const isDashboard = location.pathname.startsWith('/dashboard');
+
+  // Collapsible Sidebar state (Feedback requirement)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    return localStorage.getItem('sukyso_sidebar_collapsed') === 'true';
+  });
+
+  const handleToggleSidebar = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem('sukyso_sidebar_collapsed', String(next));
+      return next;
+    });
+  };
 
   // Handle Login Success
   const handleLoginSuccess = (user, token) => {
@@ -351,6 +370,8 @@ export default function App() {
           <Sidebar
             stats={stats}
             currentUser={currentUser}
+            isCollapsed={isSidebarCollapsed}
+            onToggleCollapse={handleToggleSidebar}
           />
         )}
 
@@ -373,196 +394,17 @@ export default function App() {
                     isAdmin={currentUser?.role === 'admin'}
                   />
 
-                  {/* 3D Interactive Highlight Teaser */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch">
-                    <div className="lg:col-span-7 bg-white p-5 sm:p-6 lg:p-7 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
-                      <div className="space-y-4">
-                        {/* Header & Badges */}
-                        <div>
-                          <div className="flex flex-wrap items-center gap-2 mb-2">
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200/90">
-                              <Box className="w-3.5 h-3.5 text-slate-600 shrink-0" />
-                              Mô phỏng 3D & Bản đồ số
-                            </span>
-                            <span className="text-xs text-slate-500 font-medium">
-                              Chuẩn GDPT 2018 Lịch sử 10
-                            </span>
-                          </div>
+                  {/* Core Features Showcase (Replacing old teaser as requested in Feedback) */}
+                  <CoreFeaturesShowcase
+                    topics={topics}
+                    artifacts3d={artifacts3d}
+                  />
 
-                          <h3 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-snug">
-                            Studio Di Sản 3D & Hải Trình Cổ Đại
-                          </h3>
-
-                          <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-                            Số hóa bảo vật chuẩn bảo tàng quốc gia: tương tác xoay 360°, bóc tách đa tầng hoa văn, đo đạc kích thước khảo cổ học và khám phá mạng lưới giao thương hàng hải Đông Nam Á cổ đại.
-                          </p>
-                        </div>
-
-                        {/* Feature Highlights Grid - Clean, unified, professional neutral styling */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
-                          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-slate-100/70 hover:border-slate-300 transition flex items-center sm:flex-col sm:items-start gap-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center justify-center shrink-0 shadow-2xs">
-                              <Box className="w-4 h-4 text-slate-700" />
-                            </div>
-                            <div className="min-w-0">
-                              <h5 className="text-xs font-bold text-slate-900 truncate">Cổ vật 3D 360°</h5>
-                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">Xoay và bóc tách hoa văn</p>
-                            </div>
-                          </div>
-
-                          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-slate-100/70 hover:border-slate-300 transition flex items-center sm:flex-col sm:items-start gap-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center justify-center shrink-0 shadow-2xs">
-                              <Globe className="w-4 h-4 text-slate-700" />
-                            </div>
-                            <div className="min-w-0">
-                              <h5 className="text-xs font-bold text-slate-900 truncate">Hải trình biển</h5>
-                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">Tuyến giao thương cổ</p>
-                            </div>
-                          </div>
-
-                          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 hover:bg-slate-100/70 hover:border-slate-300 transition flex items-center sm:flex-col sm:items-start gap-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center justify-center shrink-0 shadow-2xs">
-                              <ShieldCheck className="w-4 h-4 text-slate-700" />
-                            </div>
-                            <div className="min-w-0">
-                              <h5 className="text-xs font-bold text-slate-900 truncate">Thẩm định sư phạm</h5>
-                              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">Phục vụ học liệu lớp 10</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Quick Artifacts Tag Strip */}
-                        <div className="pt-0.5 flex flex-wrap items-center gap-1.5 text-xs">
-                          <span className="text-slate-400 font-medium shrink-0">Bảo vật mẫu:</span>
-                          <Link
-                            to="/studio-3d/co-vat/dong_son_drum"
-                            className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-[11px] transition border border-slate-200/70"
-                          >
-                            Trống Ngọc Lũ
-                          </Link>
-                          <Link
-                            to="/studio-3d/co-vat/borobudur"
-                            className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-[11px] transition border border-slate-200/70"
-                          >
-                            Tháp Borobudur
-                          </Link>
-                          <Link
-                            to="/studio-3d/co-vat/my_son_altar"
-                            className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-[11px] transition border border-slate-200/70"
-                          >
-                            Đài thờ Linga-Yoni
-                          </Link>
-                          <Link
-                            to="/studio-3d/co-vat/vo_canh_stele"
-                            className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-[11px] transition border border-slate-200/70"
-                          >
-                            Bia Võ Cạnh
-                          </Link>
-                          <Link
-                            to="/studio-3d/co-vat/that_luang"
-                            className="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-[11px] transition border border-slate-200/70"
-                          >
-                            Thạt Luổng
-                          </Link>
-                        </div>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="mt-5 pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                        <Link
-                          to="/studio-3d"
-                          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-900 text-white hover:bg-slate-800 transition shadow-xs active:scale-[0.99] w-full"
-                        >
-                          <Box className="w-4 h-4 text-slate-300 shrink-0" />
-                          <span>Mở Studio 3D</span>
-                          <ArrowRight className="w-3.5 h-3.5 ml-auto sm:ml-0 text-slate-400" />
-                        </Link>
-                        <Link
-                          to="/kho-tu-lieu?topic=4"
-                          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 transition active:scale-[0.99] w-full"
-                        >
-                          <BookOpen className="w-4 h-4 text-slate-500 shrink-0" />
-                          <span>Tư liệu Đông Nam Á</span>
-                        </Link>
-                      </div>
-                    </div>
-
-                    {/* Stats Card - Refined, dignified, academic styling without neon or glow */}
-                    <div className="lg:col-span-5 bg-[#162032] text-white p-5 sm:p-6 lg:p-7 rounded-2xl border border-slate-800 shadow-xs flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                            Thống kê học liệu
-                          </span>
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-white/10 text-slate-300 border border-white/10 shrink-0">
-                            Hệ thống số hóa
-                          </span>
-                        </div>
-
-                        <h4 className="text-base sm:text-lg font-bold mt-1 text-white leading-tight">
-                          Dữ Liệu Đã Được Thẩm Định Sư Phạm
-                        </h4>
-
-                        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mt-4">
-                          {/* Stat 1 */}
-                          <div className="p-3 sm:p-3.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/[0.08] transition">
-                            <div className="flex items-center justify-between gap-1">
-                              <span className="text-xs text-slate-300 font-medium truncate">Chủ đề bài học</span>
-                              <BookOpen className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                            </div>
-                            <strong className="text-2xl font-bold text-white block mt-1 tracking-tight">
-                              {stats?.topics || 7}
-                            </strong>
-                            <span className="text-[11px] text-slate-400 mt-0.5 block truncate">Chương trình SGK</span>
-                          </div>
-
-                          {/* Stat 2 */}
-                          <div className="p-3 sm:p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/[0.08] transition">
-                            <div className="flex items-center justify-between gap-1">
-                              <span className="text-xs text-slate-300 font-medium truncate">Tư liệu số hóa</span>
-                              <Layers className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                            </div>
-                            <strong className="text-2xl font-bold text-white block mt-1 tracking-tight">
-                              {stats?.resources || 32}
-                            </strong>
-                            <span className="text-[11px] text-slate-400 mt-0.5 block truncate">Ảnh & văn bản gốc</span>
-                          </div>
-
-                          {/* Stat 3 */}
-                          <div className="p-3 sm:p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/[0.08] transition">
-                            <div className="flex items-center justify-between gap-1">
-                              <span className="text-xs text-slate-300 font-medium truncate">Bảo vật 3D</span>
-                              <Box className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                            </div>
-                            <strong className="text-2xl font-bold text-white block mt-1 tracking-tight">
-                              {stats?.artifacts_3d || 5}
-                            </strong>
-                            <span className="text-[11px] text-slate-400 mt-0.5 block truncate">Tương tác 360°</span>
-                          </div>
-
-                          {/* Stat 4 */}
-                          <div className="p-3 sm:p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/[0.08] transition">
-                            <div className="flex items-center justify-between gap-1">
-                              <span className="text-xs text-slate-300 font-medium truncate">Lượt tương tác</span>
-                              <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                            </div>
-                            <strong className="text-2xl font-bold text-white block mt-1 tracking-tight">
-                              {stats?.total_views ? stats.total_views.toLocaleString() : '12,480'}
-                            </strong>
-                            <span className="text-[11px] text-slate-400 mt-0.5 block truncate">Giáo viên & học sinh</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-4 pt-3.5 border-t border-white/10 flex items-center justify-between gap-2 text-xs text-slate-400">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <ShieldCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                          <span className="truncate">Chuẩn GDPT 2018 Lịch sử 10</span>
-                        </div>
-                        <span className="text-[11px] text-slate-500 font-mono shrink-0">v2.0</span>
-                      </div>
-                    </div>
-                  </div>
+                  {/* Why Choose Us / Ưu điểm của trang web (As requested in Feedback) */}
+                  <WhyChooseUsSection
+                    onOpenLogin={() => setIsLoginModalOpen(true)}
+                    currentUser={currentUser}
+                  />
 
                   {/* 7 Curriculum Topics Grid */}
                   <div>
@@ -911,7 +753,7 @@ export default function App() {
             />
             <Route
               path="/hoc-sinh/:tab"
-              element={<StudentsView currentUser={currentUser} authToken={authToken} />}
+              element={<StudentsView currentUser={currentUser} authToken={authToken} topics={topics} />}
             />
 
             {/* ================= ROUTE: ABOUT ================= */}
@@ -919,6 +761,31 @@ export default function App() {
 
             {/* ================= ROUTE: CONTACT & FEEDBACK ================= */}
             <Route path="/lien-he" element={<ContactView />} />
+
+            {/* ================= ROUTE: COLLABORATIVE STUDY SPACE ================= */}
+            <Route
+              path="/khong-gian-chung"
+              element={
+                <CollaborativeStudySpace
+                  currentUser={currentUser}
+                  authToken={authToken}
+                  onOpenLogin={() => setIsLoginModalOpen(true)}
+                  topics={topics}
+                />
+              }
+            />
+
+            {/* ================= ROUTES: DEDICATED AUTH PAGES (HỌC SINH & GIÁO VIÊN) ================= */}
+            <Route path="/dang-nhap" element={<Navigate to="/dang-nhap/hoc-sinh" replace />} />
+            <Route
+              path="/dang-nhap/:roleParam"
+              element={
+                <AuthPage
+                  currentUser={currentUser}
+                  onLoginSuccess={handleLoginSuccess}
+                />
+              }
+            />
 
             {/* ================= ROUTE: ADMIN DASHBOARD ================= */}
             <Route
@@ -958,6 +825,9 @@ export default function App() {
         </main>
       </div>
 
+      {/* Cultural Heritage Footer (Feedback requirement) */}
+      {!isDashboard && <Footer />}
+
       {/* Resource Editor Modal (Create / Edit) */}
       {isEditorOpen && (
         <ResourceEditorModal
@@ -976,6 +846,7 @@ export default function App() {
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
+        initialRole={loginModalRole}
       />
 
       {/* User Profile Modal */}

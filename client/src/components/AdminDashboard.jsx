@@ -1,22 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import {
-  TrendingUp, Users, BookOpen, Box, Eye, Activity, ShieldCheck,
-  RefreshCw, PlusCircle, Edit3, Trash2, Calendar, Award, ArrowUpRight, Search, Filter,
-  ArrowLeft, LogOut, X, ExternalLink, Film, Image, MapPin, Sparkles, CheckCircle2,
-  ChevronRight, LayoutList, LayoutGrid, KeyRound, EyeOff, UserCheck, AlertCircle,
-  GraduationCap, HelpCircle, FileText, Sliders, Mail, Phone, MessageSquare, Send, CheckCircle, Clock, Compass, FolderPlus,
-  BarChart3, SlidersHorizontal, Landmark, GripVertical, ArrowUpDown, ChevronUp, ChevronDown
+    Activity,
+    AlertCircle,
+    ArrowUpDown,
+    Award,
+    BarChart3,
+    BookOpen, Box,
+    CheckCircle,
+    CheckCircle2,
+    ChevronDown,
+    ChevronRight,
+    ChevronUp,
+    Clock, Compass,
+    Edit3,
+    ExternalLink,
+    Eye,
+    EyeOff,
+    FileText,
+    Film,
+    FolderKanban,
+    GraduationCap,
+    GripVertical,
+    HelpCircle,
+    Image,
+    KeyRound,
+    Landmark,
+    LayoutGrid,
+    LayoutList,
+    LogOut,
+    Mail, Phone,
+    PlusCircle,
+    RefreshCw,
+    Search,
+    ShieldCheck,
+    Sliders,
+    SlidersHorizontal,
+    Sparkles,
+    Trash2,
+    TrendingUp,
+    UserCheck,
+    Users,
+    X
 } from 'lucide-react';
-import ThreeArtifactViewer from './ThreeArtifactViewer.jsx';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { formatYouTubeEmbedUrl } from '../utils/slugify.js';
 import Artifact3DEditorModal from './Artifact3DEditorModal.jsx';
-import TeacherGuideEditorModal from './TeacherGuideEditorModal.jsx';
-import QuizEditorModal from './QuizEditorModal.jsx';
-import TopicEditorModal from './TopicEditorModal.jsx';
 import ExamAssignmentModal from './ExamAssignmentModal.jsx';
 import ExamSubmissionsViewerModal from './ExamSubmissionsViewerModal.jsx';
 import ExamTakingModal from './ExamTakingModal.jsx';
-import { formatYouTubeEmbedUrl } from '../utils/slugify.js';
+import QuizEditorModal from './QuizEditorModal.jsx';
+import TeacherGuideEditorModal from './TeacherGuideEditorModal.jsx';
+import ThreeArtifactViewer from './ThreeArtifactViewer.jsx';
+import TopicEditorModal from './TopicEditorModal.jsx';
 
 export default function AdminDashboard({
   currentUser,
@@ -804,7 +839,7 @@ export default function AdminDashboard({
     { id: 'overview', label: 'Tổng quan', icon: BarChart3, count: null },
     { id: 'resources', label: 'Kho tư liệu', icon: BookOpen, count: resources.length },
     { id: 'artifacts3d', label: 'Bảo vật 3D', icon: Box, count: artifacts3dList.length },
-    { id: 'topics', label: 'Chủ đề SGK', icon: Compass, count: topicsList.length },
+    { id: 'topics', label: 'Quản lý Chủ đề', icon: FolderKanban, count: topicsList.length },
     { id: 'teachers', label: 'Sư phạm 5512', icon: GraduationCap, count: teacherMaterials.length },
     { id: 'quizzes', label: 'Ngân hàng câu hỏi', icon: HelpCircle, count: quizzesList.length },
     { id: 'assignments', label: 'Giao bài & Đề thi', icon: Award, count: assignmentsList.length },

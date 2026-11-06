@@ -3,20 +3,27 @@ import { useParams, NavLink, Link, useNavigate } from 'react-router-dom';
 import {
   Users, Award, CheckCircle, CheckCircle2, HelpCircle, BookOpen, Box, Compass,
   ArrowRight, Filter, ShieldCheck, PlusCircle, RefreshCw, Eye, CheckSquare, ChevronDown,
-  ChevronUp, Copy, Check, Star, Zap, Target, Edit3, Trash2, RotateCcw, Lightbulb, Landmark
+  ChevronUp, Copy, Check, Star, Zap, Target, Edit3, Trash2, RotateCcw, Lightbulb, Landmark,
+  Flame, MessageSquare, Trophy
 } from 'lucide-react';
 import QuizInteractiveComponent from './QuizInteractiveComponent.jsx';
 import QuizEditorModal from './QuizEditorModal.jsx';
 import StudentTaskEditorModal from './StudentTaskEditorModal.jsx';
+import CollaborativeStudySpace from './CollaborativeStudySpace.jsx';
 
-export default function StudentsView({ currentUser, authToken }) {
+export default function StudentsView({ currentUser, authToken, topics = [] }) {
   const { tab = 'nhiem-vu' } = useParams();
   const navigate = useNavigate();
 
   const studentTabs = [
-    { to: '/hoc-sinh/nhiem-vu', id: 'nhiem-vu', label: 'Nhiệm Vụ Học Tập & Phương Pháp', icon: BookOpen },
-    { to: '/hoc-sinh/luyen-tap-trac-nghiem', id: 'luyen-tap-trac-nghiem', label: 'Thử Thách Trắc Nghiệm Từng Bài', icon: Award },
+    { to: '/hoc-sinh/nhiem-vu', id: 'nhiem-vu', label: 'Nhiệm Vụ Học Tập', icon: BookOpen },
+    { to: '/hoc-sinh/bang-xep-hang-streak', id: 'bang-xep-hang-streak', label: 'Bảng Vàng Chuỗi Streak 🔥', icon: Flame },
+    { to: '/hoc-sinh/khong-gian-chung', id: 'khong-gian-chung', label: 'Không Gian Học Tập Chung 💬', icon: MessageSquare },
+    { to: '/hoc-sinh/luyen-tap-trac-nghiem', id: 'luyen-tap-trac-nghiem', label: 'Thử Thách Trắc Nghiệm', icon: Award },
   ];
+
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [loadingLeaderboard, setLoadingLeaderboard] = useState(false);
 
   const isAdmin = currentUser?.role === 'admin';
 
@@ -111,9 +118,25 @@ export default function StudentsView({ currentUser, authToken }) {
     }
   };
 
+  const fetchLeaderboard = async () => {
+    try {
+      setLoadingLeaderboard(true);
+      const res = await fetch(`/api/students/streak-leaderboard?_t=${Date.now()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setLeaderboard(data);
+      }
+    } catch (err) {
+      console.error('Lỗi tải bảng xếp hạng streak:', err);
+    } finally {
+      setLoadingLeaderboard(false);
+    }
+  };
+
   useEffect(() => {
     fetchTasks(taskLessonFilter);
     fetchLessons();
+    fetchLeaderboard();
   }, []);
 
   useEffect(() => {
@@ -898,6 +921,127 @@ export default function StudentsView({ currentUser, authToken }) {
             )}
           </div>
         </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* TAB 3: BẢNG VÀNG CHUỖI STREAK                             */}
+      {/* ========================================================= */}
+      {tab === 'bang-xep-hang-streak' && (
+        <div className="space-y-6">
+          <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-black bg-orange-100 text-orange-800 mb-1">
+                  <Flame className="w-3.5 h-3.5 text-orange-600 fill-orange-600" />
+                  <span>Thi Đua Tự Học GDPT 2018</span>
+                </div>
+                <h3 className="text-xl font-black text-slate-900">
+                  Bảng Vàng Chuỗi Ngày Đăng Nhập Học Bài (Streak)
+                </h3>
+              </div>
+              <span className="text-xs text-slate-400 font-bold">
+                Xếp hạng toàn hệ thống
+              </span>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-orange-50 via-amber-50 to-orange-100/60 border border-orange-200/80 text-xs text-orange-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <Flame className="w-5 h-5 text-orange-500 fill-orange-500 animate-pulse shrink-0" />
+                <div>
+                  <strong className="block text-slate-900 font-bold">Quy tắc duy trì chuỗi Streak:</strong>
+                  <span>Mỗi ngày đăng nhập học bài, làm trắc nghiệm sẽ cộng thêm +1 ngày. Giữ lửa học tập để nhận danh hiệu "Học Giả Lịch Sử"!</span>
+                </div>
+              </div>
+              {currentUser && (
+                <div className="px-3.5 py-2 rounded-xl bg-white border border-orange-200 font-black text-orange-600 shrink-0 shadow-2xs">
+                  Chuỗi của bạn: {currentUser.streak_count || 1} ngày 🔥
+                </div>
+              )}
+            </div>
+
+            {loadingLeaderboard ? (
+              <div className="py-12 text-center text-xs text-slate-400">Đang nạp dữ liệu Bảng Vàng...</div>
+            ) : leaderboard.length === 0 ? (
+              <div className="py-12 text-center text-xs text-slate-400">Chưa có dữ liệu xếp hạng</div>
+            ) : (
+              <div className="divide-y divide-slate-100">
+                {leaderboard.map((student, idx) => {
+                  const isTop1 = idx === 0;
+                  const isTop2 = idx === 1;
+                  const isTop3 = idx === 2;
+
+                  return (
+                    <div
+                      key={student.id}
+                      className={`p-3.5 sm:p-4 flex items-center justify-between gap-3 transition rounded-2xl my-1 ${
+                        isTop1
+                          ? 'bg-amber-50/70 border border-amber-200'
+                          : isTop2
+                          ? 'bg-slate-50/80 border border-slate-200'
+                          : isTop3
+                          ? 'bg-orange-50/50 border border-orange-200'
+                          : 'hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        {/* Rank Badge */}
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs shrink-0 ${
+                          isTop1
+                            ? 'bg-amber-500 text-slate-950 shadow-md ring-2 ring-amber-300'
+                            : isTop2
+                            ? 'bg-slate-300 text-slate-800'
+                            : isTop3
+                            ? 'bg-amber-700 text-white'
+                            : 'bg-slate-100 text-slate-600'
+                        }`}>
+                          {idx + 1}
+                        </div>
+
+                        {/* Name & Account */}
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-extrabold text-xs sm:text-sm text-slate-900 truncate">
+                              {student.full_name || student.username}
+                            </span>
+                            {isTop1 && (
+                              <span className="text-[10px] font-black px-2 py-0.2 rounded-full bg-amber-400 text-slate-950 shadow-2xs">
+                                👑 Quán Quân
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[11px] text-slate-400 font-mono">
+                            @{student.username} • {student.exams_completed || 0} bài kiểm tra hoàn thành
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Streak Display */}
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 shadow-2xs shrink-0">
+                        <Flame className={`w-4 h-4 ${
+                          isTop1 ? 'text-orange-500 fill-orange-500 animate-pulse' : 'text-amber-500 fill-amber-500'
+                        }`} />
+                        <span className="font-black text-sm text-slate-900">
+                          {student.streak_count || 1} ngày
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* TAB 4: KHÔNG GIAN HỌC TẬP CHUNG                           */}
+      {/* ========================================================= */}
+      {tab === 'khong-gian-chung' && (
+        <CollaborativeStudySpace
+          currentUser={currentUser}
+          authToken={authToken}
+          topics={topics}
+        />
       )}
 
       {/* ========================================================= */}

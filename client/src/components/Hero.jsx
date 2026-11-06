@@ -113,7 +113,13 @@ export default function Hero({
         </div>
 
         <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight drop-shadow-sm">
-          Khám Phá Dòng Chảy <span className="text-amber-200">Văn Minh Lịch Sử 10</span>
+          {activeSlide?.title ? (
+            activeSlide.title
+          ) : (
+            <>
+              Khám Phá Di Sản & <span className="text-amber-200">Dòng Chảy Lịch Sử 10</span>
+            </>
+          )}
         </h1>
 
         <p className="mt-3 text-slate-200 text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl font-normal drop-shadow-xs">
