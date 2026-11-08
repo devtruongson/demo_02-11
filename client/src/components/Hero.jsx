@@ -70,8 +70,8 @@ export default function Hero() {
         </div>
 
         {/* Main Calligraphic Title "Sử Học Số" */}
-        <div className="w-full flex justify-center my-0.5 sm:my-1 lg:my-2">
-          <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[9.5rem] 2xl:text-[11.5rem] font-black text-[#FFFDF5] hero-main-title tracking-tight leading-none select-text">
+        <div className="w-full flex justify-center my-1 sm:my-2">
+          <h1 className="hero-main-title title text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem] 2xl:text-[6.5rem] text-[#FFFDF5] tracking-tight leading-none select-text whitespace-nowrap">
             Sử Học Số
           </h1>
         </div>
