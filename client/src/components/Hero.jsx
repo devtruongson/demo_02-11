@@ -33,12 +33,12 @@ export default function Hero() {
       {/* ============================================================== */}
       {/* Left side motif: Lacquer pillar + Left ancient_house */}
       <div className="absolute top-0 bottom-0 left-0 pointer-events-none z-10 animate-slide-left-motif flex items-center">
-        {/* Left red lacquer pillar (Cột đỏ hình trụ 3D chạy dọc từ trên xuống dưới) */}
+        {/* Left red lacquer pillar (Cột đỏ bóng sáng trắng 3D, không viền đen) */}
         <div
           className="absolute top-0 bottom-0 left-0 w-10 sm:w-12 md:w-14 lg:w-16 xl:w-20 h-full z-0"
           style={{
-            background: 'linear-gradient(90deg, #300204 0%, #4D0508 12%, #A31218 32%, #E52E38 48%, #C0151C 60%, #520508 82%, #2E0203 100%)',
-            boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.7), 3px 0 14px rgba(0, 0, 0, 0.55)'
+            background: 'linear-gradient(90deg, #78080C 0%, #9E0D14 15%, #C91A23 32%, #E83642 42%, #FFA8B0 48%, #FFFFFF 53%, #FFCCD2 58%, #D8222C 72%, #8F0C12 88%, #70070B 100%)',
+            boxShadow: '0 0 15px rgba(255, 255, 255, 0.15)'
           }}
         />
 
@@ -52,12 +52,12 @@ export default function Hero() {
 
       {/* Right side motif: Lacquer pillar + Right ancient_house (flipped horizontally) */}
       <div className="absolute top-0 bottom-0 right-0 pointer-events-none z-10 animate-slide-right-motif flex items-center">
-        {/* Right red lacquer pillar */}
+        {/* Right red lacquer pillar (Cột đỏ bóng sáng trắng 3D, không viền đen) */}
         <div
           className="absolute top-0 bottom-0 right-0 w-10 sm:w-12 md:w-14 lg:w-16 xl:w-20 h-full z-0"
           style={{
-            background: 'linear-gradient(270deg, #300204 0%, #4D0508 12%, #A31218 32%, #E52E38 48%, #C0151C 60%, #520508 82%, #2E0203 100%)',
-            boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.7), -3px 0 14px rgba(0, 0, 0, 0.55)'
+            background: 'linear-gradient(270deg, #78080C 0%, #9E0D14 15%, #C91A23 32%, #E83642 42%, #FFA8B0 48%, #FFFFFF 53%, #FFCCD2 58%, #D8222C 72%, #8F0C12 88%, #70070B 100%)',
+            boxShadow: '0 0 15px rgba(255, 255, 255, 0.15)'
           }}
         />
 
