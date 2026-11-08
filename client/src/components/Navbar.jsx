@@ -84,6 +84,12 @@ export default function Navbar({
               <NavLink
                 key={item.to}
                 to={item.to}
+                onClick={(e) => {
+                  if (!currentUser && item.to !== '/lien-he') {
+                    e.preventDefault();
+                    onOpenLogin();
+                  }
+                }}
                 className={({ isActive }) =>
                   `text-xs sm:text-sm font-semibold tracking-wide transition duration-150 py-1.5 ${
                     isActive
@@ -202,7 +208,13 @@ export default function Navbar({
             <NavLink
               key={item.to}
               to={item.to}
-              onClick={() => setMobileMenuOpen(false)}
+              onClick={(e) => {
+                setMobileMenuOpen(false);
+                if (!currentUser && item.to !== '/lien-he') {
+                  e.preventDefault();
+                  onOpenLogin();
+                }
+              }}
               className="block px-4 py-2.5 rounded-xl text-sm font-bold text-white hover:bg-black/20"
             >
               {item.label}

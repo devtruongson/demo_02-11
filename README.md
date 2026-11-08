@@ -21,7 +21,7 @@
 ```bash
 cd d:\duan\server
 npm run dev
-# Máy chủ backend chạy tại http://localhost:5001
+# Máy chủ backend chạy tại http://localhost:4999
 ```
 
 ### 2. Khởi chạy Frontend (React + Vite)

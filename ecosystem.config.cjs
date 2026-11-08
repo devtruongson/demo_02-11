@@ -12,7 +12,7 @@
 
 module.exports = {
   apps: [
-    // 1. Backend Server (Node.js Express + MySQL) - Cổng 5001
+    // 1. Backend Server (Node.js Express + MySQL) - Cổng 4999
     //    Đồng thời tự động phục vụ file tĩnh client/dist (SPA Fallback)
     {
       name: 'kysu-backend',
@@ -24,7 +24,7 @@ module.exports = {
       max_memory_restart: '500M',
       env: {
         NODE_ENV: 'production',
-        PORT: 5001,
+        PORT: 4999,
         DEPLOY_DOMAIN: 'kysu.fstack.asia',
         CLIENT_ORIGIN: 'https://kysu.fstack.asia'
       }

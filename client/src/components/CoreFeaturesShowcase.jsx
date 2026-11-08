@@ -5,8 +5,21 @@ import {
   Sparkles, Flame
 } from 'lucide-react';
 
-export default function CoreFeaturesShowcase({ topics = [], artifacts3d = [] }) {
+export default function CoreFeaturesShowcase({
+  topics = [],
+  artifacts3d = [],
+  currentUser = null,
+  onOpenLogin
+}) {
   const navigate = useNavigate();
+
+  const handleActionClick = (e, targetPath) => {
+    if (!currentUser) {
+      e.preventDefault();
+      onOpenLogin?.();
+      return;
+    }
+  };
 
   // Fallback topics if none passed
   const sampleTopics = topics.length > 0 ? topics : [
@@ -65,6 +78,7 @@ export default function CoreFeaturesShowcase({ topics = [], artifacts3d = [] }) 
               </div>
               <Link
                 to="/chu-de"
+                onClick={handleActionClick}
                 className="text-xs font-bold text-[#850b10] hover:text-[#590408] flex items-center gap-1 transition"
               >
                 <span>Xem tất cả</span>
@@ -83,6 +97,7 @@ export default function CoreFeaturesShowcase({ topics = [], artifacts3d = [] }) 
                   <Link
                     key={topic.id || idx}
                     to={`/kho-tu-lieu?topic=${topic.id}`}
+                    onClick={handleActionClick}
                     className="w-44 sm:w-48 shrink-0 snap-start bg-white/80 hover:bg-white rounded-2xl border border-[#ecd9ba] overflow-hidden transition group/card flex flex-col shadow-2xs"
                   >
                     <div className="relative h-24 bg-slate-200 overflow-hidden">
@@ -113,7 +128,7 @@ export default function CoreFeaturesShowcase({ topics = [], artifacts3d = [] }) 
 
           <div className="pt-3 border-t border-[#ecd9ba]/70 flex items-center justify-between text-xs text-slate-600 mt-2">
             <span>✨ Tự động tích hợp tài liệu 5512 & câu hỏi thảo luận</span>
-            <Link to="/kho-tu-lieu" className="font-bold text-[#850b10] hover:underline">
+            <Link to="/kho-tu-lieu" onClick={handleActionClick} className="font-bold text-[#850b10] hover:underline">
               Tra cứu tư liệu →
             </Link>
           </div>
@@ -136,6 +151,7 @@ export default function CoreFeaturesShowcase({ topics = [], artifacts3d = [] }) 
               </div>
               <Link
                 to="/studio-3d"
+                onClick={handleActionClick}
                 className="text-xs font-bold text-amber-300 hover:text-white flex items-center gap-1 transition"
               >
                 <span>Vào Studio 3D</span>
@@ -154,6 +170,7 @@ export default function CoreFeaturesShowcase({ topics = [], artifacts3d = [] }) 
                   <Link
                     key={art.code || idx}
                     to={`/studio-3d/co-vat/${art.code}`}
+                    onClick={handleActionClick}
                     className="w-44 sm:w-48 shrink-0 snap-start bg-[#38060a] hover:bg-[#46080d] rounded-2xl border border-amber-500/30 overflow-hidden transition group/card flex flex-col"
                   >
                     <div className="relative h-24 bg-black overflow-hidden">
@@ -185,7 +202,7 @@ export default function CoreFeaturesShowcase({ topics = [], artifacts3d = [] }) 
 
           <div className="pt-3 border-t border-amber-500/20 flex items-center justify-between text-xs text-amber-200/80 mt-2">
             <span>🔍 Tương tác mượt mà trên cả máy tính & điện thoại</span>
-            <Link to="/studio-3d" className="font-bold text-amber-300 hover:text-white">
+            <Link to="/studio-3d" onClick={handleActionClick} className="font-bold text-amber-300 hover:text-white">
               Khám phá Studio →
             </Link>
           </div>
@@ -208,6 +225,7 @@ export default function CoreFeaturesShowcase({ topics = [], artifacts3d = [] }) 
               </div>
               <Link
                 to="/hoc-sinh/luyen-tap-trac-nghiem"
+                onClick={handleActionClick}
                 className="text-xs font-bold text-[#850b10] hover:text-[#590408] flex items-center gap-1 transition"
               >
                 <span>Làm bài</span>
@@ -244,7 +262,7 @@ export default function CoreFeaturesShowcase({ topics = [], artifacts3d = [] }) 
 
           <div className="pt-3 border-t border-[#ecd9ba]/70 flex items-center justify-between text-xs text-slate-600 mt-3">
             <span>📊 Chấm điểm tức thì kèm giải thích chi tiết</span>
-            <Link to="/hoc-sinh/luyen-tap-trac-nghiem" className="font-bold text-[#850b10] hover:underline">
+            <Link to="/hoc-sinh/luyen-tap-trac-nghiem" onClick={handleActionClick} className="font-bold text-[#850b10] hover:underline">
               Bắt đầu luyện tập →
             </Link>
           </div>
@@ -267,6 +285,7 @@ export default function CoreFeaturesShowcase({ topics = [], artifacts3d = [] }) 
               </div>
               <Link
                 to="/khong-gian-chung"
+                onClick={handleActionClick}
                 className="text-xs font-bold text-[#850b10] hover:text-[#590408] flex items-center gap-1 transition"
               >
                 <span>Tham gia phòng</span>
@@ -311,7 +330,7 @@ export default function CoreFeaturesShowcase({ topics = [], artifacts3d = [] }) 
 
           <div className="pt-3 border-t border-[#ecd9ba]/70 flex items-center justify-between text-xs text-slate-600 mt-3">
             <span>💬 Đăng bài thảo luận & hỏi đáp cùng giáo viên</span>
-            <Link to="/khong-gian-chung" className="font-bold text-[#850b10] hover:underline">
+            <Link to="/khong-gian-chung" onClick={handleActionClick} className="font-bold text-[#850b10] hover:underline">
               Vào không gian chung →
             </Link>
           </div>
