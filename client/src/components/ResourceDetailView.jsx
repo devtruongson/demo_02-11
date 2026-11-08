@@ -48,6 +48,7 @@ export default function ResourceDetailView({
   };
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     let resourceId = null;
     if (slug) {
       resourceId = parseIdFromSlug(slug);
@@ -57,10 +58,16 @@ export default function ResourceDetailView({
 
     if (!resourceId) return;
 
-    if (initialResource && initialResource.id === resourceId) {
-      setResource(initialResource);
-      setDefaultMediaTab(initialResource);
-      return;
+    setActivePhotoIdx(0);
+    setError(null);
+
+    // If available in allResources cache, load immediately
+    if (allResources && allResources.length > 0) {
+      const found = allResources.find((r) => r.id === resourceId);
+      if (found) {
+        setResource(found);
+        setDefaultMediaTab(found);
+      }
     }
 
     setLoading(true);
@@ -80,7 +87,7 @@ export default function ResourceDetailView({
       .finally(() => {
         setLoading(false);
       });
-  }, [slug, initialResource]);
+  }, [slug]);
 
   useEffect(() => {
     const resourceId = slug ? parseIdFromSlug(slug) : initialResource?.id;
@@ -629,8 +636,9 @@ export default function ResourceDetailView({
                 {finalRelated.map((rel) => (
                   <Link
                     key={rel.id}
-                    to={`/tu-lieu/${createResourceSlug(rel.title, rel.id)}`}
-                    className="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition group flex flex-col justify-between"
+                    to={`/tu-lieu/${createResourceSlug(rel.id, rel.title)}`}
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    className="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition group flex flex-col justify-between cursor-pointer"
                   >
                     <div>
                       <div className="h-20 rounded-xl overflow-hidden bg-slate-200 mb-2">

@@ -9,7 +9,13 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative w-full h-[calc(100vh-4rem)] sm:h-[calc(100vh-5rem)] min-h-[560px] sm:min-h-[640px] bg-gradient-to-b from-[#8B0B10] via-[#7B080D] to-[#5C0407] text-white flex flex-col justify-center items-center overflow-hidden select-none">
+    <section
+      className="relative w-full h-[calc(100vh-4rem)] sm:h-[calc(100vh-5rem)] min-h-[560px] sm:min-h-[640px] bg-[#8B0B10] bg-cover bg-center text-white flex flex-col justify-center items-center overflow-hidden select-none"
+      style={{ backgroundImage: "url('/home-assets/bg-banner.jpeg')" }}
+    >
+      {/* Subtle depth vignette */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-black/25 pointer-events-none z-0" />
+
       {/* ============================================================== */}
       {/* 1. BACKGROUND LAYERS: MISTY CLOUDS                             */}
       {/* ============================================================== */}
@@ -22,24 +28,44 @@ export default function Hero() {
       </div>
 
       {/* ============================================================== */}
-      {/* 2. SIDE ANCIENT_HOUSE MOTIFS SLIDING IN (animation.mp4)        */}
-      {/* Chỉ hiện 1 góc nhỏ ở mép 2 bên, vươn cao dọc viền màn hình     */}
+      {/* 2. SIDE ANCIENT_HOUSE & LACQUER PILLARS (media & animation)   */}
+      {/* Cột trụ sơn son tròn 3D chạy dọc mép + Mái nhà rồng vươn ra     */}
       {/* ============================================================== */}
-      {/* Left ancient_house (Chỉ hé lộ góc mái rồng uốn lượn ở rìa mép) */}
+      {/* Left side motif: Lacquer pillar + Left ancient_house */}
       <div className="absolute top-0 bottom-0 left-0 pointer-events-none z-10 animate-slide-left-motif flex items-center">
+        {/* Left red lacquer pillar (Cột đỏ hình trụ 3D chạy dọc từ trên xuống dưới) */}
+        <div
+          className="absolute top-0 bottom-0 left-0 w-10 sm:w-12 md:w-14 lg:w-16 xl:w-20 h-full z-0"
+          style={{
+            background: 'linear-gradient(90deg, #300204 0%, #4D0508 12%, #A31218 32%, #E52E38 48%, #C0151C 60%, #520508 82%, #2E0203 100%)',
+            boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.7), 3px 0 14px rgba(0, 0, 0, 0.55)'
+          }}
+        />
+
+        {/* Left ancient_house (Mái ngói rồng uốn lượn vươn từ sau cột vào) */}
         <img
           src="/home-assets/ancient_house.png"
           alt="ancient_house"
-          className="h-[75vh] sm:h-[84vh] md:h-[90vh] lg:h-[94vh] w-auto max-w-none object-contain -translate-x-[86%] sm:-translate-x-[84%] md:-translate-x-[83%] lg:-translate-x-[82%]"
+          className="relative z-10 h-[75vh] sm:h-[84vh] md:h-[90vh] lg:h-[94vh] w-auto max-w-none object-contain -translate-x-[86%] sm:-translate-x-[84%] md:-translate-x-[83%] lg:-translate-x-[82%]"
         />
       </div>
 
-      {/* Right ancient_house (flipped horizontally) */}
+      {/* Right side motif: Lacquer pillar + Right ancient_house (flipped horizontally) */}
       <div className="absolute top-0 bottom-0 right-0 pointer-events-none z-10 animate-slide-right-motif flex items-center">
+        {/* Right red lacquer pillar */}
+        <div
+          className="absolute top-0 bottom-0 right-0 w-10 sm:w-12 md:w-14 lg:w-16 xl:w-20 h-full z-0"
+          style={{
+            background: 'linear-gradient(270deg, #300204 0%, #4D0508 12%, #A31218 32%, #E52E38 48%, #C0151C 60%, #520508 82%, #2E0203 100%)',
+            boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.7), -3px 0 14px rgba(0, 0, 0, 0.55)'
+          }}
+        />
+
+        {/* Right ancient_house */}
         <img
           src="/home-assets/ancient_house.png"
           alt="ancient_house"
-          className="h-[75vh] sm:h-[84vh] md:h-[90vh] lg:h-[94vh] w-auto max-w-none object-contain translate-x-[86%] sm:translate-x-[84%] md:translate-x-[83%] lg:translate-x-[82%] scale-x-[-1]"
+          className="relative z-10 h-[75vh] sm:h-[84vh] md:h-[90vh] lg:h-[94vh] w-auto max-w-none object-contain translate-x-[86%] sm:translate-x-[84%] md:translate-x-[83%] lg:translate-x-[82%] scale-x-[-1]"
         />
       </div>
 

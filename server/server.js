@@ -16,7 +16,7 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 4999;
 const JWT_SECRET = process.env.JWT_SECRET || 'sukyso_jwt_secret_key_2026';
 
 // Ensure uploads folder exists
@@ -2104,7 +2104,7 @@ app.get('/api/resources/:id/game-quizzes', async (req, res) => {
       try {
         const gal = typeof resource.gallery === 'string' ? JSON.parse(resource.gallery) : resource.gallery;
         if (Array.isArray(gal) && gal.length > 0) secretImage = gal[0];
-      } catch {}
+      } catch { }
     }
 
     res.json({
