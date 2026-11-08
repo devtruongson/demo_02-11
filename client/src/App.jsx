@@ -19,7 +19,6 @@ import ContactView from './components/ContactView.jsx';
 import TopicEditorModal from './components/TopicEditorModal.jsx';
 import Footer from './components/Footer.jsx';
 import CoreFeaturesShowcase from './components/CoreFeaturesShowcase.jsx';
-import WhyChooseUsSection from './components/WhyChooseUsSection.jsx';
 import CollaborativeStudySpace from './components/CollaborativeStudySpace.jsx';
 import AuthPage from './components/AuthPage.jsx';
 import { createResourceSlug } from './utils/slugify.js';
@@ -403,16 +402,10 @@ export default function App() {
 
                   {/* Main Homepage Sections - Căn Đều 2 Bên (max-w-7xl mx-auto) */}
                   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-12 sm:space-y-16">
-                    {/* 1. Core Features Showcase (Slide 2) */}
+                    {/* Core Features Showcase (Slide 2) */}
                     <CoreFeaturesShowcase
                       topics={topics}
                       artifacts3d={artifacts3d}
-                    />
-
-                    {/* 2. Why Choose Us / Ưu điểm của trang web (Slide 1) */}
-                    <WhyChooseUsSection
-                      onOpenLogin={() => setIsLoginModalOpen(true)}
-                      currentUser={currentUser}
                     />
                   </div>
                 </div>
