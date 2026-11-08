@@ -26,7 +26,7 @@ export default function Hero() {
       {/* Chỉ hiện 1 góc nhỏ ở mép 2 bên, vươn cao dọc viền màn hình     */}
       {/* ============================================================== */}
       {/* Left ancient_house (Chỉ hé lộ góc mái rồng uốn lượn ở rìa mép) */}
-      <div className="absolute top-0 bottom-0 left-0 pointer-events-none z-20 animate-slide-left-motif flex items-center">
+      <div className="absolute top-0 bottom-0 left-0 pointer-events-none z-10 animate-slide-left-motif flex items-center">
         <img
           src="/home-assets/ancient_house.png"
           alt="ancient_house"
@@ -35,7 +35,7 @@ export default function Hero() {
       </div>
 
       {/* Right ancient_house (flipped horizontally) */}
-      <div className="absolute top-0 bottom-0 right-0 pointer-events-none z-20 animate-slide-right-motif flex items-center">
+      <div className="absolute top-0 bottom-0 right-0 pointer-events-none z-10 animate-slide-right-motif flex items-center">
         <img
           src="/home-assets/ancient_house.png"
           alt="ancient_house"
@@ -61,34 +61,34 @@ export default function Hero() {
       {/* 4. CENTER CONTENT REVEALED BEHIND THE BIRD (animation.mp4)     */}
       {/* Đằng sau con chim là phần chữ được kéo cùng - Căn giữa thoáng  */}
       {/* ============================================================== */}
-      <div className="relative z-10 w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-8 text-center flex flex-col items-center justify-center animate-text-reveal">
+      <div className="relative z-20 w-full max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-8 text-center flex flex-col items-center justify-center animate-text-reveal">
         {/* Top Subtitle */}
-        <div className="w-full flex justify-center mb-1 sm:mb-2">
+        <div className="w-full flex justify-center mb-6 sm:mb-8 md:mb-10 lg:mb-12">
           <h2 className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-black uppercase tracking-[0.14em] text-[#FDE2A7] hero-subtitle select-text">
             HỆ THỐNG HỌC LIỆU SỐ & MÔ PHỎNG 3D
           </h2>
         </div>
 
         {/* Main Calligraphic Title "Sử Học Số" */}
-        <div className="w-full flex justify-center my-1 sm:my-2">
-          <h1 className="hero-main-title title text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.5rem] 2xl:text-[6.5rem] text-[#FFFDF5] tracking-tight leading-none select-text whitespace-nowrap">
+        <div className="w-full flex justify-center py-3 sm:py-4 md:py-6">
+          <h1 className="hero-main-title title text-4xl sm:text-5xl md:text-6xl lg:text-[4.75rem] xl:text-[5.5rem] 2xl:text-[6.25rem] text-[#FFFDF5] tracking-tight leading-[1.25] sm:leading-[1.3] select-text whitespace-nowrap">
             Sử Học Số
           </h1>
         </div>
 
         {/* Bottom Subtitle */}
-        <div className="w-full flex justify-center mt-1 sm:mt-2 mb-6 sm:mb-8 md:mb-10">
+        <div className="w-full flex justify-center mt-5 sm:mt-7 md:mt-9 lg:mt-11 mb-8 sm:mb-10 md:mb-12 lg:mb-16">
           <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl font-black uppercase tracking-[0.12em] text-[#FDE2A7] hero-subtitle select-text">
             ĐƯA LỊCH SỬ ĐẾN GẦN HƠN BẰNG CÔNG NGHỆ SỐ
           </p>
         </div>
 
         {/* Call-to-action Button: BẮT ĐẦU TRẢI NGHIỆM ▶ */}
-        <div>
+        <div className="mt-1 sm:mt-2">
           <button
             type="button"
             onClick={handleStartExperience}
-            className="px-8 sm:px-12 py-3 sm:py-3.5 bg-white hover:bg-[#FFFDF5] text-[#850B10] font-black text-xs sm:text-sm md:text-base uppercase tracking-wider shadow-[0_4px_25px_rgba(0,0,0,0.55)] hover:shadow-[0_6px_30px_rgba(0,0,0,0.75)] hover:scale-[1.03] active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer"
+            className="px-8 sm:px-12 py-3.5 sm:py-4 bg-white hover:bg-[#FFFDF5] text-[#850B10] font-black text-xs sm:text-sm md:text-base uppercase tracking-wider shadow-[0_4px_25px_rgba(0,0,0,0.55)] hover:shadow-[0_6px_30px_rgba(0,0,0,0.75)] hover:scale-[1.03] active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer"
             style={{ borderRadius: '2px' }}
           >
             <span className="font-extrabold tracking-[0.06em]">BẮT ĐẦU TRẢI NGHIỆM</span>

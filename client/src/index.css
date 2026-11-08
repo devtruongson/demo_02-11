@@ -123,14 +123,18 @@
 /* 4. Center text & CTA unrolled / pulled open behind the flying bird */
 @keyframes textRevealBehindBird {
   0% {
-    clip-path: inset(0 100% 0 0);
+    clip-path: inset(-120px 100% -120px -100px);
     opacity: 0;
   }
   15% {
     opacity: 1;
   }
+  96% {
+    clip-path: inset(-120px 0% -120px -100px);
+    opacity: 1;
+  }
   100% {
-    clip-path: inset(0 0% 0 0);
+    clip-path: none;
     opacity: 1;
   }
 }
