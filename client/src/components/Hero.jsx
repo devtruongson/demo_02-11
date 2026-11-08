@@ -61,11 +61,11 @@ export default function Hero() {
           }}
         />
 
-        {/* Right ancient_house */}
+        {/* Right ancient_house (Nhô ra nhiều hơn bên trái 1 chút theo đúng thiết kế) */}
         <img
           src="/home-assets/ancient_house.png"
           alt="ancient_house"
-          className="relative z-10 h-[75vh] sm:h-[84vh] md:h-[90vh] lg:h-[94vh] w-auto max-w-none object-contain translate-x-[86%] sm:translate-x-[84%] md:translate-x-[83%] lg:translate-x-[82%] scale-x-[-1]"
+          className="relative z-10 h-[75vh] sm:h-[84vh] md:h-[90vh] lg:h-[94vh] w-auto max-w-none object-contain translate-x-[78%] sm:translate-x-[76%] md:translate-x-[75%] lg:translate-x-[74%] scale-x-[-1]"
         />
       </div>
 

@@ -59,7 +59,7 @@ export default function Navbar({
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-[#850B10] text-white select-none transition-all">
+    <header className="sticky top-0 z-50 bg-[#850B10] text-white select-none transition-all shadow-md">
       <div className="w-full px-4 sm:px-8 lg:px-12">
         <div className="h-16 sm:h-20 flex items-center justify-between gap-4">
           {/* Brand Logo Stamp (Matching design/image.png) */}
@@ -71,7 +71,7 @@ export default function Navbar({
             <img
               src="/home-assets/logo.png"
               alt="Logo Sử Học Số"
-              className="w-10 h-10 sm:w-12 sm:h-12 object-contain drop-shadow-md group-hover:scale-105 transition-transform outline-none focus:outline-none"
+              className="h-11 w-11 sm:h-13 sm:w-13 md:h-14 md:w-14 lg:h-16 lg:w-16 object-contain drop-shadow-md group-hover:scale-105 transition-transform outline-none focus:outline-none"
               onError={(e) => {
                 e.target.style.display = 'none';
               }}
@@ -203,7 +203,13 @@ export default function Navbar({
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#73070b] border-t border-amber-300/20 p-4 space-y-3 animate-fadeIn">
+        <div
+          className="lg:hidden bg-[#73070b]/90 backdrop-blur-lg border-t border-amber-300/20 p-4 space-y-3 animate-fadeIn"
+          style={{
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+          }}
+        >
           {navItems.map((item) => (
             <NavLink
               key={item.to}

@@ -368,7 +368,7 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col selection:bg-[#850b10] selection:text-[#fff8ee] font-sans ${isDashboard ? 'bg-slate-950 text-slate-100' : 'bg-[#FFF7E8] text-[#2D1B08]'}`}>
+    <div className={`min-h-screen flex flex-col selection:bg-[#850b10] selection:text-[#fff8ee] font-sans ${isDashboard ? 'bg-slate-950 text-slate-100' : isHomePage ? 'bg-[#850B10]' : 'bg-[#FFF7E8] text-[#2D1B08]'}`}>
       {/* Top Navbar: Hidden on Admin Dashboard */}
       {!isDashboard && (
         <Navbar
