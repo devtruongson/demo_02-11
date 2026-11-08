@@ -28,10 +28,22 @@
 
 /* Typography Helpers */
 .font-serif-royal {
-  font-family: 'Playfair Display', 'Times New Roman', Georgia, serif;
+  font-family: 'Playfair Display', 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+  font-feature-settings: "swsh" 1, "dlig" 1, "cswh" 1, "calt" 1;
 }
 .font-serif-cinzel {
-  font-family: 'Cinzel', 'Times New Roman', serif;
+  font-family: 'Cinzel', 'Playfair Display', 'Times New Roman', serif;
+}
+
+.hero-main-title {
+  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  font-feature-settings: "swsh" 1, "dlig" 1, "cswh" 1, "calt" 1, "titl" 1;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.75), 0 12px 36px rgba(0, 0, 0, 0.9);
+}
+
+.hero-subtitle {
+  font-family: 'Cinzel', 'Playfair Display', 'Times New Roman', serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 4px 12px rgba(0, 0, 0, 0.85);
 }
 
 /* ============================================================== */

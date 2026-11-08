@@ -71,37 +71,38 @@ export default function Hero() {
       {/* 4. CENTER CONTENT REVEALED BEHIND THE BIRD (animation.mp4)     */}
       {/* Đằng sau con chim là phần chữ được kéo cùng - Căn giữa thoáng  */}
       {/* ============================================================== */}
-      <div className="relative z-10 max-w-3xl lg:max-w-4xl mx-auto px-10 sm:px-20 md:px-28 lg:px-36 text-center flex flex-col items-center justify-center space-y-3.5 sm:space-y-5 animate-text-reveal">
+      <div className="relative z-10 w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-8 text-center flex flex-col items-center justify-center animate-text-reveal">
         {/* Top Subtitle */}
-        <div>
-          <h2 className="text-[11px] sm:text-xs md:text-sm font-bold uppercase tracking-[0.2em] text-[#FDE2A7] drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)] font-serif-cinzel">
+        <div className="w-full flex justify-center mb-1 sm:mb-2">
+          <h2 className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-black uppercase tracking-[0.14em] text-[#FDE2A7] hero-subtitle select-text">
             HỆ THỐNG HỌC LIỆU SỐ & MÔ PHỎNG 3D
           </h2>
         </div>
 
-        {/* Main Calligraphic Title */}
-        <div className="py-0.5 sm:py-1">
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-[#FFFDF8] font-serif-royal drop-shadow-[0_10px_25px_rgba(0,0,0,0.9)] tracking-tight leading-none">
+        {/* Main Calligraphic Title "Sử Học Số" */}
+        <div className="w-full flex justify-center my-0.5 sm:my-1 lg:my-2">
+          <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[9.5rem] 2xl:text-[11.5rem] font-black text-[#FFFDF5] hero-main-title tracking-tight leading-none select-text">
             Sử Học Số
           </h1>
         </div>
 
-        {/* Subtitle */}
-        <div className="max-w-xl mx-auto">
-          <p className="text-[11px] sm:text-xs md:text-sm font-bold uppercase tracking-[0.14em] text-[#FDE2A7] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] font-serif-cinzel leading-relaxed">
+        {/* Bottom Subtitle */}
+        <div className="w-full flex justify-center mt-1 sm:mt-2 mb-6 sm:mb-8 md:mb-10">
+          <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl font-black uppercase tracking-[0.12em] text-[#FDE2A7] hero-subtitle select-text">
             ĐƯA LỊCH SỬ ĐẾN GẦN HƠN BẰNG CÔNG NGHỆ SỐ
           </p>
         </div>
 
         {/* Call-to-action Button: BẮT ĐẦU TRẢI NGHIỆM ▶ */}
-        <div className="pt-2 sm:pt-4">
+        <div>
           <button
             type="button"
             onClick={handleStartExperience}
-            className="px-8 sm:px-10 py-3 sm:py-3.5 rounded-md bg-[#FFFDF8] hover:bg-white text-[#8B0B10] font-black text-xs sm:text-sm uppercase tracking-wider shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2.5 border border-amber-300/40 cursor-pointer"
+            className="px-8 sm:px-12 py-3 sm:py-3.5 bg-white hover:bg-[#FFFDF5] text-[#850B10] font-black text-xs sm:text-sm md:text-base uppercase tracking-wider shadow-[0_4px_25px_rgba(0,0,0,0.55)] hover:shadow-[0_6px_30px_rgba(0,0,0,0.75)] hover:scale-[1.03] active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer"
+            style={{ borderRadius: '2px' }}
           >
-            <span>BẮT ĐẦU TRẢI NGHIỆM</span>
-            <span className="text-[#8B0B10] text-xs">▶</span>
+            <span className="font-extrabold tracking-[0.06em]">BẮT ĐẦU TRẢI NGHIỆM</span>
+            <span className="text-[#850B10] text-sm sm:text-base leading-none">▶</span>
           </button>
         </div>
       </div>

@@ -176,7 +176,8 @@ export default function Navbar({
             ) : (
               <button
                 onClick={onOpenLogin}
-                className="flex items-center justify-center px-6 sm:px-7 py-2.5 rounded-md text-xs sm:text-sm font-black uppercase tracking-wider bg-[#FFFDF8] hover:bg-white text-[#8B0B10] shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
+                className="flex items-center justify-center px-7 sm:px-8 py-2.5 text-xs sm:text-sm font-black uppercase tracking-wider bg-white hover:bg-[#FFFDF5] text-[#850B10] shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer shrink-0"
+                style={{ borderRadius: '2px' }}
               >
                 <span>ĐĂNG NHẬP</span>
               </button>
