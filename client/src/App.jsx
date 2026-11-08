@@ -76,6 +76,7 @@ export default function App() {
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
 
   // Is this the full-width detail page or full-screen dashboard?
+  const isHomePage = location.pathname === '/';
   const isDetailPage = location.pathname.startsWith('/tu-lieu/');
   const isDashboard = location.pathname.startsWith('/dashboard');
 
@@ -352,7 +353,7 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col selection:bg-gold selection:text-slate-950 font-sans ${isDashboard ? 'bg-slate-950 text-slate-100' : 'bg-[#f6f8fc]'}`}>
+    <div className={`min-h-screen flex flex-col selection:bg-[#850b10] selection:text-[#fff8ee] font-sans ${isDashboard ? 'bg-slate-950 text-slate-100' : 'bg-[#FFF7E8] text-[#2D1B08]'}`}>
       {/* Top Navbar: Hidden on Admin Dashboard */}
       {!isDashboard && (
         <Navbar
@@ -364,9 +365,15 @@ export default function App() {
       )}
 
       {/* Main Container Wrapper */}
-      <div className={isDashboard ? 'min-h-screen bg-slate-950 flex-1 flex flex-col px-3 sm:px-8 lg:px-12 py-3 sm:py-4' : 'container mx-auto px-3 sm:px-6 lg:px-8 flex-1 flex my-2 sm:my-4 gap-4 sm:gap-6'}>
-        {/* Left Sidebar: HIDDEN on detail view and on dashboard */}
-        {!isDetailPage && !isDashboard && (
+      <div className={
+        isDashboard
+          ? 'min-h-screen bg-slate-950 flex-1 flex flex-col px-3 sm:px-8 lg:px-12 py-3 sm:py-4'
+          : isHomePage
+          ? 'w-full flex-1 flex flex-col'
+          : 'container mx-auto px-3 sm:px-6 lg:px-8 flex-1 flex my-2 sm:my-4 gap-4 sm:gap-6'
+      }>
+        {/* Left Sidebar: HIDDEN on home page, detail view, and on dashboard */}
+        {!isHomePage && !isDetailPage && !isDashboard && (
           <Sidebar
             stats={stats}
             currentUser={currentUser}
@@ -376,14 +383,14 @@ export default function App() {
         )}
 
         {/* Dynamic Main Workspace Content */}
-        <main className={`flex-1 min-w-0 ${isDetailPage || isDashboard ? 'w-full' : ''} ${!isDashboard ? 'pb-12' : ''}`}>
+        <main className={`flex-1 min-w-0 ${isHomePage || isDetailPage || isDashboard ? 'w-full' : ''} ${!isDashboard ? 'pb-12' : ''}`}>
           <Routes>
             {/* ================= ROUTE: HOME ================= */}
             <Route
               path="/"
               element={
-                <div className="space-y-8 animate-fade-in">
-                  {/* Hero Banner */}
+                <div className="w-full animate-fade-in">
+                  {/* Full-screen Edge-to-Edge Hero Banner */}
                   <Hero
                     searchQuery={inputSearch}
                     setSearchQuery={setInputSearch}
@@ -394,84 +401,19 @@ export default function App() {
                     isAdmin={currentUser?.role === 'admin'}
                   />
 
-                  {/* Core Features Showcase (Replacing old teaser as requested in Feedback) */}
-                  <CoreFeaturesShowcase
-                    topics={topics}
-                    artifacts3d={artifacts3d}
-                  />
+                  {/* Main Homepage Sections - Căn Đều 2 Bên (max-w-7xl mx-auto) */}
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-12 sm:space-y-16">
+                    {/* 1. Core Features Showcase (Slide 2) */}
+                    <CoreFeaturesShowcase
+                      topics={topics}
+                      artifacts3d={artifacts3d}
+                    />
 
-                  {/* Why Choose Us / Ưu điểm của trang web (As requested in Feedback) */}
-                  <WhyChooseUsSection
-                    onOpenLogin={() => setIsLoginModalOpen(true)}
-                    currentUser={currentUser}
-                  />
-
-                  {/* 7 Curriculum Topics Grid */}
-                  <div>
-                    <div className="flex items-end justify-between mb-4">
-                      <div>
-                        <h2 className="text-xl font-black text-slate-900 tracking-tight">
-                          Các Chủ Đề Lịch Sử 10
-                        </h2>
-                        <p className="text-xs text-slate-500 mt-0.5">
-                          Chọn chủ đề để xem danh mục bài học và tư liệu tương ứng
-                        </p>
-                      </div>
-                      <Link
-                        to="/chu-de"
-                        className="text-xs font-bold text-navy hover:text-gold-dark transition flex items-center gap-1"
-                      >
-                        <span>Xem tất cả ({topics.length})</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                      {topics.map((t) => (
-                        <TopicCard
-                          key={t.id}
-                          topic={t}
-                          isAdmin={currentUser?.role === 'admin'}
-                          onEdit={handleOpenEditTopic}
-                          onDelete={handleDeleteTopic}
-                          onSelect={(topic) => {
-                            navigate(`/kho-tu-lieu?topic=${topic.id}`);
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Featured Artifacts Spotlight */}
-                  <div>
-                    <div className="flex items-end justify-between mb-4">
-                      <div>
-                        <h2 className="text-xl font-black text-slate-900 tracking-tight">
-                          Hiện Vật & Tư Liệu Tiêu Biểu
-                        </h2>
-                        <p className="text-xs text-slate-500 mt-0.5">
-                          Bảo vật quốc gia, di sản khảo cổ học và nguồn tư liệu lịch sử nổi bật
-                        </p>
-                      </div>
-                      <Link
-                        to="/kho-tu-lieu"
-                        className="text-xs font-bold text-navy hover:text-gold-dark transition flex items-center gap-1"
-                      >
-                        <span>Khám phá toàn bộ kho ({resources.length})</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                      {resources.slice(0, 6).map((res) => (
-                        <ResourceCard
-                          key={res.id}
-                          resource={res}
-                          onSelect={handleSelectResource}
-                          onOpen3D={(code) => navigate(`/studio-3d/co-vat/${code}`)}
-                        />
-                      ))}
-                    </div>
+                    {/* 2. Why Choose Us / Ưu điểm của trang web (Slide 1) */}
+                    <WhyChooseUsSection
+                      onOpenLogin={() => setIsLoginModalOpen(true)}
+                      currentUser={currentUser}
+                    />
                   </div>
                 </div>
               }

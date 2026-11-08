@@ -7,9 +7,9 @@ export default function TopicCard({ topic, onSelect, isAdmin = false, onEdit = n
   const fallbackImg = 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=600&q=80';
 
   return (
-    <div className="group relative bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col">
+    <div className="group relative bg-[#fdfaf5] rounded-2xl overflow-hidden border border-[#edd8be] shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 flex flex-col">
       {/* Image Preview with Topic Number */}
-      <Link to={url} className="relative h-36 overflow-hidden bg-slate-100 block">
+      <Link to={url} className="relative h-40 overflow-hidden bg-slate-100 block">
         <img
           src={topic.img || fallbackImg}
           alt={topic.title}
@@ -17,19 +17,19 @@ export default function TopicCard({ topic, onSelect, isAdmin = false, onEdit = n
             e.target.onerror = null;
             e.target.src = fallbackImg;
           }}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent opacity-80" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#590408]/70 via-transparent to-transparent opacity-80" />
         
         {/* Number Badge */}
-        <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md text-navy text-xs font-black px-2.5 py-1 rounded-lg shadow-sm border border-slate-100">
+        <div className="absolute top-3 left-3 bg-[#850b10] text-[#fff8ee] text-xs font-black px-2.5 py-1 rounded-lg shadow-sm border border-amber-300/40">
           Chủ đề {topic.order_index || topic.id}
         </div>
 
         {/* Count Badge */}
         {topic.resource_count !== undefined && (
-          <div className="absolute bottom-2.5 right-3 bg-black/60 backdrop-blur-md text-gold text-[11px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 border border-white/10">
+          <div className="absolute bottom-2.5 right-3 bg-black/60 backdrop-blur-md text-[#fef08a] text-[11px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 border border-white/10">
             <BookOpen className="w-3 h-3" />
             <span>{topic.resource_count} tư liệu</span>
           </div>
