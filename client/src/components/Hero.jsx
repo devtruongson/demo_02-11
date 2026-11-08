@@ -25,21 +25,21 @@ export default function Hero() {
       {/* 2. SIDE ANCIENT_HOUSE MOTIFS SLIDING IN (animation.mp4)        */}
       {/* Chỉ hiện 1 góc nhỏ ở mép 2 bên, vươn cao dọc viền màn hình     */}
       {/* ============================================================== */}
-      {/* Left ancient_house */}
-      <div className="absolute top-0 bottom-0 left-0 w-20 sm:w-28 md:w-36 lg:w-44 xl:w-52 pointer-events-none z-20 animate-slide-left-motif overflow-hidden">
+      {/* Left ancient_house (Chỉ hé lộ góc mái rồng uốn lượn ở rìa mép) */}
+      <div className="absolute top-0 bottom-0 left-0 pointer-events-none z-20 animate-slide-left-motif flex items-center">
         <img
           src="/home-assets/ancient_house.png"
           alt="ancient_house"
-          className="absolute right-0 top-1/2 -translate-y-1/2 h-[75vh] sm:h-[84vh] md:h-[90vh] lg:h-[94vh] w-auto max-w-none object-contain drop-shadow-[0_20px_45px_rgba(0,0,0,0.92)] translate-x-0"
+          className="h-[75vh] sm:h-[84vh] md:h-[90vh] lg:h-[94vh] w-auto max-w-none object-contain -translate-x-[86%] sm:-translate-x-[84%] md:-translate-x-[83%] lg:-translate-x-[82%]"
         />
       </div>
 
       {/* Right ancient_house (flipped horizontally) */}
-      <div className="absolute top-0 bottom-0 right-0 w-20 sm:w-28 md:w-36 lg:w-44 xl:w-52 pointer-events-none z-20 animate-slide-right-motif overflow-hidden">
+      <div className="absolute top-0 bottom-0 right-0 pointer-events-none z-20 animate-slide-right-motif flex items-center">
         <img
           src="/home-assets/ancient_house.png"
           alt="ancient_house"
-          className="absolute left-0 top-1/2 -translate-y-1/2 h-[75vh] sm:h-[84vh] md:h-[90vh] lg:h-[94vh] w-auto max-w-none object-contain drop-shadow-[0_20px_45px_rgba(0,0,0,0.92)] translate-x-0 scale-x-[-1]"
+          className="h-[75vh] sm:h-[84vh] md:h-[90vh] lg:h-[94vh] w-auto max-w-none object-contain translate-x-[86%] sm:translate-x-[84%] md:translate-x-[83%] lg:translate-x-[82%] scale-x-[-1]"
         />
       </div>
 
