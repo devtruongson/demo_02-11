@@ -13,12 +13,12 @@ export default function Hero() {
       {/* ============================================================== */}
       {/* 1. BACKGROUND LAYERS: MISTY CLOUDS                             */}
       {/* ============================================================== */}
-      {/* Floating traditional clouds top & bottom */}
-      <div className="absolute top-4 left-12 w-48 sm:w-64 opacity-20 pointer-events-none">
-        <img src="/home-assets/cloud_1.png" alt="" className="w-full h-auto" />
+      {/* Floating traditional clouds top-left & bottom-right (design/image.png) */}
+      <div className="absolute -top-4 sm:-top-8 md:-top-12 lg:-top-16 -left-6 sm:-left-10 md:-left-16 w-[380px] sm:w-[540px] md:w-[700px] lg:w-[850px] xl:w-[980px] max-w-none opacity-[0.085] pointer-events-none select-none z-0">
+        <img src="/home-assets/cloud_1.png" alt="" className="w-full h-auto object-contain" />
       </div>
-      <div className="absolute bottom-8 right-12 w-56 sm:w-72 opacity-20 pointer-events-none">
-        <img src="/home-assets/cloud_2.png" alt="" className="w-full h-auto" />
+      <div className="absolute -bottom-6 sm:-bottom-10 md:-bottom-14 lg:-bottom-18 -right-6 sm:-right-10 md:-right-16 w-[400px] sm:w-[560px] md:w-[740px] lg:w-[890px] xl:w-[1020px] max-w-none opacity-[0.085] pointer-events-none select-none z-0">
+        <img src="/home-assets/cloud_2.png" alt="" className="w-full h-auto object-contain" />
       </div>
 
       {/* ============================================================== */}
