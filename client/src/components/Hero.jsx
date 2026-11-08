@@ -11,18 +11,8 @@ export default function Hero() {
   return (
     <section className="relative w-full h-[calc(100vh-4rem)] sm:h-[calc(100vh-5rem)] min-h-[560px] sm:min-h-[640px] bg-gradient-to-b from-[#8B0B10] via-[#7B080D] to-[#5C0407] text-white flex flex-col justify-center items-center overflow-hidden select-none">
       {/* ============================================================== */}
-      {/* 1. BACKGROUND LAYERS: DONG SON PATTERNS & MISTY CLOUDS        */}
+      {/* 1. BACKGROUND LAYERS: MISTY CLOUDS                             */}
       {/* ============================================================== */}
-      <div
-        className="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay"
-        style={{
-          backgroundImage: `url('/home-assets/Dong_Son_patterns.png')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      />
-
       {/* Floating traditional clouds top & bottom */}
       <div className="absolute top-4 left-12 w-48 sm:w-64 opacity-20 pointer-events-none">
         <img src="/home-assets/cloud_1.png" alt="" className="w-full h-auto" />

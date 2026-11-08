@@ -26,6 +26,19 @@
   background: #aab6cb;
 }
 
+/* Custom Display Font for Hero Title (DFVN Menata) */
+@font-face {
+  font-family: 'Menata';
+  src: url('/fonts/Menata.woff2') format('woff2'),
+       url('/fonts/Menata.otf') format('opentype'),
+       url('/fonts/Menata.ttf') format('truetype'),
+       url('/fonts/DFVN-Menata.otf') format('opentype'),
+       url('/fonts/DFVN-Menata.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Typography Helpers */
 .font-serif-royal {
   font-family: 'Playfair Display', 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
@@ -36,7 +49,7 @@
 }
 
 .hero-main-title {
-  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  font-family: 'Menata', 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
   font-feature-settings: "swsh" 1, "dlig" 1, "cswh" 1, "calt" 1, "titl" 1;
   text-shadow: 0 4px 16px rgba(0, 0, 0, 0.75), 0 12px 36px rgba(0, 0, 0, 0.9);
 }
