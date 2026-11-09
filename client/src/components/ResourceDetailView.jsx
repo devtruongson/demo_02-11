@@ -443,7 +443,7 @@ export default function ResourceDetailView({
         {/* ================= RIGHT COLUMN: SCROLLABLE DOSSIER & PEDAGOGY ================= */}
         <div className="lg:col-span-6 space-y-6">
           {/* Header Title & Curriculum Tag */}
-          <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-xs space-y-4">
+          <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-xs space-y-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-navy/10 text-navy border border-navy/20">
                 {resource.lesson || 'Chuyên đề GDPT 2018 Lịch sử 10'}
@@ -456,10 +456,24 @@ export default function ResourceDetailView({
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-snug">
               {resource.title}
             </h1>
+          </div>
 
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-              {resource.description?.split('\n')[0] || 'Tư liệu học tập số hóa phục vụ giảng dạy và tự học môn Lịch sử 10.'}
-            </p>
+          {/* Detailed Historical Narrative (Hồ Sơ Lịch Sử & Phân Tích Chuyên Sâu đặt ngay dưới tên tư liệu) */}
+          <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-xs space-y-4">
+            <h3 className="font-extrabold text-sm sm:text-base text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-100">
+              <BookOpen className="w-4 h-4 text-navy" />
+              <span>Hồ Sơ Lịch Sử & Phân Tích Chuyên Sâu</span>
+            </h3>
+
+            <div className="text-xs sm:text-sm text-slate-700 leading-relaxed space-y-3">
+              {resource.description ? (
+                resource.description.split('\n\n').map((para, idx) => (
+                  <p key={idx} className="whitespace-pre-line">{para.trim()}</p>
+                ))
+              ) : (
+                <p className="text-slate-400 italic">Đang cập nhật hồ sơ chi tiết...</p>
+              )}
+            </div>
           </div>
 
           {/* Section: TƯ LIỆU ẢNH (Grid of all images with titles - Matching Feedback Diagram) */}
@@ -577,24 +591,6 @@ export default function ResourceDetailView({
                   Hoàn thành 3 câu trắc nghiệm nhanh bên dưới để kiểm tra mức độ ghi nhớ và hiểu sâu về tư liệu.
                 </p>
               </div>
-            </div>
-          </div>
-
-          {/* Detailed Historical Narrative */}
-          <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-xs space-y-4">
-            <h3 className="font-extrabold text-sm sm:text-base text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-100">
-              <BookOpen className="w-4 h-4 text-navy" />
-              <span>Hồ Sơ Lịch Sử & Phân Tích Chuyên Sâu</span>
-            </h3>
-
-            <div className="text-xs sm:text-sm text-slate-700 leading-relaxed space-y-3">
-              {resource.description ? (
-                resource.description.split('\n\n').map((para, idx) => (
-                  <p key={idx} className="whitespace-pre-line">{para.trim()}</p>
-                ))
-              ) : (
-                <p className="text-slate-400 italic">Đang cập nhật hồ sơ chi tiết...</p>
-              )}
             </div>
           </div>
 
