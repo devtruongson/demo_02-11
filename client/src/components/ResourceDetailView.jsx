@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft, Box, Image, Video, Calendar, MapPin, Eye, ExternalLink,
   Edit3, Trash2, Share2, Compass, Sparkles, BookOpen, Lightbulb,
-  CheckCircle2, Layers, Maximize2, ChevronLeft, ChevronRight, Bookmark,
+  CheckCircle2, Layers, Maximize2, Minimize2, ZoomIn, ZoomOut, X, ChevronLeft, ChevronRight, Bookmark,
   Play, Film, Globe2, Clock, FileText, Copy, Check, Printer, Target, GraduationCap, Award
 } from 'lucide-react';
 import ThreeArtifactViewer from './ThreeArtifactViewer.jsx';
@@ -34,6 +34,9 @@ export default function ResourceDetailView({
 
   const [activeMediaTab, setActiveMediaTab] = useState('gallery'); // 'gallery' | 'video' | '3d'
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [lightboxPhotoIdx, setLightboxPhotoIdx] = useState(0);
+  const [lightboxZoom, setLightboxZoom] = useState(1);
   const [copied, setCopied] = useState(false);
   const [copiedCitation, setCopiedCitation] = useState(false);
 
@@ -208,6 +211,37 @@ export default function ResourceDetailView({
     setActivePhotoIdx((prev) => (prev - 1 + galleryPhotos.length) % galleryPhotos.length);
   };
 
+  const handleLightboxPrev = () => {
+    setLightboxPhotoIdx((prev) => (prev - 1 + galleryPhotos.length) % galleryPhotos.length);
+    setLightboxZoom(1);
+  };
+
+  const handleLightboxNext = () => {
+    setLightboxPhotoIdx((prev) => (prev + 1) % galleryPhotos.length);
+    setLightboxZoom(1);
+  };
+
+  const handleToggleZoom = () => {
+    setLightboxZoom((prev) => (prev === 1 ? 1.6 : prev === 1.6 ? 2.2 : 1));
+  };
+
+  // Keyboard navigation for Fullscreen Lightbox
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsLightboxOpen(false);
+        setLightboxZoom(1);
+      } else if (e.key === 'ArrowLeft') {
+        handleLightboxPrev();
+      } else if (e.key === 'ArrowRight') {
+        handleLightboxNext();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLightboxOpen, galleryPhotos.length]);
+
   return (
     <div className="space-y-6 animate-fade-in pb-16">
       {/* Top Breadcrumb & Action Bar */}
@@ -362,7 +396,14 @@ export default function ResourceDetailView({
 
               {/* TAB 3: GALLERY SLIDER */}
               {activeMediaTab === 'gallery' && (
-                <div className="relative w-full h-full flex items-center justify-center group">
+                <div
+                  className="relative w-full h-full flex items-center justify-center group cursor-zoom-in"
+                  onClick={() => {
+                    setLightboxPhotoIdx(activePhotoIdx);
+                    setIsLightboxOpen(true);
+                  }}
+                  title="Nhấn để phóng to toàn màn hình xem ảnh gốc"
+                >
                   <img
                     src={galleryPhotos[activePhotoIdx]}
                     alt={resource.title}
@@ -370,18 +411,41 @@ export default function ResourceDetailView({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-80 pointer-events-none" />
 
+                  {/* Top-Right: Zoom in Fullscreen Button */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLightboxPhotoIdx(activePhotoIdx);
+                      setIsLightboxOpen(true);
+                    }}
+                    className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/85 hover:bg-slate-900 text-white text-xs font-bold border border-white/20 shadow-lg backdrop-blur-md transition active:scale-95 cursor-pointer opacity-90 group-hover:opacity-100"
+                    title="Phóng to xem ảnh gốc không bị cắt"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Phóng to</span>
+                  </button>
+
                   {galleryPhotos.length > 1 && (
                     <>
                       <button
-                        onClick={handlePrevPhoto}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center transition border border-white/20 active:scale-95"
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePrevPhoto();
+                        }}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center transition border border-white/20 active:scale-95 z-20 cursor-pointer"
                         title="Ảnh trước"
                       >
                         <ChevronLeft className="w-5 h-5" />
                       </button>
                       <button
-                        onClick={handleNextPhoto}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center transition border border-white/20 active:scale-95"
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleNextPhoto();
+                        }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center transition border border-white/20 active:scale-95 z-20 cursor-pointer"
                         title="Ảnh sau"
                       >
                         <ChevronRight className="w-5 h-5" />
@@ -389,10 +453,15 @@ export default function ResourceDetailView({
                     </>
                   )}
 
-                  <div className="absolute bottom-4 left-4 right-4 text-white pointer-events-none">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-gold/30 text-amber-200 border border-gold/40 mb-1 inline-block">
-                      Ảnh {activePhotoIdx + 1} / {galleryPhotos.length}
-                    </span>
+                  <div className="absolute bottom-4 left-4 right-4 text-white pointer-events-none z-10">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-gold/30 text-amber-200 border border-gold/40 mb-1 inline-block">
+                        Ảnh {activePhotoIdx + 1} / {galleryPhotos.length}
+                      </span>
+                      <span className="text-[10px] text-white/75 italic flex items-center gap-1">
+                        <Maximize2 className="w-3 h-3 text-amber-400" /> Nhấn ảnh để phóng to full
+                      </span>
+                    </div>
                     <h3 className="font-extrabold text-sm sm:text-base text-white truncate drop-shadow">
                       {resource.title}
                     </h3>
@@ -499,12 +568,16 @@ export default function ResourceDetailView({
                   onClick={() => {
                     setActivePhotoIdx(idx);
                     setActiveMediaTab('gallery');
+                    setLightboxPhotoIdx(idx);
+                    setLightboxZoom(1);
+                    setIsLightboxOpen(true);
                   }}
                   className={`group/img cursor-pointer rounded-2xl overflow-hidden border transition bg-slate-50 flex flex-col ${
                     activePhotoIdx === idx && activeMediaTab === 'gallery'
                       ? 'border-gold ring-2 ring-gold/40 shadow-md'
-                      : 'border-slate-200 hover:border-slate-300'
+                      : 'border-slate-200 hover:border-slate-300 hover:shadow-sm'
                   }`}
+                  title="Nhấn để phóng to toàn màn hình xem ảnh gốc"
                 >
                   <div className="relative h-24 overflow-hidden bg-slate-200">
                     <img
@@ -512,6 +585,12 @@ export default function ResourceDetailView({
                       alt={`${resource.title} - Ảnh ${idx + 1}`}
                       className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300"
                     />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                      <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-white/95 text-slate-900 text-[10px] font-bold shadow-md">
+                        <Maximize2 className="w-3 h-3 text-amber-600" />
+                        <span>Phóng to</span>
+                      </span>
+                    </div>
                     <span className="absolute bottom-1 right-1 text-[9px] font-bold px-1.5 py-0.2 rounded bg-black/60 text-white">
                       #{idx + 1}
                     </span>
@@ -628,6 +707,149 @@ export default function ResourceDetailView({
           )}
         </div>
       </div>
+
+      {/* ================= FULLSCREEN IMAGE LIGHTBOX MODAL ================= */}
+      {isLightboxOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between animate-fade-in select-none !m-0"
+          onClick={() => {
+            setIsLightboxOpen(false);
+            setLightboxZoom(1);
+          }}
+        >
+          {/* Top Control Bar */}
+          <div
+            className="flex items-center justify-between px-4 sm:px-8 py-3.5 bg-gradient-to-b from-black/90 to-transparent text-white z-30 shrink-0 border-b border-white/10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 shrink-0">
+                Ảnh {lightboxPhotoIdx + 1} / {galleryPhotos.length}
+              </span>
+              <div className="min-w-0">
+                <h3 className="text-xs sm:text-sm font-bold text-white truncate max-w-xs sm:max-w-md lg:max-w-xl">
+                  {resource.title}
+                </h3>
+                <span className="text-[10px] text-slate-400 hidden sm:block">
+                  {resource.place ? `${resource.place} • ` : ''}Chế độ phóng to xem trọn vẹn (không bị cắt mép)
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              {/* Zoom scale toggle */}
+              <button
+                type="button"
+                onClick={handleToggleZoom}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition border border-white/15 cursor-pointer active:scale-95"
+                title="Phóng đại chi tiết (1x / 1.6x / 2.2x)"
+              >
+                {lightboxZoom > 1 ? (
+                  <>
+                    <ZoomOut className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Thu nhỏ ({lightboxZoom}x)</span>
+                  </>
+                ) : (
+                  <>
+                    <ZoomIn className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Phóng to chi tiết</span>
+                  </>
+                )}
+              </button>
+
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLightboxOpen(false);
+                  setLightboxZoom(1);
+                }}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-rose-600/80 hover:bg-rose-600 text-white text-xs font-bold transition border border-rose-500/40 cursor-pointer shadow-sm active:scale-95"
+                title="Đóng (ESC)"
+              >
+                <X className="w-4 h-4" />
+                <span className="hidden sm:inline">Đóng (ESC)</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Center Stage: Image displayed 100% full uncropped with object-contain */}
+          <div
+            className="relative flex-1 flex items-center justify-center p-2 sm:p-6 overflow-hidden min-h-0"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Prev Photo Arrow */}
+            {galleryPhotos.length > 1 && (
+              <button
+                type="button"
+                onClick={handleLightboxPrev}
+                className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center transition border border-white/20 shadow-2xl active:scale-95 z-30 cursor-pointer"
+                title="Ảnh trước (Mũi tên trái)"
+              >
+                <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7" />
+              </button>
+            )}
+
+            {/* The Image (Uncropped, Full Display) */}
+            <div
+              className={`max-w-full max-h-[82vh] transition-transform duration-200 flex items-center justify-center ${
+                lightboxZoom > 1 ? 'overflow-auto cursor-zoom-out' : 'cursor-zoom-in'
+              }`}
+              onClick={handleToggleZoom}
+            >
+              <img
+                src={galleryPhotos[lightboxPhotoIdx]}
+                alt={`${resource.title} - ${lightboxPhotoIdx + 1}`}
+                style={{
+                  transform: `scale(${lightboxZoom})`,
+                  transformOrigin: 'center center',
+                  transition: 'transform 0.25s ease'
+                }}
+                className="max-w-full max-h-[82vh] w-auto h-auto object-contain rounded-lg shadow-2xl"
+              />
+            </div>
+
+            {/* Next Photo Arrow */}
+            {galleryPhotos.length > 1 && (
+              <button
+                type="button"
+                onClick={handleLightboxNext}
+                className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center transition border border-white/20 shadow-2xl active:scale-95 z-30 cursor-pointer"
+                title="Ảnh sau (Mũi tên phải)"
+              >
+                <ChevronRight className="w-6 h-6 sm:w-7 sm:h-7" />
+              </button>
+            )}
+          </div>
+
+          {/* Bottom Filmstrip Thumbnails */}
+          {galleryPhotos.length > 1 && (
+            <div
+              className="p-3 bg-gradient-to-t from-black/95 via-black/80 to-transparent flex items-center justify-center gap-2 overflow-x-auto scrollbar-none shrink-0 z-30 border-t border-white/10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {galleryPhotos.map((photoUrl, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => {
+                    setLightboxPhotoIdx(idx);
+                    setLightboxZoom(1);
+                  }}
+                  className={`relative w-14 h-10 sm:w-18 sm:h-12 rounded-lg overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
+                    lightboxPhotoIdx === idx
+                      ? 'border-amber-400 scale-105 shadow-lg ring-2 ring-amber-400/50'
+                      : 'border-transparent opacity-50 hover:opacity-100'
+                  }`}
+                  title={`Xem ảnh #${idx + 1}`}
+                >
+                  <img src={photoUrl} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

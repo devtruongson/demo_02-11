@@ -355,7 +355,7 @@ export default function ContactView() {
                 <button
                   type="button"
                   onClick={() => setOpenFaqIndex(isOpen ? -1 : idx)}
-                  className="w-full p-4.5 text-left flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-50/70 transition"
+                  className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-50/70 transition"
                 >
                   <span className="font-bold text-xs sm:text-sm text-slate-900 leading-snug">
                     {faq.question}
@@ -366,7 +366,7 @@ export default function ContactView() {
                 </button>
 
                 {isOpen && (
-                  <div className="px-4.5 pb-4 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3 animate-fade-in font-normal">
+                  <div className="px-4 sm:px-5 pb-4 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3 animate-fade-in font-normal">
                     {faq.answer}
                   </div>
                 )}

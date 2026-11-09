@@ -350,66 +350,69 @@ export default function AuthenticatedHomeSection({
           </div>
 
           {/* Teacher's Class Cards Overview */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
-            <div className="bg-white rounded-2xl border border-[#ECD9BA] p-4.5 shadow-2xs space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pt-2">
+            <div className="bg-white rounded-2xl border border-[#ECD9BA] p-5 sm:p-6 shadow-2xs space-y-3.5 transition hover:shadow-md hover:border-amber-300">
               <div className="flex items-center justify-between">
-                <span className="px-2.5 py-1 rounded-md bg-[#850B10] text-[#FFF7E8] text-xs font-black">
+                <span className="px-3 py-1 rounded-lg bg-[#850B10] text-[#FFF7E8] text-xs font-black">
                   Lớp 10A1
                 </span>
-                <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
                   42 học sinh
                 </span>
               </div>
               <div>
-                <h5 className="font-bold text-sm text-slate-900">Lịch sử 10 - Năm học 2026-2027</h5>
-                <p className="text-xs text-slate-500 mt-0.5">Tiến độ bài học: Chủ đề 4</p>
+                <h5 className="font-bold text-sm sm:text-base text-slate-900 leading-snug">Lịch sử 10 - Năm học 2026-2027</h5>
+                <p className="text-xs text-slate-500 mt-1">Tiến độ bài học: Chủ đề 4</p>
               </div>
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
-                <span>📝 Đã giao: <strong>3 bài tập</strong></span>
-                <Link to="/giao-vien" className="font-bold text-[#850B10] hover:underline text-xs">
-                  Xem chi tiết →
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                <span>📝 Đã giao: <strong className="text-slate-800">3 bài tập</strong></span>
+                <Link to="/giao-vien/lop-hoc" className="font-bold text-[#850B10] hover:text-[#590408] transition text-xs flex items-center gap-0.5">
+                  <span>Xem chi tiết</span>
+                  <span>→</span>
                 </Link>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-[#ECD9BA] p-4.5 shadow-2xs space-y-3">
+            <div className="bg-white rounded-2xl border border-[#ECD9BA] p-5 sm:p-6 shadow-2xs space-y-3.5 transition hover:shadow-md hover:border-amber-300">
               <div className="flex items-center justify-between">
-                <span className="px-2.5 py-1 rounded-md bg-[#850B10] text-[#FFF7E8] text-xs font-black">
+                <span className="px-3 py-1 rounded-lg bg-[#850B10] text-[#FFF7E8] text-xs font-black">
                   Lớp 10A2
                 </span>
-                <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
                   40 học sinh
                 </span>
               </div>
               <div>
-                <h5 className="font-bold text-sm text-slate-900">Lịch sử 10 - Năm học 2026-2027</h5>
-                <p className="text-xs text-slate-500 mt-0.5">Tiến độ bài học: Chủ đề 3</p>
+                <h5 className="font-bold text-sm sm:text-base text-slate-900 leading-snug">Lịch sử 10 - Năm học 2026-2027</h5>
+                <p className="text-xs text-slate-500 mt-1">Tiến độ bài học: Chủ đề 3</p>
               </div>
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
-                <span>📝 Đã giao: <strong>2 bài tập</strong></span>
-                <Link to="/giao-vien" className="font-bold text-[#850B10] hover:underline text-xs">
-                  Xem chi tiết →
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                <span>📝 Đã giao: <strong className="text-slate-800">2 bài tập</strong></span>
+                <Link to="/giao-vien/lop-hoc" className="font-bold text-[#850B10] hover:text-[#590408] transition text-xs flex items-center gap-0.5">
+                  <span>Xem chi tiết</span>
+                  <span>→</span>
                 </Link>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-[#ECD9BA] p-4.5 shadow-2xs space-y-3">
+            <div className="bg-white rounded-2xl border border-[#ECD9BA] p-5 sm:p-6 shadow-2xs space-y-3.5 transition hover:shadow-md hover:border-amber-300">
               <div className="flex items-center justify-between">
-                <span className="px-2.5 py-1 rounded-md bg-[#850B10] text-[#FFF7E8] text-xs font-black">
+                <span className="px-3 py-1 rounded-lg bg-[#850B10] text-[#FFF7E8] text-xs font-black">
                   Lớp 10A3
                 </span>
-                <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
                   41 học sinh
                 </span>
               </div>
               <div>
-                <h5 className="font-bold text-sm text-slate-900">Lịch sử 10 - Năm học 2026-2027</h5>
-                <p className="text-xs text-slate-500 mt-0.5">Tiến độ bài học: Chủ đề 4</p>
+                <h5 className="font-bold text-sm sm:text-base text-slate-900 leading-snug">Lịch sử 10 - Năm học 2026-2027</h5>
+                <p className="text-xs text-slate-500 mt-1">Tiến độ bài học: Chủ đề 4</p>
               </div>
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
-                <span>📝 Đã giao: <strong>3 bài tập</strong></span>
-                <Link to="/giao-vien" className="font-bold text-[#850B10] hover:underline text-xs">
-                  Xem chi tiết →
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                <span>📝 Đã giao: <strong className="text-slate-800">3 bài tập</strong></span>
+                <Link to="/giao-vien/lop-hoc" className="font-bold text-[#850B10] hover:text-[#590408] transition text-xs flex items-center gap-0.5">
+                  <span>Xem chi tiết</span>
+                  <span>→</span>
                 </Link>
               </div>
             </div>

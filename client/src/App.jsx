@@ -567,23 +567,23 @@ export default function App() {
 
                     {/* Filter & Search Bar */}
                     <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/90 shadow-sm space-y-4">
-                      <div className="flex flex-col sm:flex-row items-center gap-3">
-                        {/* Search Form */}
+                      <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
+                        {/* Search Form: fluid full-width on mobile/tablet, flex-1 on desktop */}
                         <form
                           onSubmit={(e) => {
                             e.preventDefault();
                             updateFilters({ q: inputSearch.trim() });
                           }}
-                          className="relative flex-1 w-full flex items-center gap-2"
+                          className="relative flex-1 w-full flex items-center gap-2 min-w-0"
                         >
-                          <div className="relative flex-1">
-                            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                          <div className="relative flex-1 min-w-0">
+                            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                             <input
                               type="text"
                               value={inputSearch}
                               onChange={(e) => setInputSearch(e.target.value)}
                               placeholder="Tìm kiếm tư liệu, bảo vật, địa danh, di tích..."
-                              className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-navy"
+                              className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-navy focus:bg-white transition"
                             />
                             {inputSearch && (
                               <button
@@ -601,53 +601,64 @@ export default function App() {
                           </div>
                           <button
                             type="submit"
-                            className="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition active:scale-95 shrink-0 cursor-pointer shadow-2xs"
+                            className="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition active:scale-95 shrink-0 cursor-pointer shadow-2xs whitespace-nowrap"
                           >
                             Tìm kiếm
                           </button>
                         </form>
 
-                        {/* Topic Filter */}
-                        <select
-                          value={selectedTopicId}
-                          onChange={(e) => updateFilters({ topic: e.target.value })}
-                          className="w-full sm:w-auto px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-navy"
-                        >
-                          <option value="all">Tất cả các chủ đề (7)</option>
-                          {topics.map((t) => (
-                            <option key={t.id} value={t.id}>
-                              Chủ đề {t.id}: {t.title}
-                            </option>
-                          ))}
-                        </select>
-
-                        {/* Format Filter */}
-                        <select
-                          value={selectedType}
-                          onChange={(e) => updateFilters({ type: e.target.value })}
-                          className="w-full sm:w-auto px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-navy"
-                        >
-                          <option value="all">Tất cả định dạng</option>
-                          <option value="3d">Mô hình 3D tương tác</option>
-                          <option value="image">Hình ảnh khảo cổ</option>
-                          <option value="video">Video bài học</option>
-                          <option value="text">Văn bản / Bia ký</option>
-                        </select>
-
-                        {/* Reset Button */}
-                        {(searchQuery || selectedTopicId !== 'all' || selectedType !== 'all') && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setInputSearch('');
-                              navigate('/kho-tu-lieu');
-                            }}
-                            className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition cursor-pointer"
-                            title="Đặt lại bộ lọc"
+                        {/* Dropdown Filters & Actions: neatly wrapped and never crushes search input */}
+                        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 shrink-0 w-full lg:w-auto">
+                          {/* Topic Filter */}
+                          <select
+                            value={selectedTopicId}
+                            onChange={(e) => updateFilters({ topic: e.target.value })}
+                            className="flex-1 sm:flex-none sm:w-56 md:w-64 lg:w-52 xl:w-64 px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-navy cursor-pointer truncate"
+                            title="Lọc theo chủ đề học tập"
                           >
-                            <RotateCcw className="w-4 h-4" />
-                          </button>
-                        )}
+                            <option value="all">Tất cả các chủ đề (7)</option>
+                            {topics.map((t) => {
+                              const title = t.title || '';
+                              const cleanLabel = /^chủ đề\s*\d+/i.test(title.trim())
+                                ? title
+                                : `Chủ đề ${t.id}: ${title}`;
+                              return (
+                                <option key={t.id} value={t.id}>
+                                  {cleanLabel}
+                                </option>
+                              );
+                            })}
+                          </select>
+
+                          {/* Format Filter */}
+                          <select
+                            value={selectedType}
+                            onChange={(e) => updateFilters({ type: e.target.value })}
+                            className="flex-1 sm:flex-none sm:w-44 lg:w-40 xl:w-44 px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-navy cursor-pointer truncate"
+                            title="Lọc theo định dạng tư liệu"
+                          >
+                            <option value="all">Tất cả định dạng</option>
+                            <option value="3d">Mô hình 3D tương tác</option>
+                            <option value="image">Hình ảnh khảo cổ</option>
+                            <option value="video">Video bài học</option>
+                            <option value="text">Văn bản / Bia ký</option>
+                          </select>
+
+                          {/* Reset Button */}
+                          {(searchQuery || selectedTopicId !== 'all' || selectedType !== 'all') && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setInputSearch('');
+                                navigate('/kho-tu-lieu');
+                              }}
+                              className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition cursor-pointer shrink-0"
+                              title="Đặt lại bộ lọc"
+                            >
+                              <RotateCcw className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
                       </div>
 
                       {/* Active search pill indicator */}
