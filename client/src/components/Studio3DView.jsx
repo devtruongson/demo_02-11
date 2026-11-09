@@ -413,15 +413,16 @@ export default function Studio3DView({
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"
                       onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
+                        e.currentTarget.style.display = 'none';
+                        const fallback = e.currentTarget.parentElement?.querySelector('.card-fallback-box');
+                        if (fallback) fallback.style.display = 'flex';
                       }}
                     />
                   ) : null}
 
                   {/* Fallback Graphic if Image Fails or None */}
                   <div
-                    className={`w-full h-full bg-gradient-to-br from-amber-50 to-orange-100 flex flex-col items-center justify-center text-[#850B10] p-4 ${
+                    className={`card-fallback-box w-full h-full bg-gradient-to-br from-amber-50 to-orange-100 flex flex-col items-center justify-center text-[#850B10] p-4 ${
                       art.img ? 'hidden' : 'flex'
                     }`}
                   >

@@ -44,6 +44,11 @@ function ProtectedRoute({ currentUser, onOpenLogin, children }) {
   return children;
 }
 
+function cleanTopicTitle(title) {
+  if (!title) return '';
+  return title.replace(/^(chủ đề\s*\d+\s*[:.-]?\s*)+/i, '').trim();
+}
+
 export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -523,11 +528,8 @@ export default function App() {
                       return (
                         <div className="bg-[#FAF5EB] p-4 sm:p-5 rounded-3xl border border-[#EBDBC5] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
                           <div>
-                            <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#850B10] text-[#FFFDF8] mb-1">
-                              Chủ đề {currentTopic.order_index || currentTopic.id}
-                            </span>
                             <h2 className="text-lg sm:text-xl font-black text-slate-900 font-serif-royal">
-                              {currentTopic.title}
+                              {cleanTopicTitle(currentTopic.title)}
                             </h2>
                             {currentTopic.description && (
                               <p className="text-xs text-slate-600 mt-0.5 max-w-2xl line-clamp-2">
@@ -749,7 +751,7 @@ export default function App() {
                             <div className="flex items-center gap-2">
                               <span className="w-3 h-3 rounded-full bg-[#850B10] shrink-0" />
                               <h3 className="text-base sm:text-lg font-black text-slate-900 uppercase font-serif-royal">
-                                Trò Chơi Trắc Nghiệm Mở Khóa Ô Tranh: {currentTopic.title}
+                                Trò Chơi Trắc Nghiệm Mở Khóa Ô Tranh: {cleanTopicTitle(currentTopic.title)}
                               </h3>
                             </div>
 
@@ -767,7 +769,7 @@ export default function App() {
                           {/* Interactive Game for this Topic */}
                           <TilePuzzleGame
                             topicId={currentTopic.id}
-                            topicTitle={currentTopic.title}
+                            topicTitle={cleanTopicTitle(currentTopic.title)}
                             topicImg={currentTopic.game_image || currentTopic.img}
                           />
                         </div>

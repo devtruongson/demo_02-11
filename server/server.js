@@ -1325,7 +1325,8 @@ app.post('/api/3d-artifacts', requireAdmin, async (req, res) => {
       significance,
       lighting_preset,
       color_base,
-      embed
+      embed,
+      img
     } = req.body;
 
     if (!name || !code) {
@@ -1340,8 +1341,8 @@ app.post('/api/3d-artifacts', requireAdmin, async (req, res) => {
 
     const [result] = await pool.query(
       `INSERT INTO artifacts_3d 
-       (code, name, culture, period, location, description, material, dimensions, significance, lighting_preset, color_base, embed)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (code, name, culture, period, location, description, material, dimensions, significance, lighting_preset, color_base, embed, img)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         cleanCode,
         name.trim(),
@@ -1354,7 +1355,8 @@ app.post('/api/3d-artifacts', requireAdmin, async (req, res) => {
         significance || '',
         lighting_preset || 'museum',
         color_base || '#b58b4c',
-        embed ? embed.trim() : null
+        embed ? embed.trim() : null,
+        img ? img.trim() : null
       ]
     );
 
@@ -1383,10 +1385,11 @@ app.put('/api/3d-artifacts/:id', requireAdmin, async (req, res) => {
       significance,
       lighting_preset,
       color_base,
-      embed
+      embed,
+      img
     } = req.body;
 
-    const [exists] = await pool.query('SELECT id, name FROM artifacts_3d WHERE id = ?', [id]);
+    const [exists] = await pool.query('SELECT * FROM artifacts_3d WHERE id = ?', [id]);
     if (exists.length === 0) {
       return res.status(404).json({ error: 'Không tìm thấy bảo vật 3D cần cập nhật' });
     }
@@ -1412,21 +1415,23 @@ app.put('/api/3d-artifacts/:id', requireAdmin, async (req, res) => {
          significance = ?,
          lighting_preset = ?,
          color_base = ?,
-         embed = ?
+         embed = ?,
+         img = ?
        WHERE id = ?`,
       [
-        cleanCode,
+        cleanCode || exists[0].code,
         name ? name.trim() : exists[0].name,
-        culture || '',
-        period || '',
-        location || '',
-        description || '',
-        material || '',
-        dimensions || '',
-        significance || '',
-        lighting_preset || 'museum',
-        color_base || '#b58b4c',
-        embed !== undefined ? (embed ? embed.trim() : null) : null,
+        culture !== undefined ? (culture || '') : exists[0].culture,
+        period !== undefined ? (period || '') : exists[0].period,
+        location !== undefined ? (location || '') : exists[0].location,
+        description !== undefined ? (description || '') : exists[0].description,
+        material !== undefined ? (material || '') : exists[0].material,
+        dimensions !== undefined ? (dimensions || '') : exists[0].dimensions,
+        significance !== undefined ? (significance || '') : exists[0].significance,
+        lighting_preset || exists[0].lighting_preset || 'museum',
+        color_base || exists[0].color_base || '#b58b4c',
+        embed !== undefined ? (embed ? embed.trim() : null) : exists[0].embed,
+        img !== undefined ? (img ? img.trim() : null) : exists[0].img,
         id
       ]
     );
@@ -2040,6 +2045,19 @@ async function initTopicGameColumns() {
   }
 }
 initTopicGameColumns();
+
+async function initArtifact3DColumns() {
+  try {
+    const [cols] = await pool.query("SHOW COLUMNS FROM artifacts_3d LIKE 'img'");
+    if (cols.length === 0) {
+      await pool.query('ALTER TABLE artifacts_3d ADD COLUMN img TEXT NULL AFTER embed');
+      console.log('✅ Added img to artifacts_3d table');
+    }
+  } catch (err) {
+    console.error('Error checking img column in artifacts_3d:', err.message);
+  }
+}
+initArtifact3DColumns();
 
 // ==========================================
 // TILE PUZZLE GAME API (Lật ô chữ mở hình ảnh)

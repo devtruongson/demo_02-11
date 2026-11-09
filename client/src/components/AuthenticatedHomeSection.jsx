@@ -135,14 +135,36 @@ export default function AuthenticatedHomeSection({
                 to={`/studio-3d/co-vat/${art.code}`}
                 className="w-56 sm:w-64 shrink-0 snap-start bg-[#2B0407] text-white rounded-2xl border border-amber-500/30 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col group/art shadow-sm"
               >
-                <div className="relative h-32 sm:h-36 bg-black overflow-hidden">
-                  <img
-                    src={art.img}
-                    alt={art.name}
-                    className="w-full h-full object-cover group-hover/art:scale-108 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                <div className="relative h-32 sm:h-36 bg-stone-100 overflow-hidden flex items-center justify-center">
+                  {art.img ? (
+                    <>
+                      <img
+                        src={art.img}
+                        alt={art.name}
+                        className="w-full h-full object-cover group-hover/art:scale-108 transition-transform duration-500"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const fallback = e.currentTarget.parentElement?.querySelector('.card-fallback-box');
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
+                    </>
+                  ) : null}
+
+                  {/* Fallback Graphic like Studio 3D */}
+                  <div
+                    className={`card-fallback-box w-full h-full bg-gradient-to-br from-amber-50 to-orange-100 flex flex-col items-center justify-center text-[#850B10] p-4 ${
+                      art.img ? 'hidden' : 'flex'
+                    }`}
+                  >
+                    <Box className="w-10 h-10 text-[#850B10]/70 group-hover/art:scale-110 transition-transform" />
+                    <span className="text-[10px] font-bold text-[#850B10]/80 mt-1 uppercase tracking-wider">
+                      Mô hình 3D
+                    </span>
+                  </div>
+
                   <div className="absolute top-2.5 left-2.5 flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#850B10] text-amber-200 text-[10px] font-black border border-amber-300/30 shadow-xs">
                     <Sparkles className="w-3 h-3 text-amber-300" />
                     <span>3D 360°</span>

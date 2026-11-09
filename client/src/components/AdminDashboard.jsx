@@ -1563,12 +1563,23 @@ export default function AdminDashboard({
                         </span>
                       </td>
                       <td className="py-3.5 px-4">
-                        <strong className="text-white font-bold block text-sm group-hover:text-gold transition">
-                          {art.name}
-                        </strong>
-                        <span className="text-[11px] text-slate-400 line-clamp-1 max-w-md">
-                          {art.description}
-                        </span>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 shrink-0 flex items-center justify-center">
+                            {art.img ? (
+                              <img src={art.img} alt={art.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <Box className="w-5 h-5 text-amber-500/50" />
+                            )}
+                          </div>
+                          <div>
+                            <strong className="text-white font-bold block text-sm group-hover:text-gold transition">
+                              {art.name}
+                            </strong>
+                            <span className="text-[11px] text-slate-400 line-clamp-1 max-w-md">
+                              {art.description}
+                            </span>
+                          </div>
+                        </div>
                       </td>
                       <td className="py-3.5 px-4">
                         <span className="text-slate-200 font-semibold block">{art.culture}</span>

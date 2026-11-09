@@ -160,7 +160,7 @@ export default function CoreFeaturesShowcase({
             </div>
 
             <p className="text-xs text-amber-100/80 leading-relaxed mb-4">
-              Mô hình hóa bảo vật quốc gia với công nghệ WebGL tiên tiến. Học sinh và giáo viên có thể phóng to, xoay đa chiều và giải mã từng đường nét văn hóa.
+              Khám phá hiện vật lịch sử bằng mô hình 3D 360 độ sắc nét. Học sinh và giáo viên có thể phóng to, xoay chuyển đa chiều và đọc thông tin chi tiết, khắc phục hoàn toàn hạn chế của việc không thể tiếp cận bảo tàng thực tế.
             </p>
 
             {/* Continuous Scrolling Ticker of 3D Artifacts */}
@@ -173,14 +173,36 @@ export default function CoreFeaturesShowcase({
                     onClick={handleActionClick}
                     className="w-44 sm:w-48 shrink-0 snap-start bg-[#38060a] hover:bg-[#46080d] rounded-2xl border border-amber-500/30 overflow-hidden transition group/card flex flex-col"
                   >
-                    <div className="relative h-24 bg-black overflow-hidden">
-                      <img
-                        src={art.img}
-                        alt={art.name}
-                        className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-300"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+                    <div className="relative h-24 bg-stone-100 overflow-hidden flex items-center justify-center">
+                      {art.img ? (
+                        <>
+                          <img
+                            src={art.img}
+                            alt={art.name}
+                            className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              const fallback = e.currentTarget.parentElement?.querySelector('.card-fallback-box');
+                              if (fallback) fallback.style.display = 'flex';
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+                        </>
+                      ) : null}
+
+                      {/* Fallback Graphic like Studio 3D */}
+                      <div
+                        className={`card-fallback-box w-full h-full bg-gradient-to-br from-amber-50 to-orange-100 flex flex-col items-center justify-center text-[#850B10] p-2 ${
+                          art.img ? 'hidden' : 'flex'
+                        }`}
+                      >
+                        <Box className="w-7 h-7 text-[#850B10]/70 group-hover/card:scale-110 transition-transform" />
+                        <span className="text-[9px] font-bold text-[#850B10]/80 mt-1 uppercase tracking-wider">
+                          Mô hình 3D
+                        </span>
+                      </div>
+
                       <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#850b10] text-[#fef08a] text-[10px] font-black border border-amber-300/30">
                         <Sparkles className="w-2.5 h-2.5" />
                         <span>3D 360°</span>

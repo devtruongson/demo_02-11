@@ -29,11 +29,6 @@ export default function TopicCard({
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#590408]/70 via-transparent to-transparent opacity-80" />
 
-        {/* Number Badge */}
-        <div className="absolute top-3 left-3 bg-[#850b10] text-[#fff8ee] text-xs font-black px-2.5 py-1 rounded-lg shadow-sm border border-amber-300/40">
-          Chủ đề {topic.order_index || topic.id}
-        </div>
-
         {/* Count Badge */}
         {topic.resource_count !== undefined && (
           <div className="absolute bottom-2.5 right-3 bg-black/60 backdrop-blur-md text-[#fef08a] text-[11px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 border border-white/10">

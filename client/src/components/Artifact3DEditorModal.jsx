@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Sparkles, Save, RefreshCw, X, Code2, Trash2, Eye, Info, Check } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Box, Sparkles, Save, RefreshCw, X, Code2, Trash2, Eye, Info, Check, Upload, Image as ImageIcon } from 'lucide-react';
 import ThreeArtifactViewer from './ThreeArtifactViewer.jsx';
 
 export default function Artifact3DEditorModal({
@@ -20,12 +20,15 @@ export default function Artifact3DEditorModal({
     significance: '',
     description: '',
     embed: '',
+    img: '',
     lighting_preset: 'museum',
     color_base: '#b58b4c'
   });
 
   const [saving, setSaving] = useState(false);
+  const [uploadingImg, setUploadingImg] = useState(false);
   const [activePreviewTab, setActivePreviewTab] = useState('live'); // 'live' or 'code'
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (artifact) {
@@ -40,6 +43,7 @@ export default function Artifact3DEditorModal({
         significance: artifact.significance || '',
         description: artifact.description || '',
         embed: artifact.embed || '',
+        img: artifact.img || '',
         lighting_preset: artifact.lighting_preset || 'museum',
         color_base: artifact.color_base || '#b58b4c'
       });
@@ -55,11 +59,44 @@ export default function Artifact3DEditorModal({
         significance: '',
         description: '',
         embed: '',
+        img: '',
         lighting_preset: 'museum',
         color_base: '#b58b4c'
       });
     }
   }, [artifact, isOpen]);
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImg(true);
+    try {
+      const data = new FormData();
+      data.append('image', file);
+
+      const res = await fetch('/api/upload/single', {
+        method: 'POST',
+        body: data
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Lỗi khi tải ảnh lên máy chủ');
+      }
+
+      const result = await res.json();
+      setFormData((prev) => ({
+        ...prev,
+        img: result.url
+      }));
+    } catch (err) {
+      alert('Tải ảnh thất bại: ' + err.message);
+    } finally {
+      setUploadingImg(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -310,8 +347,97 @@ export default function Artifact3DEditorModal({
               </div>
             </div>
 
-            {/* ----------------- RIGHT COLUMN: 3D EMBED & LIVE PREVIEW (6 COLS) ----------------- */}
+            {/* ----------------- RIGHT COLUMN: THUMBNAIL, 3D EMBED & LIVE PREVIEW (6 COLS) ----------------- */}
             <div className="lg:col-span-6 space-y-5">
+              
+              {/* SECTION: THUMBNAIL IMAGE FOR 3D CARD */}
+              <div className="bg-slate-50/70 p-5 rounded-3xl border border-slate-200/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-amber-800 bg-amber-100 px-3 py-1 rounded-full inline-block border border-amber-200">
+                      Ảnh Thumbnail Thẻ Bảo Vật 3D
+                    </span>
+                  </div>
+                  {uploadingImg && (
+                    <span className="text-[11px] text-navy font-bold flex items-center gap-1">
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Đang tải lên...
+                    </span>
+                  )}
+                </div>
+
+                <p className="text-[11px] text-slate-500">
+                  Hiển thị trên thẻ bảo vật ở Không gian 3D và Trang chủ. Nếu để trống, hệ thống sẽ tự động hiển thị biểu tượng mô hình 3D mặc định như hiện tại.
+                </p>
+
+                {/* Thumbnail Preview Box */}
+                <div className="relative aspect-[16/10] sm:aspect-[2/1] rounded-2xl overflow-hidden bg-slate-900 border-2 border-dashed border-slate-200 flex items-center justify-center group">
+                  {formData.img ? (
+                    <>
+                      <img
+                        src={formData.img}
+                        alt="Thumbnail Preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="px-3 py-1.5 rounded-xl bg-white text-slate-900 font-bold text-xs shadow hover:bg-slate-100 transition"
+                        >
+                          Đổi ảnh khác
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFormData((prev) => ({ ...prev, img: '' }))}
+                          className="px-3 py-1.5 rounded-xl bg-rose-600 text-white font-bold text-xs shadow hover:bg-rose-700 transition"
+                        >
+                          Xóa ảnh
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center p-4">
+                      <div className="w-12 h-12 rounded-xl bg-amber-50 text-[#850B10] border border-[#850B10]/20 flex flex-col items-center justify-center mx-auto mb-2 shadow-2xs">
+                        <Box className="w-6 h-6 text-[#850B10]/70" />
+                      </div>
+                      <p className="text-xs text-slate-600 font-bold">Chưa có ảnh thumbnail</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Sẽ hiển thị thẻ mô hình 3D mặc định</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* File input (hidden) */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+
+                <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadingImg}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 font-bold text-xs transition shadow-2xs active:scale-95 disabled:opacity-50"
+                  >
+                    <Upload className="w-4 h-4" />
+                    <span>Tải ảnh từ máy tính</span>
+                  </button>
+                </div>
+
+                <div>
+                  <input
+                    type="text"
+                    value={formData.img}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, img: e.target.value }))}
+                    placeholder="Hoặc dán đường dẫn ảnh: https://..."
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-navy focus:border-navy bg-white placeholder:text-slate-400 shadow-2xs"
+                  />
+                </div>
+              </div>
+
               <div className="bg-slate-50/70 p-5 rounded-3xl border border-slate-200/80 space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-black uppercase tracking-wider text-amber-800 bg-amber-100 px-3 py-1 rounded-full inline-block border border-amber-200">
