@@ -75,34 +75,34 @@ export default function WhyChooseUsSection({ onOpenLogin, currentUser }) {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 xl:gap-20 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-center">
           {/* ================= LEFT COLUMN (matching design/image copy.png) ================= */}
-          <div className="lg:col-span-5 space-y-4 sm:space-y-5">
+          <div className="lg:col-span-6 xl:col-span-5 space-y-3.5 sm:space-y-4">
             {/* Red Cartouche Badge */}
             <div className="inline-block">
-              <span className="inline-flex items-center px-5 py-1.5 rounded-full bg-[#850B10] text-[#FFFDF5] text-xs sm:text-sm font-bold tracking-wide shadow-md">
+              <span className="inline-flex items-center px-4 sm:px-5 py-1 sm:py-1.5 rounded-full bg-[#850B10] text-[#FFFDF5] text-xs sm:text-sm font-bold tracking-wide shadow-md">
                 Tại sao chọn Sử Học Số?
               </span>
             </div>
 
             {/* Main 3-line Headline: Black lines 1-2, Crimson Red line 3 */}
-            <h2 className="text-2xl sm:text-3xl lg:text-[2.5rem] xl:text-[2.85rem] font-black font-serif-royal leading-[1.2] tracking-tight uppercase">
-              <span className="text-[#1A120B] block">ĐƯỢC XÂY DỰNG CHO</span>
-              <span className="text-[#1A120B] block">CÔNG VIỆC THẬT CỦA</span>
-              <span className="text-[#850B10] block">GIÁO VIÊN & HỌC SINH</span>
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-[1.85rem] xl:text-[2.15rem] font-black font-serif-royal leading-[1.3] tracking-tight uppercase space-y-1">
+              <span className="text-[#1A120B] block whitespace-nowrap">ĐƯỢC XÂY DỰNG CHO</span>
+              <span className="text-[#1A120B] block whitespace-nowrap">CÔNG VIỆC THẬT CỦA</span>
+              <span className="text-[#850B10] block whitespace-nowrap">GIÁO VIÊN & HỌC SINH</span>
             </h2>
 
             {/* Red Underline Divider */}
-            <div className="w-28 sm:w-36 h-[2.5px] bg-[#850B10] rounded-full" />
+            <div className="w-24 sm:w-32 h-[2.5px] bg-[#850B10] rounded-full" />
 
             {/* Description Text */}
-            <p className="text-sm sm:text-base text-[#3A2A1A] leading-relaxed font-normal max-w-xl">
+            <p className="text-xs sm:text-sm lg:text-[0.95rem] text-[#3A2A1A] leading-relaxed font-normal max-w-md lg:max-w-lg">
               Không chỉ là kho lưu trữ số, <strong className="font-bold text-[#1A120B]">Sử Ký Số</strong> mang đến hệ sinh thái học tập đa phương tiện tương tác, giúp việc dạy và học Lịch sử 10 trở nên trực quan, sinh động và tràn đầy cảm hứng.
             </p>
           </div>
 
           {/* ================= RIGHT COLUMN (matching design/image copy.png) ================= */}
-          <div className="lg:col-span-7 space-y-7 sm:space-y-9">
+          <div className="lg:col-span-6 xl:col-span-7 space-y-6 sm:space-y-8">
             {points.map((p, idx) => (
               <div
                 key={idx}
