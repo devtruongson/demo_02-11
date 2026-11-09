@@ -832,7 +832,7 @@ export default function App() {
               path="/giao-vien"
               element={
                 <ProtectedRoute currentUser={currentUser} onOpenLogin={() => setIsLoginModalOpen(true)}>
-                  <Navigate to="/giao-vien/cam-nang" replace />
+                  <Navigate to="/giao-vien/ke-hoach-5512" replace />
                 </ProtectedRoute>
               }
             />

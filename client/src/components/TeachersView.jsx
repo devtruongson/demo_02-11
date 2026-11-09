@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, NavLink, Link } from 'react-router-dom';
+import { useParams, NavLink, Link, Navigate } from 'react-router-dom';
 import {
   GraduationCap, CheckCircle2, FileText, Sparkles, Layers, BookOpen,
   ExternalLink, Lightbulb, HelpCircle, Award, PlusCircle, Edit3, Trash2,
@@ -11,7 +11,13 @@ import ExamSubmissionsViewerModal from './ExamSubmissionsViewerModal.jsx';
 import ExamTakingModal from './ExamTakingModal.jsx';
 
 export default function TeachersView({ currentUser, authToken }) {
-  const { tab = 'cam-nang' } = useParams();
+  const { tab = 'ke-hoach-5512' } = useParams();
+
+  // Tạm ẩn phân hệ "Cẩm nang sư phạm" theo yêu cầu -> tự động chuyển hướng sang tab Kế hoạch bài dạy 5512
+  if (tab === 'cam-nang') {
+    return <Navigate to="/giao-vien/ke-hoach-5512" replace />;
+  }
+
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,7 +48,7 @@ export default function TeachersView({ currentUser, authToken }) {
   const isTeacherOrAdmin = currentUser?.role === 'teacher' || currentUser?.role === 'admin';
 
   const teacherTabs = [
-    { to: '/giao-vien/cam-nang', id: 'cam-nang', category: 'cam_nang', label: 'Cẩm Nang Sư Phạm', icon: BookOpen },
+    // { to: '/giao-vien/cam-nang', id: 'cam-nang', category: 'cam_nang', label: 'Cẩm Nang Sư Phạm', icon: BookOpen }, // Tạm ẩn theo yêu cầu
     { to: '/giao-vien/ke-hoach-5512', id: 'ke-hoach-5512', category: 'ke_hoach_5512', label: 'Kế Hoạch Bài Dạy 5512', icon: FileText },
     { to: '/giao-vien/ngan-hang-cau-hoi', id: 'ngan-hang-cau-hoi', category: 'ngan_hang_cau_hoi', label: 'Ngân Hàng Câu Hỏi & Đề Kiểm Tra', icon: HelpCircle },
     { to: '/giao-vien/giao-bai-tap', id: 'giao-bai-tap', category: 'giao_bai_tap', label: 'Giao Bài Tập & Đề Thi', icon: Award },
@@ -345,7 +351,7 @@ export default function TeachersView({ currentUser, authToken }) {
           <span>Không Gian Sư Phạm Lịch Sử 10</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-serif-royal">
-          Cẩm Nang Khai Thác Tư Liệu Cho Giáo Viên
+          Không Gian Lớp Học & Giao Bài Dành Cho Giáo Viên
         </h2>
         <p className="mt-2 text-[#FFF7E8]/90 text-xs sm:text-sm leading-relaxed max-w-3xl font-normal">
           Định hướng tổ chức dạy học phát triển năng lực môn Lịch sử theo Chương trình GDPT 2018. Khai thác hiệu quả các nguồn sử liệu hình ảnh, bia ký và mô hình 3D trong bài dạy.
