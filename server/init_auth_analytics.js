@@ -77,7 +77,7 @@ async function init() {
   // Seed sample activity logs for realistic analytics
   await conn.query('DELETE FROM activity_logs');
   const sampleLogs = [
-    ['admin', 'SYSTEM_INIT', 'Khởi tạo hệ thống học liệu Sử Ký Số'],
+    ['admin', 'SYSTEM_INIT', 'Khởi tạo hệ thống học liệu Sử Học Số'],
     ['admin', 'SEED_RESOURCES', 'Nhập 32 tư liệu lịch sử Chủ đề Văn minh Đông Nam Á'],
     ['student', 'LOGIN', 'Học sinh Lê Minh Khôi đăng nhập'],
     ['student', 'VIEW_3D', 'Tương tác mô hình 3D Trống đồng Ngọc Lũ (Đông Sơn)'],

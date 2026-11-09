@@ -1,45 +1,45 @@
 import {
-    Activity,
-    AlertCircle,
-    ArrowUpDown,
-    Award,
-    BarChart3,
-    BookOpen, Box,
-    CheckCircle,
-    CheckCircle2,
-    ChevronDown,
-    ChevronRight,
-    ChevronUp,
-    Clock, Compass,
-    Edit3,
-    ExternalLink,
-    Eye,
-    EyeOff,
-    FileText,
-    Film,
-    FolderKanban,
-    GraduationCap,
-    GripVertical,
-    HelpCircle,
-    Image,
-    KeyRound,
-    Landmark,
-    LayoutGrid,
-    LayoutList,
-    LogOut,
-    Mail, Phone,
-    PlusCircle,
-    RefreshCw,
-    Search,
-    ShieldCheck,
-    Sliders,
-    SlidersHorizontal,
-    Sparkles,
-    Trash2,
-    TrendingUp,
-    UserCheck,
-    Users,
-    X
+  Activity,
+  AlertCircle,
+  ArrowUpDown,
+  Award,
+  BarChart3,
+  BookOpen, Box,
+  CheckCircle,
+  CheckCircle2,
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  Clock, Compass,
+  Edit3,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  FileText,
+  Film,
+  FolderKanban,
+  GraduationCap,
+  GripVertical,
+  HelpCircle,
+  Image,
+  KeyRound,
+  Landmark,
+  LayoutGrid,
+  LayoutList,
+  LogOut,
+  Mail, Phone,
+  PlusCircle,
+  RefreshCw,
+  Search,
+  ShieldCheck,
+  Sliders,
+  SlidersHorizontal,
+  Sparkles,
+  Trash2,
+  TrendingUp,
+  UserCheck,
+  Users,
+  X
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -864,7 +864,7 @@ export default function AdminDashboard({
           </div>
           <div>
             <span className="font-extrabold text-sm text-white block leading-tight">
-              Sử Ký Số • Trung Tâm Quản Trị Hệ Thống
+              Sử Học Số • Trung Tâm Quản Trị Hệ Thống
             </span>
             <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -978,16 +978,14 @@ export default function AdminDashboard({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer ${
-                  isActive
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer ${isActive
                     ? 'bg-slate-800 text-white shadow-xs border border-slate-700/80 ring-1 ring-white/10 font-bold'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 border border-transparent'
-                }`}
+                  }`}
               >
                 <Icon
-                  className={`w-3.5 h-3.5 shrink-0 transition-colors ${
-                    isActive ? 'text-amber-400' : 'text-slate-500'
-                  }`}
+                  className={`w-3.5 h-3.5 shrink-0 transition-colors ${isActive ? 'text-amber-400' : 'text-slate-500'
+                    }`}
                 />
                 <span>{tab.label}</span>
 
@@ -997,11 +995,10 @@ export default function AdminDashboard({
                   </span>
                 ) : tab.count !== null && tab.count !== undefined ? (
                   <span
-                    className={`px-1.5 py-0.5 rounded-md text-[11px] font-mono leading-none border transition-colors ${
-                      isActive
+                    className={`px-1.5 py-0.5 rounded-md text-[11px] font-mono leading-none border transition-colors ${isActive
                         ? 'bg-amber-400/15 text-amber-300 border-amber-400/30 font-bold'
                         : 'bg-slate-950/60 text-slate-400 border-slate-800'
-                    }`}
+                      }`}
                   >
                     {tab.count}
                   </span>
@@ -1165,15 +1162,14 @@ export default function AdminDashboard({
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <span
-                        className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black shrink-0 ${
-                          index === 0
+                        className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black shrink-0 ${index === 0
                             ? 'bg-amber-500 text-slate-950'
                             : index === 1
-                            ? 'bg-slate-300 text-slate-900'
-                            : index === 2
-                            ? 'bg-orange-500 text-white'
-                            : 'bg-slate-800 text-slate-400'
-                        }`}
+                              ? 'bg-slate-300 text-slate-900'
+                              : index === 2
+                                ? 'bg-orange-500 text-white'
+                                : 'bg-slate-800 text-slate-400'
+                          }`}
                       >
                         {index + 1}
                       </span>
@@ -1470,13 +1466,12 @@ export default function AdminDashboard({
                     <td className="py-3 px-4 text-slate-400">{u.email}</td>
                     <td className="py-3 px-4">
                       <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                          u.role === 'admin'
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${u.role === 'admin'
                             ? 'bg-gold/20 text-gold border border-gold/40'
                             : u.role === 'teacher'
-                            ? 'bg-blue-500/20 text-blue-400 border border-blue-500/40'
-                            : 'bg-slate-800 text-slate-300'
-                        }`}
+                              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/40'
+                              : 'bg-slate-800 text-slate-300'
+                          }`}
                       >
                         {u.role === 'admin' ? 'Quản trị viên' : u.role === 'teacher' ? 'Giáo viên' : 'Học sinh'}
                       </span>
@@ -1676,41 +1671,37 @@ export default function AdminDashboard({
             <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
               <button
                 onClick={() => setTeacherCategoryFilter('all')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                  teacherCategoryFilter === 'all'
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${teacherCategoryFilter === 'all'
                     ? 'bg-gold text-slate-950 font-black'
                     : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-                }`}
+                  }`}
               >
                 Tất cả ({teacherMaterials.length})
               </button>
               <button
                 onClick={() => setTeacherCategoryFilter('cam_nang')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                  teacherCategoryFilter === 'cam_nang'
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${teacherCategoryFilter === 'cam_nang'
                     ? 'bg-blue-600 text-white font-black'
                     : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-                }`}
+                  }`}
               >
                 📖 Cẩm nang ({teacherMaterials.filter((m) => m.category === 'cam_nang').length})
               </button>
               <button
                 onClick={() => setTeacherCategoryFilter('ke_hoach_5512')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                  teacherCategoryFilter === 'ke_hoach_5512'
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${teacherCategoryFilter === 'ke_hoach_5512'
                     ? 'bg-emerald-600 text-white font-black'
                     : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-                }`}
+                  }`}
               >
                 📑 Kế hoạch 5512 ({teacherMaterials.filter((m) => m.category === 'ke_hoach_5512').length})
               </button>
               <button
                 onClick={() => setTeacherCategoryFilter('ngan_hang_cau_hoi')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                  teacherCategoryFilter === 'ngan_hang_cau_hoi'
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${teacherCategoryFilter === 'ngan_hang_cau_hoi'
                     ? 'bg-amber-600 text-white font-black'
                     : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-                }`}
+                  }`}
               >
                 ❓ Ngân hàng câu hỏi ({teacherMaterials.filter((m) => m.category === 'ngan_hang_cau_hoi').length})
               </button>
@@ -2036,11 +2027,10 @@ export default function AdminDashboard({
                             {opts.map((opt, i) => (
                               <div
                                 key={i}
-                                className={`flex items-start gap-1.5 px-2 py-0.5 rounded ${
-                                  q.correct_index === i
+                                className={`flex items-start gap-1.5 px-2 py-0.5 rounded ${q.correct_index === i
                                     ? 'bg-emerald-950/80 text-emerald-300 font-bold border border-emerald-800/80'
                                     : 'text-slate-400'
-                                }`}
+                                  }`}
                               >
                                 <span className="font-mono">{String.fromCharCode(65 + i)}.</span>
                                 <span className="truncate">{opt}</span>
@@ -2294,11 +2284,10 @@ export default function AdminDashboard({
                 <button
                   type="button"
                   onClick={() => setTopicsViewMode('grid')}
-                  className={`p-2 rounded-lg transition text-xs font-bold flex items-center gap-1.5 ${
-                    topicsViewMode === 'grid'
+                  className={`p-2 rounded-lg transition text-xs font-bold flex items-center gap-1.5 ${topicsViewMode === 'grid'
                       ? 'bg-slate-800 text-gold shadow-sm'
                       : 'text-slate-400 hover:text-white'
-                  }`}
+                    }`}
                   title="Chế độ xem dạng Thẻ Lưới (Grid)"
                 >
                   <LayoutGrid className="w-4 h-4" />
@@ -2307,11 +2296,10 @@ export default function AdminDashboard({
                 <button
                   type="button"
                   onClick={() => setTopicsViewMode('list')}
-                  className={`p-2 rounded-lg transition text-xs font-bold flex items-center gap-1.5 ${
-                    topicsViewMode === 'list'
+                  className={`p-2 rounded-lg transition text-xs font-bold flex items-center gap-1.5 ${topicsViewMode === 'list'
                       ? 'bg-slate-800 text-gold shadow-sm'
                       : 'text-slate-400 hover:text-white'
-                  }`}
+                    }`}
                   title="Chế độ xem dạng Danh Sách (List)"
                 >
                   <LayoutList className="w-4 h-4" />
@@ -2409,23 +2397,21 @@ export default function AdminDashboard({
                     onDragOver={handleDragOverTopic}
                     onDrop={(e) => handleDropTopic(e, index)}
                     onDragEnd={handleDragEndTopic}
-                    className={`bg-slate-900/90 rounded-2xl border transition-all duration-200 overflow-hidden flex flex-col justify-between group shadow-sm ${
-                      isDragging
+                    className={`bg-slate-900/90 rounded-2xl border transition-all duration-200 overflow-hidden flex flex-col justify-between group shadow-sm ${isDragging
                         ? 'opacity-40 border-gold scale-95 ring-2 ring-gold/40'
                         : isDragOver
-                        ? 'border-amber-400 ring-2 ring-amber-400/60 bg-amber-400/5 translate-y-[-2px]'
-                        : 'border-slate-800 hover:border-slate-700'
-                    }`}
+                          ? 'border-amber-400 ring-2 ring-amber-400/60 bg-amber-400/5 translate-y-[-2px]'
+                          : 'border-slate-800 hover:border-slate-700'
+                      }`}
                   >
                     <div>
                       {/* Drag Handle & Reorder Controls Topbar */}
                       <div className="px-3.5 py-2 bg-slate-950 border-b border-slate-800/80 flex items-center justify-between gap-2 select-none">
                         <div
-                          className={`flex items-center gap-1.5 ${
-                            canReorder
+                          className={`flex items-center gap-1.5 ${canReorder
                               ? 'cursor-grab active:cursor-grabbing text-gold hover:text-amber-300'
                               : 'text-slate-500 cursor-not-allowed'
-                          } transition`}
+                            } transition`}
                           title={canReorder ? 'Nhấn giữ và kéo thả để di chuyển vị trí' : 'Xóa tìm kiếm để kích hoạt kéo thả'}
                         >
                           <GripVertical className="w-4 h-4 text-gold shrink-0" />
@@ -2540,22 +2526,20 @@ export default function AdminDashboard({
                       onDragOver={handleDragOverTopic}
                       onDrop={(e) => handleDropTopic(e, index)}
                       onDragEnd={handleDragEndTopic}
-                      className={`p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all duration-200 group ${
-                        isDragging
+                      className={`p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all duration-200 group ${isDragging
                           ? 'opacity-40 bg-gold/10'
                           : isDragOver
-                          ? 'bg-amber-400/10 border-l-4 border-amber-400'
-                          : 'hover:bg-slate-800/50'
-                      }`}
+                            ? 'bg-amber-400/10 border-l-4 border-amber-400'
+                            : 'hover:bg-slate-800/50'
+                        }`}
                     >
                       <div className="flex items-center gap-3.5 min-w-0">
                         {/* Drag Handle */}
                         <div
-                          className={`p-1.5 rounded-lg ${
-                            canReorder
+                          className={`p-1.5 rounded-lg ${canReorder
                               ? 'cursor-grab active:cursor-grabbing text-gold hover:bg-gold/20'
                               : 'text-slate-600 cursor-not-allowed'
-                          } transition shrink-0`}
+                            } transition shrink-0`}
                           title={canReorder ? 'Nhấn giữ và kéo thả để di chuyển thứ tự' : 'Xóa tìm kiếm để kích hoạt kéo thả'}
                         >
                           <GripVertical className="w-5 h-5" />
@@ -2663,7 +2647,7 @@ export default function AdminDashboard({
               </div>
               <h3 className="text-xl font-extrabold text-white">Hộp Thư Liên Hệ & Đóng Góp Ý Kiến</h3>
               <p className="text-xs text-slate-400 mt-1">
-                Danh sách liên hệ, câu chuyện đóng góp và yêu cầu hỗ trợ gửi từ trang Liên hệ của Sử Ký Số.
+                Danh sách liên hệ, câu chuyện đóng góp và yêu cầu hỗ trợ gửi từ trang Liên hệ của Sử Học Số.
               </p>
             </div>
 
@@ -2683,32 +2667,29 @@ export default function AdminDashboard({
             <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs shrink-0">
               <button
                 onClick={() => setContactStatusFilter('all')}
-                className={`px-3 py-1.5 rounded-lg font-bold transition ${
-                  contactStatusFilter === 'all'
+                className={`px-3 py-1.5 rounded-lg font-bold transition ${contactStatusFilter === 'all'
                     ? 'bg-navy text-white shadow-sm'
                     : 'text-slate-400 hover:text-white'
-                }`}
+                  }`}
               >
                 Tất cả ({contactsList.length})
               </button>
               <button
                 onClick={() => setContactStatusFilter('new')}
-                className={`px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1 ${
-                  contactStatusFilter === 'new'
+                className={`px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1 ${contactStatusFilter === 'new'
                     ? 'bg-rose-950 text-rose-300 border border-rose-800 shadow-sm'
                     : 'text-slate-400 hover:text-rose-300'
-                }`}
+                  }`}
               >
                 <span className="w-2 h-2 rounded-full bg-rose-500" />
                 <span>Chưa xử lý ({contactsList.filter((c) => c.status === 'new').length})</span>
               </button>
               <button
                 onClick={() => setContactStatusFilter('replied')}
-                className={`px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1 ${
-                  contactStatusFilter === 'replied'
+                className={`px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1 ${contactStatusFilter === 'replied'
                     ? 'bg-emerald-950 text-emerald-300 border border-emerald-800 shadow-sm'
                     : 'text-slate-400 hover:text-emerald-300'
-                }`}
+                  }`}
               >
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 <span>Đã phản hồi ({contactsList.filter((c) => c.status === 'replied').length})</span>
@@ -2752,9 +2733,8 @@ export default function AdminDashboard({
                     filteredContacts.map((contact) => (
                       <tr
                         key={contact.id}
-                        className={`hover:bg-slate-800/50 transition ${
-                          contact.status === 'new' ? 'bg-amber-950/10' : ''
-                        }`}
+                        className={`hover:bg-slate-800/50 transition ${contact.status === 'new' ? 'bg-amber-950/10' : ''
+                          }`}
                       >
                         <td className="py-3 px-4 whitespace-nowrap">
                           {contact.status === 'new' ? (
@@ -2822,11 +2802,10 @@ export default function AdminDashboard({
                                   contact.status === 'new' ? 'replied' : 'new'
                                 )
                               }
-                              className={`p-1.5 rounded-lg transition ${
-                                contact.status === 'new'
+                              className={`p-1.5 rounded-lg transition ${contact.status === 'new'
                                   ? 'bg-emerald-950/60 hover:bg-emerald-900 text-emerald-400'
                                   : 'bg-slate-800 hover:bg-slate-700 text-slate-400'
-                              }`}
+                                }`}
                               title={
                                 contact.status === 'new'
                                   ? 'Đánh dấu đã phản hồi'
@@ -2990,11 +2969,10 @@ export default function AdminDashboard({
                       adminNoteInput
                     )
                   }
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition ${
-                    viewingContact.status === 'new'
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition ${viewingContact.status === 'new'
                       ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
                       : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
-                  }`}
+                    }`}
                 >
                   <CheckCircle className="w-3.5 h-3.5" />
                   <span>
@@ -3051,11 +3029,10 @@ export default function AdminDashboard({
             <form onSubmit={handleSaveUser} className="p-6 space-y-4">
               {userMsg.text && (
                 <div
-                  className={`p-3 rounded-2xl text-xs font-bold flex items-center gap-2 ${
-                    userMsg.type === 'success'
+                  className={`p-3 rounded-2xl text-xs font-bold flex items-center gap-2 ${userMsg.type === 'success'
                       ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-800'
                       : 'bg-rose-950/80 text-rose-400 border border-rose-800'
-                  }`}
+                    }`}
                 >
                   {userMsg.type === 'success' ? (
                     <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -3237,11 +3214,10 @@ export default function AdminDashboard({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setPreviewActiveTab('gallery')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-                      previewActiveTab === 'gallery'
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${previewActiveTab === 'gallery'
                         ? 'bg-white text-slate-950 font-black'
                         : 'bg-slate-800 text-slate-400'
-                    }`}
+                      }`}
                   >
                     <Image className="w-3.5 h-3.5" />
                     <span>Bộ ảnh ({previewPhotos.length})</span>
@@ -3250,11 +3226,10 @@ export default function AdminDashboard({
                   {previewYoutubeUrl && (
                     <button
                       onClick={() => setPreviewActiveTab('video')}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-                        previewActiveTab === 'video'
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${previewActiveTab === 'video'
                           ? 'bg-rose-600 text-white font-black'
                           : 'bg-slate-800 text-slate-400'
-                      }`}
+                        }`}
                     >
                       <Film className="w-3.5 h-3.5" />
                       <span>Video YouTube 4K</span>
@@ -3264,11 +3239,10 @@ export default function AdminDashboard({
                   {previewResource.model_3d && (
                     <button
                       onClick={() => setPreviewActiveTab('3d')}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-                        previewActiveTab === '3d'
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${previewActiveTab === '3d'
                           ? 'bg-gold text-slate-950 font-black'
                           : 'bg-slate-800 text-slate-400'
-                      }`}
+                        }`}
                     >
                       <Box className="w-3.5 h-3.5" />
                       <span>Mô hình 3D tương tác</span>
@@ -3310,9 +3284,8 @@ export default function AdminDashboard({
                       <button
                         key={idx}
                         onClick={() => setPreviewPhotoIdx(idx)}
-                        className={`relative w-16 h-12 rounded-lg overflow-hidden shrink-0 border-2 transition ${
-                          previewPhotoIdx === idx ? 'border-gold scale-105' : 'border-transparent opacity-60'
-                        }`}
+                        className={`relative w-16 h-12 rounded-lg overflow-hidden shrink-0 border-2 transition ${previewPhotoIdx === idx ? 'border-gold scale-105' : 'border-transparent opacity-60'
+                          }`}
                       >
                         <img src={p} alt="" className="w-full h-full object-cover" />
                       </button>

@@ -97,7 +97,7 @@ export default function WhyChooseUsSection({ onOpenLogin, currentUser }) {
 
             {/* Description Text */}
             <p className="text-xs sm:text-sm lg:text-[0.95rem] text-[#3A2A1A] leading-relaxed font-normal max-w-md lg:max-w-lg">
-              Không chỉ là kho lưu trữ số, <strong className="font-bold text-[#1A120B]">Sử Ký Số</strong> mang đến hệ sinh thái học tập đa phương tiện tương tác, giúp việc dạy và học Lịch sử 10 trở nên trực quan, sinh động và tràn đầy cảm hứng.
+              Không chỉ là kho lưu trữ số, <strong className="font-bold text-[#1A120B]">Sử Học Số</strong> mang đến hệ sinh thái học tập đa phương tiện tương tác, giúp việc dạy và học Lịch sử 10 trở nên trực quan, sinh động và tràn đầy cảm hứng.
             </p>
           </div>
 

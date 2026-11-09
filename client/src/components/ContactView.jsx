@@ -1,13 +1,13 @@
 import {
-    AlertCircle,
-    CheckCircle2,
-    Globe,
-    Mail,
-    MapPin,
-    Navigation,
-    RefreshCw,
-    Send,
-    ShieldCheck
+  AlertCircle,
+  CheckCircle2,
+  Globe,
+  Mail,
+  MapPin,
+  Navigation,
+  RefreshCw,
+  Send,
+  ShieldCheck
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -44,7 +44,7 @@ export default function ContactView() {
     },
     {
       question: 'Tư liệu gửi về được dùng thế nào?',
-      answer: 'Các nguồn sử liệu và hình ảnh đạt chuẩn sẽ được thẩm định sư phạm, số hóa thành tư liệu chất lượng cao hoặc chuyển hóa thành mô hình 3D tương tác trên nền tảng Sử Ký Số, phục vụ miễn phí cho công tác giảng dạy Lịch sử 10 trên toàn quốc.'
+      answer: 'Các nguồn sử liệu và hình ảnh đạt chuẩn sẽ được thẩm định sư phạm, số hóa thành tư liệu chất lượng cao hoặc chuyển hóa thành mô hình 3D tương tác trên nền tảng Sử Học Số, phục vụ miễn phí cho công tác giảng dạy Lịch sử 10 trên toàn quốc.'
     },
     {
       question: 'Tôi cần hỗ trợ kỹ thuật thì liên hệ đâu?',
@@ -129,7 +129,7 @@ export default function ContactView() {
                     Địa chỉ
                   </span>
                   <span className="font-semibold text-slate-800 leading-relaxed block mt-0.5">
-                    Số 60 Bà Triệu, Phường Cửa Nam, TP. Hà Nội
+                    136 Xuân Thủy, Cầu giấy, TP. Hà Nội
                   </span>
                 </div>
               </div>
@@ -147,7 +147,7 @@ export default function ContactView() {
                     href="mailto:tuyengiaotwd@gmail.com"
                     className="font-semibold text-slate-800 hover:text-rose-700 transition block mt-0.5"
                   >
-                    tuyengiaotwd@gmail.com
+                    Trannhuquynh9597@gmail.com
                   </a>
                 </div>
               </div>
@@ -162,18 +162,18 @@ export default function ContactView() {
                     Website
                   </span>
                   <a
-                    href="https://doanthanhnien.vn"
+                    href="https://suhocso.fstack.asia/"
                     target="_blank"
                     rel="noreferrer"
                     className="font-semibold text-slate-800 hover:text-rose-700 transition block mt-0.5"
                   >
-                    doanthanhnien.vn
+                    suhocso.fstack.asia
                   </a>
                 </div>
               </div>
 
               {/* Facebook */}
-              <div className="flex items-start gap-3">
+              {/* <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center shrink-0 border border-rose-100">
                   <FacebookIcon className="w-4 h-4" />
                 </div>
@@ -190,10 +190,10 @@ export default function ContactView() {
                     Cổng thông tin Trung ương Đoàn TNCS Hồ Chí Minh
                   </a>
                 </div>
-              </div>
+              </div> */}
 
               {/* TikTok */}
-              <div className="flex items-start gap-3">
+              {/* <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center shrink-0 border border-rose-100 font-black text-xs">
                   ♪
                 </div>
@@ -205,7 +205,7 @@ export default function ContactView() {
                     Congtactuyengiao
                   </span>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -231,7 +231,7 @@ export default function ContactView() {
               <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
               <div>
                 <strong className="font-bold block text-sm">Gửi thông tin thành công!</strong>
-                <span>Cảm ơn bạn đã liên hệ. Ban biên tập Sử Ký Số đã tiếp nhận thông tin và sẽ liên lạc lại trong thời gian sớm nhất.</span>
+                <span>Cảm ơn bạn đã liên hệ. Ban biên tập Sử Học Số đã tiếp nhận thông tin và sẽ liên lạc lại trong thời gian sớm nhất.</span>
               </div>
             </div>
           )}

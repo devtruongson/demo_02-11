@@ -1,4 +1,4 @@
-# 🏛️ SỬ KÝ SỐ — KHO TƯ LIỆU LỊCH SỬ 10 & STUDIO 3D
+# 🏛️ Sử Học Số — KHO TƯ LIỆU LỊCH SỬ 10 & STUDIO 3D
 
 > Ứng dụng số hóa học liệu lịch sử bám sát Chương trình GDPT 2018 và tài liệu Nghiệp vụ Sư phạm **"Chủ đề 5: Văn minh Đông Nam Á thời cổ – trung đại"**.
 

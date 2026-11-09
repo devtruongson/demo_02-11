@@ -1,267 +1,1048 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sử Ký Số — Kho tư liệu Lịch sử 10</title>
-<style>
-:root{
-  --navy:#243866; --navy2:#334b83; --gold:#e6ad4c; --ink:#202d49;
-  --muted:#6c7890; --bg:#f6f8fc; --line:#e6eaf2; --white:#fff;
-  --soft:#eef2fa; --shadow:0 8px 24px rgba(31,48,86,.08); --radius:18px;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Be Vietnam Pro",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-a{color:inherit;text-decoration:none}
-.topbar{height:76px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:20}
-.brand{display:flex;align-items:center;gap:12px;min-width:230px}
-.brandmark{width:44px;height:44px;border-radius:14px;background:#eaf0fc;display:grid;place-items:center;color:var(--navy);font-size:25px}
-.brandname{font-weight:800;font-size:19px;letter-spacing:-.4px;color:var(--navy)}
-.brandtag{font-size:11px;color:var(--muted);margin-top:3px}
-.topnav{display:flex;gap:7px;align-items:center}
-.navbtn,.iconbtn{border:0;background:transparent;padding:11px 13px;border-radius:12px;color:#4b5875;font-weight:600;font-size:13px}
-.navbtn:hover,.navbtn.active{background:#edf1fb;color:var(--navy)}
-.iconbtn{font-size:18px;border:1px solid var(--line);width:42px;height:42px;padding:0}
-.layout{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:calc(100vh - 76px)}
-.sidebar{padding:24px 14px;border-right:1px solid var(--line);background:#fff}
-.side-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#9aa4b8;font-weight:800;padding:12px 12px 8px}
-.sidebtn{display:flex;align-items:center;gap:12px;padding:12px 13px;border-radius:12px;margin:3px 0;color:#58647d;font-size:13px;font-weight:600;border:0;background:transparent;width:100%;text-align:left}
-.sidebtn .ico{width:23px;text-align:center;font-size:17px}
-.sidebtn.active,.sidebtn:hover{background:#edf1fb;color:var(--navy)}
-.side-note{margin:28px 4px 0;padding:15px;background:#fff7e9;border:1px solid #f6e7c9;border-radius:14px;font-size:12px;line-height:1.55;color:#755b2e}
-main{padding:26px clamp(18px,3vw,42px) 50px;min-width:0;max-width:1600px;width:100%;margin:auto}
-.hero{min-height:220px;border-radius:22px;background:linear-gradient(100deg,rgba(27,43,79,.92),rgba(40,65,113,.62)),url('https://images.unsplash.com/photo-1564399579883-451a5d44ec08?auto=format&fit=crop&w=1800&q=85') center/cover;color:#fff;padding:32px 38px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;box-shadow:var(--shadow)}
-.hero-copy{max-width:680px}
-.eyebrow{font-size:11px;letter-spacing:1.7px;text-transform:uppercase;color:#f5d79a;font-weight:800}
-.hero h1{font-size:clamp(26px,3vw,40px);line-height:1.13;letter-spacing:-1px;margin:12px 0}
-.hero p{color:#e5eaf5;font-size:14px;line-height:1.6;margin:0 0 20px}
-.searchbox{background:#fff;border-radius:14px;padding:6px;display:flex;align-items:center;max-width:600px;box-shadow:0 5px 20px #18284930}
-.searchbox span{padding:0 12px;color:#6e7890;font-size:18px}
-.searchbox input{border:0;outline:0;flex:1;min-width:0;padding:10px 0;color:var(--ink);font-size:13px}
-.searchbox button{border:0;border-radius:10px;background:var(--gold);color:#2b3550;font-weight:800;padding:11px 15px}
-.hero-badge{font-size:90px;opacity:.28;margin:0 4vw 0 20px}
-.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:30px 0 15px}
-.section-head h2{font-size:19px;margin:0;letter-spacing:-.4px}
-.section-head p{margin:5px 0 0;color:var(--muted);font-size:12px}
-.textlink{border:0;background:transparent;color:var(--navy2);font-size:12px;font-weight:800}
-.topic-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
-.topic-card{position:relative;min-height:145px;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#fff;box-shadow:0 4px 12px #1c315009;cursor:pointer;transition:.18s}
-.topic-card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
-.topic-card img{width:100%;height:95px;object-fit:cover;display:block}
-.topic-card .topic-title{font-size:12px;font-weight:800;line-height:1.35;padding:10px 11px 12px}
-.topic-num{position:absolute;top:8px;left:8px;background:#ffffffeb;color:var(--navy);border-radius:8px;padding:4px 7px;font-size:10px;font-weight:800}
-.quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:24px}
-.quick-card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:16px;display:flex;gap:12px;align-items:center}
-.quick-icon{width:42px;height:42px;border-radius:12px;background:#eef2fb;display:grid;place-items:center;font-size:20px}
-.quick-card strong{font-size:13px;display:block}.quick-card small{color:var(--muted);font-size:11px;line-height:1.4;display:block;margin-top:4px}
-.page-head{border-radius:20px;padding:26px 30px;color:white;background:linear-gradient(100deg,#263c70,#536fba);position:relative;overflow:hidden;margin-bottom:20px}
-.page-head:after{content:"⌂";position:absolute;right:40px;top:-22px;font-size:150px;opacity:.08}
-.breadcrumb{font-size:11px;color:#e1e8f8;margin-bottom:12px}
-.page-head h1{font-size:27px;margin:0 0 8px;position:relative;z-index:1}
-.page-head p{font-size:13px;color:#e1e8f8;margin:0;position:relative;z-index:1}
-.toolbar{display:flex;gap:10px;align-items:center;margin:18px 0;flex-wrap:wrap}
-.toolbar .searchbox{flex:1;min-width:220px;border:1px solid var(--line);box-shadow:none}
-.filter-select{border:1px solid var(--line);border-radius:12px;padding:13px;background:#fff;color:var(--ink);font-size:12px}
-.pills{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 20px}
-.pill{border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 14px;color:#5c6880;font-size:12px;font-weight:700}
-.pill.active,.pill:hover{background:var(--navy);border-color:var(--navy);color:#fff}
-.resource-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.resource-card{background:#fff;border:1px solid var(--line);border-radius:17px;overflow:hidden;box-shadow:0 4px 15px #21365d08;transition:.18s}
-.resource-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
-.resource-image{height:180px;position:relative;background:#e9edf5}
-.resource-image img{width:100%;height:100%;object-fit:cover;display:block}
-.type-badge{position:absolute;top:11px;right:11px;background:#fffffff0;border-radius:8px;padding:5px 8px;font-size:10px;font-weight:800;color:var(--navy)}
-.play-mark{position:absolute;inset:0;display:grid;place-items:center;color:white;font-size:42px;text-shadow:0 2px 10px #0008}
-.resource-body{padding:14px}
-.resource-body h3{font-size:14px;line-height:1.4;margin:0 0 7px}
-.resource-body p{font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 12px;min-height:35px}
-.meta{font-size:10px;color:#7d879a;margin-bottom:12px}
-.card-actions{display:flex;gap:8px}
-.primary-btn,.secondary-btn{border-radius:10px;padding:9px 12px;font-size:11px;font-weight:800;border:1px solid var(--line)}
-.primary-btn{background:#edf2ff;border-color:#dbe4fb;color:var(--navy)}
-.secondary-btn{background:#fff;color:#5c6880}
-.lesson-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(250px,.8fr);gap:18px}
-.panel{background:#fff;border:1px solid var(--line);border-radius:17px;padding:20px;margin-bottom:16px}
-.panel h2{font-size:16px;margin:0 0 12px}
-.panel p,.panel li{font-size:13px;line-height:1.7;color:#5f6b83}
-.highlight{padding:13px 15px;background:#fff7e9;border-radius:12px;color:#755b2e;font-size:12px;line-height:1.6}
-.lesson-image{width:100%;max-height:260px;object-fit:cover;border-radius:12px;margin-top:12px}
-.lesson-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0}
-.lesson-tabs button{border:0;border-radius:10px;padding:10px 14px;background:#e9edf5;color:#4d5b79;font-weight:700;font-size:12px}
-.lesson-tabs button.active{background:var(--navy);color:#fff}
-.empty{grid-column:1/-1;background:#fff;border:1px dashed #ccd4e4;border-radius:15px;padding:40px;text-align:center;color:var(--muted);font-size:13px}
-footer{margin-top:38px;border-top:1px solid var(--line);padding:22px 0;color:#8791a4;font-size:11px;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
-.modal-backdrop{position:fixed;inset:0;background:#101a30a8;display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
-.modal-backdrop.open{display:flex}
-.modal{background:#fff;border-radius:20px;max-width:900px;width:100%;max-height:90vh;overflow:auto;display:grid;grid-template-columns:1.1fr 1fr;box-shadow:0 20px 80px #0003}
-.modal img{width:100%;height:100%;min-height:340px;max-height:600px;object-fit:cover;background:#e9edf5}
-.modal-content{padding:28px}
-.modal-content h2{font-size:23px;margin:10px 0}
-.modal-content p{font-size:13px;color:#5d6980;line-height:1.7}
-.modal-top{display:flex;justify-content:space-between;align-items:center}
-.close{border:0;background:#f0f2f7;border-radius:10px;width:36px;height:36px;font-size:20px}
-.modal-label{display:inline-block;background:#eef2fb;color:var(--navy);padding:6px 9px;border-radius:8px;font-size:11px;font-weight:800}
-.source-box{background:#f7f8fb;border-radius:12px;padding:13px;font-size:12px;line-height:1.6;margin:15px 0}
-.source-box input{width:100%;border:1px solid #dce2ee;border-radius:8px;padding:8px;margin-top:6px;font-size:11px}
-.edit-hint{font-size:11px;color:#8993a7;margin-top:10px}
-@media(max-width:1100px){.topic-grid{grid-template-columns:repeat(3,1fr)}.resource-grid{grid-template-columns:repeat(2,1fr)}.topnav .navbtn{display:none}.hero-badge{display:none}}
-@media(max-width:700px){.topbar{padding:0 14px;height:66px}.brand{min-width:0}.brandname{font-size:16px}.layout{grid-template-columns:1fr}.sidebar{display:flex;overflow-x:auto;padding:8px;gap:4px;border-right:0;border-bottom:1px solid var(--line)}.side-label,.side-note{display:none}.sidebtn{white-space:nowrap;width:auto;padding:10px}.sidebtn .ico{display:none}main{padding:16px 13px 30px}.hero{padding:25px 20px;min-height:230px}.hero h1{font-size:28px}.topic-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.quick-grid{grid-template-columns:1fr}.resource-grid{grid-template-columns:1fr}.resource-image{height:210px}.lesson-layout{grid-template-columns:1fr}.page-head{padding:22px}.page-head h1{font-size:22px}.modal{grid-template-columns:1fr}.modal img{min-height:220px;max-height:300px}.modal-content{padding:20px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sử Học Số — Kho tư liệu Lịch sử 10</title>
+  <style>
+    :root {
+      --navy: #243866;
+      --navy2: #334b83;
+      --gold: #e6ad4c;
+      --ink: #202d49;
+      --muted: #6c7890;
+      --bg: #f6f8fc;
+      --line: #e6eaf2;
+      --white: #fff;
+      --soft: #eef2fa;
+      --shadow: 0 8px 24px rgba(31, 48, 86, .08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, "Be Vietnam Pro", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit
+    }
+
+    button {
+      cursor: pointer
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none
+    }
+
+    .topbar {
+      height: 76px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      position: sticky;
+      top: 0;
+      z-index: 20
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 230px
+    }
+
+    .brandmark {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: #eaf0fc;
+      display: grid;
+      place-items: center;
+      color: var(--navy);
+      font-size: 25px
+    }
+
+    .brandname {
+      font-weight: 800;
+      font-size: 19px;
+      letter-spacing: -.4px;
+      color: var(--navy)
+    }
+
+    .brandtag {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 3px
+    }
+
+    .topnav {
+      display: flex;
+      gap: 7px;
+      align-items: center
+    }
+
+    .navbtn,
+    .iconbtn {
+      border: 0;
+      background: transparent;
+      padding: 11px 13px;
+      border-radius: 12px;
+      color: #4b5875;
+      font-weight: 600;
+      font-size: 13px
+    }
+
+    .navbtn:hover,
+    .navbtn.active {
+      background: #edf1fb;
+      color: var(--navy)
+    }
+
+    .iconbtn {
+      font-size: 18px;
+      border: 1px solid var(--line);
+      width: 42px;
+      height: 42px;
+      padding: 0
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      min-height: calc(100vh - 76px)
+    }
+
+    .sidebar {
+      padding: 24px 14px;
+      border-right: 1px solid var(--line);
+      background: #fff
+    }
+
+    .side-label {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #9aa4b8;
+      font-weight: 800;
+      padding: 12px 12px 8px
+    }
+
+    .sidebtn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 13px;
+      border-radius: 12px;
+      margin: 3px 0;
+      color: #58647d;
+      font-size: 13px;
+      font-weight: 600;
+      border: 0;
+      background: transparent;
+      width: 100%;
+      text-align: left
+    }
+
+    .sidebtn .ico {
+      width: 23px;
+      text-align: center;
+      font-size: 17px
+    }
+
+    .sidebtn.active,
+    .sidebtn:hover {
+      background: #edf1fb;
+      color: var(--navy)
+    }
+
+    .side-note {
+      margin: 28px 4px 0;
+      padding: 15px;
+      background: #fff7e9;
+      border: 1px solid #f6e7c9;
+      border-radius: 14px;
+      font-size: 12px;
+      line-height: 1.55;
+      color: #755b2e
+    }
+
+    main {
+      padding: 26px clamp(18px, 3vw, 42px) 50px;
+      min-width: 0;
+      max-width: 1600px;
+      width: 100%;
+      margin: auto
+    }
+
+    .hero {
+      min-height: 220px;
+      border-radius: 22px;
+      background: linear-gradient(100deg, rgba(27, 43, 79, .92), rgba(40, 65, 113, .62)), url('https://images.unsplash.com/photo-1564399579883-451a5d44ec08?auto=format&fit=crop&w=1800&q=85') center/cover;
+      color: #fff;
+      padding: 32px 38px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      box-shadow: var(--shadow)
+    }
+
+    .hero-copy {
+      max-width: 680px
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      letter-spacing: 1.7px;
+      text-transform: uppercase;
+      color: #f5d79a;
+      font-weight: 800
+    }
+
+    .hero h1 {
+      font-size: clamp(26px, 3vw, 40px);
+      line-height: 1.13;
+      letter-spacing: -1px;
+      margin: 12px 0
+    }
+
+    .hero p {
+      color: #e5eaf5;
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0 0 20px
+    }
+
+    .searchbox {
+      background: #fff;
+      border-radius: 14px;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      max-width: 600px;
+      box-shadow: 0 5px 20px #18284930
+    }
+
+    .searchbox span {
+      padding: 0 12px;
+      color: #6e7890;
+      font-size: 18px
+    }
+
+    .searchbox input {
+      border: 0;
+      outline: 0;
+      flex: 1;
+      min-width: 0;
+      padding: 10px 0;
+      color: var(--ink);
+      font-size: 13px
+    }
+
+    .searchbox button {
+      border: 0;
+      border-radius: 10px;
+      background: var(--gold);
+      color: #2b3550;
+      font-weight: 800;
+      padding: 11px 15px
+    }
+
+    .hero-badge {
+      font-size: 90px;
+      opacity: .28;
+      margin: 0 4vw 0 20px
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 30px 0 15px
+    }
+
+    .section-head h2 {
+      font-size: 19px;
+      margin: 0;
+      letter-spacing: -.4px
+    }
+
+    .section-head p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    .textlink {
+      border: 0;
+      background: transparent;
+      color: var(--navy2);
+      font-size: 12px;
+      font-weight: 800
+    }
+
+    .topic-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px
+    }
+
+    .topic-card {
+      position: relative;
+      min-height: 145px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #fff;
+      box-shadow: 0 4px 12px #1c315009;
+      cursor: pointer;
+      transition: .18s
+    }
+
+    .topic-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow)
+    }
+
+    .topic-card img {
+      width: 100%;
+      height: 95px;
+      object-fit: cover;
+      display: block
+    }
+
+    .topic-card .topic-title {
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.35;
+      padding: 10px 11px 12px
+    }
+
+    .topic-num {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: #ffffffeb;
+      color: var(--navy);
+      border-radius: 8px;
+      padding: 4px 7px;
+      font-size: 10px;
+      font-weight: 800
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px
+    }
+
+    .quick-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      padding: 16px;
+      display: flex;
+      gap: 12px;
+      align-items: center
+    }
+
+    .quick-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: #eef2fb;
+      display: grid;
+      place-items: center;
+      font-size: 20px
+    }
+
+    .quick-card strong {
+      font-size: 13px;
+      display: block
+    }
+
+    .quick-card small {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+      display: block;
+      margin-top: 4px
+    }
+
+    .page-head {
+      border-radius: 20px;
+      padding: 26px 30px;
+      color: white;
+      background: linear-gradient(100deg, #263c70, #536fba);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 20px
+    }
+
+    .page-head:after {
+      content: "⌂";
+      position: absolute;
+      right: 40px;
+      top: -22px;
+      font-size: 150px;
+      opacity: .08
+    }
+
+    .breadcrumb {
+      font-size: 11px;
+      color: #e1e8f8;
+      margin-bottom: 12px
+    }
+
+    .page-head h1 {
+      font-size: 27px;
+      margin: 0 0 8px;
+      position: relative;
+      z-index: 1
+    }
+
+    .page-head p {
+      font-size: 13px;
+      color: #e1e8f8;
+      margin: 0;
+      position: relative;
+      z-index: 1
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin: 18px 0;
+      flex-wrap: wrap
+    }
+
+    .toolbar .searchbox {
+      flex: 1;
+      min-width: 220px;
+      border: 1px solid var(--line);
+      box-shadow: none
+    }
+
+    .filter-select {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 13px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 12px
+    }
+
+    .pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 12px 0 20px
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 11px;
+      padding: 10px 14px;
+      color: #5c6880;
+      font-size: 12px;
+      font-weight: 700
+    }
+
+    .pill.active,
+    .pill:hover {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: #fff
+    }
+
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px
+    }
+
+    .resource-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px #21365d08;
+      transition: .18s
+    }
+
+    .resource-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow)
+    }
+
+    .resource-image {
+      height: 180px;
+      position: relative;
+      background: #e9edf5
+    }
+
+    .resource-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block
+    }
+
+    .type-badge {
+      position: absolute;
+      top: 11px;
+      right: 11px;
+      background: #fffffff0;
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--navy)
+    }
+
+    .play-mark {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 42px;
+      text-shadow: 0 2px 10px #0008
+    }
+
+    .resource-body {
+      padding: 14px
+    }
+
+    .resource-body h3 {
+      font-size: 14px;
+      line-height: 1.4;
+      margin: 0 0 7px
+    }
+
+    .resource-body p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin: 0 0 12px;
+      min-height: 35px
+    }
+
+    .meta {
+      font-size: 10px;
+      color: #7d879a;
+      margin-bottom: 12px
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      border: 1px solid var(--line)
+    }
+
+    .primary-btn {
+      background: #edf2ff;
+      border-color: #dbe4fb;
+      color: var(--navy)
+    }
+
+    .secondary-btn {
+      background: #fff;
+      color: #5c6880
+    }
+
+    .lesson-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(250px, .8fr);
+      gap: 18px
+    }
+
+    .panel {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      padding: 20px;
+      margin-bottom: 16px
+    }
+
+    .panel h2 {
+      font-size: 16px;
+      margin: 0 0 12px
+    }
+
+    .panel p,
+    .panel li {
+      font-size: 13px;
+      line-height: 1.7;
+      color: #5f6b83
+    }
+
+    .highlight {
+      padding: 13px 15px;
+      background: #fff7e9;
+      border-radius: 12px;
+      color: #755b2e;
+      font-size: 12px;
+      line-height: 1.6
+    }
+
+    .lesson-image {
+      width: 100%;
+      max-height: 260px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-top: 12px
+    }
+
+    .lesson-tabs {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin: 16px 0
+    }
+
+    .lesson-tabs button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      background: #e9edf5;
+      color: #4d5b79;
+      font-weight: 700;
+      font-size: 12px
+    }
+
+    .lesson-tabs button.active {
+      background: var(--navy);
+      color: #fff
+    }
+
+    .empty {
+      grid-column: 1/-1;
+      background: #fff;
+      border: 1px dashed #ccd4e4;
+      border-radius: 15px;
+      padding: 40px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    footer {
+      margin-top: 38px;
+      border-top: 1px solid var(--line);
+      padding: 22px 0;
+      color: #8791a4;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: #101a30a8;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 50
+    }
+
+    .modal-backdrop.open {
+      display: flex
+    }
+
+    .modal {
+      background: #fff;
+      border-radius: 20px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: auto;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      box-shadow: 0 20px 80px #0003
+    }
+
+    .modal img {
+      width: 100%;
+      height: 100%;
+      min-height: 340px;
+      max-height: 600px;
+      object-fit: cover;
+      background: #e9edf5
+    }
+
+    .modal-content {
+      padding: 28px
+    }
+
+    .modal-content h2 {
+      font-size: 23px;
+      margin: 10px 0
+    }
+
+    .modal-content p {
+      font-size: 13px;
+      color: #5d6980;
+      line-height: 1.7
+    }
+
+    .modal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    .close {
+      border: 0;
+      background: #f0f2f7;
+      border-radius: 10px;
+      width: 36px;
+      height: 36px;
+      font-size: 20px
+    }
+
+    .modal-label {
+      display: inline-block;
+      background: #eef2fb;
+      color: var(--navy);
+      padding: 6px 9px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800
+    }
+
+    .source-box {
+      background: #f7f8fb;
+      border-radius: 12px;
+      padding: 13px;
+      font-size: 12px;
+      line-height: 1.6;
+      margin: 15px 0
+    }
+
+    .source-box input {
+      width: 100%;
+      border: 1px solid #dce2ee;
+      border-radius: 8px;
+      padding: 8px;
+      margin-top: 6px;
+      font-size: 11px
+    }
+
+    .edit-hint {
+      font-size: 11px;
+      color: #8993a7;
+      margin-top: 10px
+    }
+
+    @media(max-width:1100px) {
+      .topic-grid {
+        grid-template-columns: repeat(3, 1fr)
+      }
+
+      .resource-grid {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .topnav .navbtn {
+        display: none
+      }
+
+      .hero-badge {
+        display: none
+      }
+    }
+
+    @media(max-width:700px) {
+      .topbar {
+        padding: 0 14px;
+        height: 66px
+      }
+
+      .brand {
+        min-width: 0
+      }
+
+      .brandname {
+        font-size: 16px
+      }
+
+      .layout {
+        grid-template-columns: 1fr
+      }
+
+      .sidebar {
+        display: flex;
+        overflow-x: auto;
+        padding: 8px;
+        gap: 4px;
+        border-right: 0;
+        border-bottom: 1px solid var(--line)
+      }
+
+      .side-label,
+      .side-note {
+        display: none
+      }
+
+      .sidebtn {
+        white-space: nowrap;
+        width: auto;
+        padding: 10px
+      }
+
+      .sidebtn .ico {
+        display: none
+      }
+
+      main {
+        padding: 16px 13px 30px
+      }
+
+      .hero {
+        padding: 25px 20px;
+        min-height: 230px
+      }
+
+      .hero h1 {
+        font-size: 28px
+      }
+
+      .topic-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px
+      }
+
+      .quick-grid {
+        grid-template-columns: 1fr
+      }
+
+      .resource-grid {
+        grid-template-columns: 1fr
+      }
+
+      .resource-image {
+        height: 210px
+      }
+
+      .lesson-layout {
+        grid-template-columns: 1fr
+      }
+
+      .page-head {
+        padding: 22px
+      }
+
+      .page-head h1 {
+        font-size: 22px
+      }
+
+      .modal {
+        grid-template-columns: 1fr
+      }
+
+      .modal img {
+        min-height: 220px;
+        max-height: 300px
+      }
+
+      .modal-content {
+        padding: 20px
+      }
+    }
+  </style>
 </head>
+
 <body>
-<header class="topbar">
-  <a href="#" class="brand" data-page="home">
-    <div class="brandmark">⌂</div><div><div class="brandname">Sử Ký Số</div><div class="brandtag">Kho tư liệu Lịch sử 10</div></div>
-  </a>
-  <nav class="topnav">
-    <button class="navbtn active" data-page="home">Trang chủ</button>
-    <button class="navbtn" data-page="topics">Chủ đề học tập</button>
-    <button class="navbtn" data-page="library">Kho tư liệu</button>
-    <button class="navbtn" data-page="teachers">Dành cho giáo viên</button>
-    <button class="navbtn" data-page="students">Dành cho học sinh</button>
-  </nav>
-  <button class="iconbtn" id="editToggle" title="Bật chế độ chỉnh sửa">✎</button>
-</header>
+  <header class="topbar">
+    <a href="#" class="brand" data-page="home">
+      <div class="brandmark">⌂</div>
+      <div>
+        <div class="brandname">Sử Học Số</div>
+        <div class="brandtag">Kho tư liệu Lịch sử 10</div>
+      </div>
+    </a>
+    <nav class="topnav">
+      <button class="navbtn active" data-page="home">Trang chủ</button>
+      <button class="navbtn" data-page="topics">Chủ đề học tập</button>
+      <button class="navbtn" data-page="library">Kho tư liệu</button>
+      <button class="navbtn" data-page="teachers">Dành cho giáo viên</button>
+      <button class="navbtn" data-page="students">Dành cho học sinh</button>
+    </nav>
+    <button class="iconbtn" id="editToggle" title="Bật chế độ chỉnh sửa">✎</button>
+  </header>
 
-<div class="layout">
-  <aside class="sidebar">
-    <div class="side-label">Không gian học tập</div>
-    <button class="sidebtn active" data-page="home"><span class="ico">⌂</span>Trang chủ</button>
-    <button class="sidebtn" data-page="topics"><span class="ico">▦</span>Chủ đề</button>
-    <button class="sidebtn" data-page="library"><span class="ico">▤</span>Kho tư liệu</button>
-    <button class="sidebtn" data-page="teachers"><span class="ico">♧</span>Dành cho giáo viên</button>
-    <button class="sidebtn" data-page="students"><span class="ico">♙</span>Dành cho học sinh</button>
-    <button class="sidebtn" data-page="about"><span class="ico">ⓘ</span>Giới thiệu</button>
-    <div class="side-note"><strong>💡 Mẹo sử dụng</strong><br>Nhập từ khóa để tìm tư liệu. Nhấn vào thẻ để xem thông tin chi tiết và nguồn tham khảo.</div>
-  </aside>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="side-label">Không gian học tập</div>
+      <button class="sidebtn active" data-page="home"><span class="ico">⌂</span>Trang chủ</button>
+      <button class="sidebtn" data-page="topics"><span class="ico">▦</span>Chủ đề</button>
+      <button class="sidebtn" data-page="library"><span class="ico">▤</span>Kho tư liệu</button>
+      <button class="sidebtn" data-page="teachers"><span class="ico">♧</span>Dành cho giáo viên</button>
+      <button class="sidebtn" data-page="students"><span class="ico">♙</span>Dành cho học sinh</button>
+      <button class="sidebtn" data-page="about"><span class="ico">ⓘ</span>Giới thiệu</button>
+      <div class="side-note"><strong>💡 Mẹo sử dụng</strong><br>Nhập từ khóa để tìm tư liệu. Nhấn vào thẻ để xem thông
+        tin chi tiết và nguồn tham khảo.</div>
+    </aside>
 
-  <main id="app"></main>
-</div>
+    <main id="app"></main>
+  </div>
 
-<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true">
-  <div class="modal" id="modalContent"></div>
-</div>
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true">
+    <div class="modal" id="modalContent"></div>
+  </div>
 
-<script>
-const topics = [
- {id:1,title:"Thế giới cổ đại",img:"https://images.unsplash.com/photo-1603565816030-6b389eeb23cb?auto=format&fit=crop&w=800&q=80",desc:"Những nền văn minh đầu tiên và di sản của thế giới cổ đại."},
- {id:2,title:"Thế giới trung đại",img:"https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",desc:"Các xã hội, nhà nước và thành tựu văn hóa thời trung đại."},
- {id:3,title:"Một số nền văn minh châu Á",img:"https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80",desc:"Khám phá những trung tâm văn minh lớn ở châu Á."},
- {id:4,title:"Văn minh Đông Nam Á",img:"https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?auto=format&fit=crop&w=800&q=80",desc:"Di sản, giao lưu và thành tựu của các nền văn minh Đông Nam Á."},
- {id:5,title:"Các cuộc cách mạng công nghiệp",img:"https://images.unsplash.com/photo-1516937941344-00b4e0337589?auto=format&fit=crop&w=800&q=80",desc:"Những chuyển biến về khoa học, công nghệ, kinh tế và xã hội."},
- {id:6,title:"Thế giới hiện đại",img:"https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=800&q=80",desc:"Các biến đổi và vấn đề nổi bật của thế giới hiện đại."},
- {id:7,title:"Việt Nam trong lịch sử thế giới",img:"https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80",desc:"Việt Nam trong dòng chảy lịch sử khu vực và thế giới."}
-];
-let resources = [
- {id:1,topic:4,lesson:"Văn minh Đông Nam Á thời cổ – trung đại",type:"image",title:"Đền Angkor Wat",period:"Thời trung đại",place:"Campuchia",desc:"Quần thể đền Angkor Wat là một thành tựu kiến trúc tiêu biểu của vương quốc Khmer.",source:"UNESCO World Heritage Centre",url:"https://whc.unesco.org/en/list/668/",img:"https://images.unsplash.com/photo-1604999333679-b86d54738315?auto=format&fit=crop&w=1200&q=85",tip:"Quan sát bố cục kiến trúc, hệ thống tháp và phù điêu để tìm hiểu đặc điểm văn minh Khmer."},
- {id:2,topic:4,lesson:"Văn minh Đông Nam Á thời cổ – trung đại",type:"image",title:"Bản đồ khu vực Đông Nam Á",period:"Cổ – trung đại",place:"Đông Nam Á",desc:"Lược đồ giúp xác định vị trí địa lý và các tuyến giao lưu trong khu vực.",source:"Bổ sung nguồn bản đồ chính xác trước khi sử dụng",url:"",img:"https://images.unsplash.com/photo-1524666041070-9a876833e706?auto=format&fit=crop&w=1200&q=85",tip:"Dùng bản đồ để xác định vị trí, đường biển và điều kiện giao lưu giữa các khu vực."},
- {id:3,topic:4,lesson:"Văn minh Đông Nam Á thời cổ – trung đại",type:"text",title:"Giao lưu thương mại đường biển",period:"Cổ – trung đại",place:"Đông Nam Á",desc:"Tư liệu đọc thêm về vai trò của các tuyến hàng hải trong giao lưu kinh tế, văn hóa.",source:"Cần bổ sung tác giả, ấn phẩm và trang trích dẫn",url:"",img:"https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1000&q=80",tip:"Phân tích tư liệu để chỉ ra vai trò của giao lưu thương mại đối với sự phát triển văn minh."},
- {id:4,topic:5,lesson:"Cuộc cách mạng công nghiệp lần thứ nhất",type:"image",title:"Máy hơi nước và công nghiệp hóa",period:"Thế kỉ XVIII–XIX",place:"Anh",desc:"Hình ảnh minh họa sự chuyển đổi công nghệ trong sản xuất thời kỳ cách mạng công nghiệp.",source:"Cần kiểm chứng nguồn ảnh và thông tin hiện vật",url:"",img:"https://images.unsplash.com/photo-1516937941344-00b4e0337589?auto=format&fit=crop&w=1200&q=85",tip:"Liên hệ tiến bộ kỹ thuật với sự thay đổi năng suất lao động và tổ chức sản xuất."},
- {id:5,topic:5,lesson:"Cuộc cách mạng công nghiệp lần thứ nhất",type:"video",title:"Cách mạng công nghiệp lần thứ nhất",period:"Thế kỉ XVIII–XIX",place:"Châu Âu",desc:"Video minh họa bối cảnh, phát minh và tác động của quá trình công nghiệp hóa.",source:"Thay bằng liên kết video giáo dục đã kiểm chứng",url:"",img:"https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=85",tip:"Khi xem, ghi lại ba phát minh tiêu biểu và một tác động kinh tế – xã hội."},
- {id:6,topic:1,lesson:"Văn minh Hy Lạp – La Mã cổ đại",type:"image",title:"Kiến trúc đền thờ Hy Lạp cổ đại",period:"Cổ đại",place:"Hy Lạp",desc:"Tư liệu hình ảnh về kiến trúc và nghệ thuật của thế giới Hy Lạp cổ đại.",source:"Cần xác minh địa điểm và nguồn ảnh cụ thể",url:"",img:"https://images.unsplash.com/photo-1603565816030-6b389eeb23cb?auto=format&fit=crop&w=1200&q=85",tip:"Quan sát các cột và tỉ lệ kiến trúc, liên hệ với thành tựu nghệ thuật cổ đại."},
- {id:7,topic:1,lesson:"Văn minh Ai Cập cổ đại",type:"text",title:"Kim tự tháp và quyền lực nhà vua",period:"Cổ đại",place:"Ai Cập",desc:"Tư liệu đọc thêm về công trình kiến trúc và tổ chức xã hội Ai Cập cổ đại.",source:"Cần bổ sung nguồn học thuật cụ thể",url:"",img:"https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?auto=format&fit=crop&w=1000&q=80",tip:"Xác định thông tin về tổ chức lao động, quyền lực nhà vua và tín ngưỡng."},
- {id:8,topic:3,lesson:"Văn minh Ấn Độ",type:"video",title:"Di sản văn minh Ấn Độ",period:"Cổ – trung đại",place:"Ấn Độ",desc:"Video giới thiệu một số di sản kiến trúc và văn hóa tiêu biểu.",source:"Thay bằng liên kết video đã kiểm chứng",url:"",img:"https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=85",tip:"Ghi lại các yếu tố tôn giáo, nghệ thuật và giao lưu văn hóa được nhắc tới."}
-];
-const typeNames={image:"Hình ảnh",text:"Văn bản",video:"Video"};
-const app=document.getElementById("app");
-let currentPage="home", currentTopic=4, activeType="all", searchTerm="", editMode=false;
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function setActive(page){document.querySelectorAll("[data-page]").forEach(el=>el.classList.toggle("active",el.dataset.page===page));}
-function renderHome(){
- app.innerHTML=`
+  <script>
+    const topics = [
+      { id: 1, title: "Thế giới cổ đại", img: "https://images.unsplash.com/photo-1603565816030-6b389eeb23cb?auto=format&fit=crop&w=800&q=80", desc: "Những nền văn minh đầu tiên và di sản của thế giới cổ đại." },
+      { id: 2, title: "Thế giới trung đại", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80", desc: "Các xã hội, nhà nước và thành tựu văn hóa thời trung đại." },
+      { id: 3, title: "Một số nền văn minh châu Á", img: "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80", desc: "Khám phá những trung tâm văn minh lớn ở châu Á." },
+      { id: 4, title: "Văn minh Đông Nam Á", img: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?auto=format&fit=crop&w=800&q=80", desc: "Di sản, giao lưu và thành tựu của các nền văn minh Đông Nam Á." },
+      { id: 5, title: "Các cuộc cách mạng công nghiệp", img: "https://images.unsplash.com/photo-1516937941344-00b4e0337589?auto=format&fit=crop&w=800&q=80", desc: "Những chuyển biến về khoa học, công nghệ, kinh tế và xã hội." },
+      { id: 6, title: "Thế giới hiện đại", img: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=800&q=80", desc: "Các biến đổi và vấn đề nổi bật của thế giới hiện đại." },
+      { id: 7, title: "Việt Nam trong lịch sử thế giới", img: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80", desc: "Việt Nam trong dòng chảy lịch sử khu vực và thế giới." }
+    ];
+    let resources = [
+      { id: 1, topic: 4, lesson: "Văn minh Đông Nam Á thời cổ – trung đại", type: "image", title: "Đền Angkor Wat", period: "Thời trung đại", place: "Campuchia", desc: "Quần thể đền Angkor Wat là một thành tựu kiến trúc tiêu biểu của vương quốc Khmer.", source: "UNESCO World Heritage Centre", url: "https://whc.unesco.org/en/list/668/", img: "https://images.unsplash.com/photo-1604999333679-b86d54738315?auto=format&fit=crop&w=1200&q=85", tip: "Quan sát bố cục kiến trúc, hệ thống tháp và phù điêu để tìm hiểu đặc điểm văn minh Khmer." },
+      { id: 2, topic: 4, lesson: "Văn minh Đông Nam Á thời cổ – trung đại", type: "image", title: "Bản đồ khu vực Đông Nam Á", period: "Cổ – trung đại", place: "Đông Nam Á", desc: "Lược đồ giúp xác định vị trí địa lý và các tuyến giao lưu trong khu vực.", source: "Bổ sung nguồn bản đồ chính xác trước khi sử dụng", url: "", img: "https://images.unsplash.com/photo-1524666041070-9a876833e706?auto=format&fit=crop&w=1200&q=85", tip: "Dùng bản đồ để xác định vị trí, đường biển và điều kiện giao lưu giữa các khu vực." },
+      { id: 3, topic: 4, lesson: "Văn minh Đông Nam Á thời cổ – trung đại", type: "text", title: "Giao lưu thương mại đường biển", period: "Cổ – trung đại", place: "Đông Nam Á", desc: "Tư liệu đọc thêm về vai trò của các tuyến hàng hải trong giao lưu kinh tế, văn hóa.", source: "Cần bổ sung tác giả, ấn phẩm và trang trích dẫn", url: "", img: "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1000&q=80", tip: "Phân tích tư liệu để chỉ ra vai trò của giao lưu thương mại đối với sự phát triển văn minh." },
+      { id: 4, topic: 5, lesson: "Cuộc cách mạng công nghiệp lần thứ nhất", type: "image", title: "Máy hơi nước và công nghiệp hóa", period: "Thế kỉ XVIII–XIX", place: "Anh", desc: "Hình ảnh minh họa sự chuyển đổi công nghệ trong sản xuất thời kỳ cách mạng công nghiệp.", source: "Cần kiểm chứng nguồn ảnh và thông tin hiện vật", url: "", img: "https://images.unsplash.com/photo-1516937941344-00b4e0337589?auto=format&fit=crop&w=1200&q=85", tip: "Liên hệ tiến bộ kỹ thuật với sự thay đổi năng suất lao động và tổ chức sản xuất." },
+      { id: 5, topic: 5, lesson: "Cuộc cách mạng công nghiệp lần thứ nhất", type: "video", title: "Cách mạng công nghiệp lần thứ nhất", period: "Thế kỉ XVIII–XIX", place: "Châu Âu", desc: "Video minh họa bối cảnh, phát minh và tác động của quá trình công nghiệp hóa.", source: "Thay bằng liên kết video giáo dục đã kiểm chứng", url: "", img: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=85", tip: "Khi xem, ghi lại ba phát minh tiêu biểu và một tác động kinh tế – xã hội." },
+      { id: 6, topic: 1, lesson: "Văn minh Hy Lạp – La Mã cổ đại", type: "image", title: "Kiến trúc đền thờ Hy Lạp cổ đại", period: "Cổ đại", place: "Hy Lạp", desc: "Tư liệu hình ảnh về kiến trúc và nghệ thuật của thế giới Hy Lạp cổ đại.", source: "Cần xác minh địa điểm và nguồn ảnh cụ thể", url: "", img: "https://images.unsplash.com/photo-1603565816030-6b389eeb23cb?auto=format&fit=crop&w=1200&q=85", tip: "Quan sát các cột và tỉ lệ kiến trúc, liên hệ với thành tựu nghệ thuật cổ đại." },
+      { id: 7, topic: 1, lesson: "Văn minh Ai Cập cổ đại", type: "text", title: "Kim tự tháp và quyền lực nhà vua", period: "Cổ đại", place: "Ai Cập", desc: "Tư liệu đọc thêm về công trình kiến trúc và tổ chức xã hội Ai Cập cổ đại.", source: "Cần bổ sung nguồn học thuật cụ thể", url: "", img: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?auto=format&fit=crop&w=1000&q=80", tip: "Xác định thông tin về tổ chức lao động, quyền lực nhà vua và tín ngưỡng." },
+      { id: 8, topic: 3, lesson: "Văn minh Ấn Độ", type: "video", title: "Di sản văn minh Ấn Độ", period: "Cổ – trung đại", place: "Ấn Độ", desc: "Video giới thiệu một số di sản kiến trúc và văn hóa tiêu biểu.", source: "Thay bằng liên kết video đã kiểm chứng", url: "", img: "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=85", tip: "Ghi lại các yếu tố tôn giáo, nghệ thuật và giao lưu văn hóa được nhắc tới." }
+    ];
+    const typeNames = { image: "Hình ảnh", text: "Văn bản", video: "Video" };
+    const app = document.getElementById("app");
+    let currentPage = "home", currentTopic = 4, activeType = "all", searchTerm = "", editMode = false;
+    const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    function setActive(page) { document.querySelectorAll("[data-page]").forEach(el => el.classList.toggle("active", el.dataset.page === page)); }
+    function renderHome() {
+      app.innerHTML = `
  <section class="hero"><div class="hero-copy"><div class="eyebrow">Kho học liệu số · Lịch sử lớp 10</div><h1>Khám phá lịch sử<br>qua những <span style="color:#f5c56d">tư liệu sống động</span></h1><p>Không gian tư liệu trực quan, dễ tìm kiếm, hỗ trợ giáo viên dạy học và học sinh chủ động khám phá lịch sử.</p><div class="searchbox"><span>⌕</span><input id="homeSearch" placeholder="Tìm bài học, sự kiện, nhân vật, tư liệu..." value="${esc(searchTerm)}"><button id="homeSearchBtn">Tìm kiếm →</button></div></div><div class="hero-badge">⌂</div></section>
  <div class="section-head"><div><h2>Các chủ đề Lịch sử 10</h2><p>Chọn một chủ đề để khám phá bài học và tư liệu liên quan.</p></div><button class="textlink" data-page="topics">Xem tất cả →</button></div>
- <section class="topic-grid">${topics.map(t=>`<article class="topic-card" data-topic="${t.id}"><span class="topic-num">CHỦ ĐỀ ${t.id}</span><img src="${t.img}" alt="${esc(t.title)}"><div class="topic-title">${esc(t.title)}</div></article>`).join("")}</section>
+ <section class="topic-grid">${topics.map(t => `<article class="topic-card" data-topic="${t.id}"><span class="topic-num">CHỦ ĐỀ ${t.id}</span><img src="${t.img}" alt="${esc(t.title)}"><div class="topic-title">${esc(t.title)}</div></article>`).join("")}</section>
  <div class="section-head"><div><h2>Tư liệu nổi bật</h2><p>Một vài tư liệu mẫu trong kho học liệu.</p></div><button class="textlink" data-page="library">Mở kho tư liệu →</button></div>
- <section class="resource-grid">${resources.slice(0,3).map(resourceCard).join("")}</section>
+ <section class="resource-grid">${resources.slice(0, 3).map(resourceCard).join("")}</section>
  <section class="quick-grid"><div class="quick-card"><div class="quick-icon">▤</div><div><strong>Kho tư liệu có hệ thống</strong><small>Hình ảnh, văn bản và video được phân loại theo bài học.</small></div></div><div class="quick-card"><div class="quick-icon">⌕</div><div><strong>Tìm kiếm nhanh chóng</strong><small>Tìm theo từ khóa, chủ đề hoặc loại tư liệu.</small></div></div><div class="quick-card"><div class="quick-icon">♧</div><div><strong>Hỗ trợ dạy và học</strong><small>Thông tin nguồn và gợi ý khai thác tư liệu.</small></div></div></section>
  ${footer()}`;
- bindCommon();
- document.getElementById("homeSearchBtn").onclick=()=>{searchTerm=document.getElementById("homeSearch").value.trim();renderLibrary();};
- document.getElementById("homeSearch").addEventListener("keydown",e=>{if(e.key==="Enter"){searchTerm=e.target.value.trim();renderLibrary();}});
-}
-function resourceCard(r){
- return `<article class="resource-card"><div class="resource-image"><img src="${r.img}" alt="${esc(r.title)}" loading="lazy"><span class="type-badge">${typeNames[r.type]}</span>${r.type==="video"?'<span class="play-mark">▶</span>':""}</div><div class="resource-body"><h3>${esc(r.title)}</h3><p>${esc(r.desc)}</p><div class="meta">${esc(r.period)}${r.place?" · "+esc(r.place):""}</div><div class="card-actions"><button class="primary-btn" data-resource="${r.id}">Xem chi tiết ↗</button><button class="secondary-btn" data-copy="${r.id}">Sao chép trích dẫn</button></div></div></article>`;
-}
-function renderTopics(){
- app.innerHTML=`<section class="page-head"><div class="breadcrumb">Trang chủ　›　Chủ đề học tập</div><h1>Chủ đề học tập</h1><p>Khám phá các chủ đề và bài học trong chương trình Lịch sử lớp 10.</p></section><div class="toolbar"><div class="searchbox"><span>⌕</span><input id="topicSearch" placeholder="Tìm chủ đề..." value="${esc(searchTerm)}"></div></div><section class="topic-grid" id="topicList">${topics.filter(t=>t.title.toLowerCase().includes(searchTerm.toLowerCase())).map(t=>`<article class="topic-card" data-topic="${t.id}"><span class="topic-num">CHỦ ĐỀ ${t.id}</span><img src="${t.img}" alt="${esc(t.title)}"><div class="topic-title">${esc(t.title)}</div></article>`).join("")}</section>${footer()}`;
- bindCommon();document.getElementById("topicSearch").addEventListener("input",e=>{searchTerm=e.target.value;renderTopics();const el=document.getElementById("topicSearch");el.focus();el.setSelectionRange(el.value.length,el.value.length);});
-}
-function renderLibrary(){
- let filtered=resources.filter(r=>(activeType==="all"||r.type===activeType)&&(`${r.title} ${r.desc} ${r.lesson} ${r.period} ${r.place}`.toLowerCase().includes(searchTerm.toLowerCase())));
- app.innerHTML=`<section class="page-head"><div class="breadcrumb">Trang chủ　›　Kho tư liệu</div><h1>Kho tư liệu Lịch sử 10</h1><p>Tìm kiếm, lọc và khám phá các tư liệu phục vụ dạy học và học tập.</p></section>
- <div class="toolbar"><div class="searchbox"><span>⌕</span><input id="librarySearch" placeholder="Tìm tên tư liệu, sự kiện, địa danh..." value="${esc(searchTerm)}"></div><select class="filter-select" id="topicFilter"><option value="all">Tất cả chủ đề</option>${topics.map(t=>`<option value="${t.id}" ${String(currentTopic)===String(t.id)?"selected":""}>Chủ đề ${t.id}: ${esc(t.title)}</option>`).join("")}</select></div>
- <div class="pills"><button class="pill ${activeType==="all"?"active":""}" data-type="all">Tất cả tư liệu</button><button class="pill ${activeType==="image"?"active":""}" data-type="image">▧ Hình ảnh</button><button class="pill ${activeType==="text"?"active":""}" data-type="text">▤ Văn bản</button><button class="pill ${activeType==="video"?"active":""}" data-type="video">▷ Video</button></div>
- <div class="section-head"><div><h2>Kết quả tư liệu</h2><p>${filtered.length} tư liệu khớp với tiêu chí tìm kiếm.</p></div></div><section class="resource-grid">${filtered.length?filtered.map(resourceCard).join(""):'<div class="empty">Không tìm thấy tư liệu phù hợp. Hãy thử từ khóa khác.</div>'}</section>${footer()}`;
- bindCommon();
- document.getElementById("librarySearch").addEventListener("input",e=>{searchTerm=e.target.value;const pos=e.target.selectionStart;renderLibrary();const el=document.getElementById("librarySearch");el.focus();el.setSelectionRange(pos,pos);});
- document.getElementById("topicFilter").onchange=e=>{const v=e.target.value; if(v!=="all"){currentTopic=Number(v); const match=resources.filter(r=>r.topic===currentTopic); if(match.length){searchTerm="";} }else currentTopic="all";renderLibrary();};
- document.querySelectorAll("[data-type]").forEach(b=>b.onclick=()=>{activeType=b.dataset.type;renderLibrary();});
-}
-function renderLesson(topicId=4){
- const t=topics.find(x=>x.id===topicId)||topics[3];
- const lessonName=resources.find(r=>r.topic===topicId)?.lesson||t.title;
- const rs=resources.filter(r=>r.topic===topicId);
- app.innerHTML=`<section class="page-head"><div class="breadcrumb">Trang chủ　›　Chủ đề ${t.id}　›　Bài học</div><h1>${esc(lessonName)}</h1><p>Khám phá tư liệu lịch sử, nguồn tham khảo và gợi ý khai thác.</p></section>
+      bindCommon();
+      document.getElementById("homeSearchBtn").onclick = () => { searchTerm = document.getElementById("homeSearch").value.trim(); renderLibrary(); };
+      document.getElementById("homeSearch").addEventListener("keydown", e => { if (e.key === "Enter") { searchTerm = e.target.value.trim(); renderLibrary(); } });
+    }
+    function resourceCard(r) {
+      return `<article class="resource-card"><div class="resource-image"><img src="${r.img}" alt="${esc(r.title)}" loading="lazy"><span class="type-badge">${typeNames[r.type]}</span>${r.type === "video" ? '<span class="play-mark">▶</span>' : ""}</div><div class="resource-body"><h3>${esc(r.title)}</h3><p>${esc(r.desc)}</p><div class="meta">${esc(r.period)}${r.place ? " · " + esc(r.place) : ""}</div><div class="card-actions"><button class="primary-btn" data-resource="${r.id}">Xem chi tiết ↗</button><button class="secondary-btn" data-copy="${r.id}">Sao chép trích dẫn</button></div></div></article>`;
+    }
+    function renderTopics() {
+      app.innerHTML = `<section class="page-head"><div class="breadcrumb">Trang chủ　›　Chủ đề học tập</div><h1>Chủ đề học tập</h1><p>Khám phá các chủ đề và bài học trong chương trình Lịch sử lớp 10.</p></section><div class="toolbar"><div class="searchbox"><span>⌕</span><input id="topicSearch" placeholder="Tìm chủ đề..." value="${esc(searchTerm)}"></div></div><section class="topic-grid" id="topicList">${topics.filter(t => t.title.toLowerCase().includes(searchTerm.toLowerCase())).map(t => `<article class="topic-card" data-topic="${t.id}"><span class="topic-num">CHỦ ĐỀ ${t.id}</span><img src="${t.img}" alt="${esc(t.title)}"><div class="topic-title">${esc(t.title)}</div></article>`).join("")}</section>${footer()}`;
+      bindCommon(); document.getElementById("topicSearch").addEventListener("input", e => { searchTerm = e.target.value; renderTopics(); const el = document.getElementById("topicSearch"); el.focus(); el.setSelectionRange(el.value.length, el.value.length); });
+    }
+    function renderLibrary() {
+      let filtered = resources.filter(r => (activeType === "all" || r.type === activeType) && (`${r.title} ${r.desc} ${r.lesson} ${r.period} ${r.place}`.toLowerCase().includes(searchTerm.toLowerCase())));
+      app.innerHTML = `<section class="page-head"><div class="breadcrumb">Trang chủ　›　Kho tư liệu</div><h1>Kho tư liệu Lịch sử 10</h1><p>Tìm kiếm, lọc và khám phá các tư liệu phục vụ dạy học và học tập.</p></section>
+ <div class="toolbar"><div class="searchbox"><span>⌕</span><input id="librarySearch" placeholder="Tìm tên tư liệu, sự kiện, địa danh..." value="${esc(searchTerm)}"></div><select class="filter-select" id="topicFilter"><option value="all">Tất cả chủ đề</option>${topics.map(t => `<option value="${t.id}" ${String(currentTopic) === String(t.id) ? "selected" : ""}>Chủ đề ${t.id}: ${esc(t.title)}</option>`).join("")}</select></div>
+ <div class="pills"><button class="pill ${activeType === "all" ? "active" : ""}" data-type="all">Tất cả tư liệu</button><button class="pill ${activeType === "image" ? "active" : ""}" data-type="image">▧ Hình ảnh</button><button class="pill ${activeType === "text" ? "active" : ""}" data-type="text">▤ Văn bản</button><button class="pill ${activeType === "video" ? "active" : ""}" data-type="video">▷ Video</button></div>
+ <div class="section-head"><div><h2>Kết quả tư liệu</h2><p>${filtered.length} tư liệu khớp với tiêu chí tìm kiếm.</p></div></div><section class="resource-grid">${filtered.length ? filtered.map(resourceCard).join("") : '<div class="empty">Không tìm thấy tư liệu phù hợp. Hãy thử từ khóa khác.</div>'}</section>${footer()}`;
+      bindCommon();
+      document.getElementById("librarySearch").addEventListener("input", e => { searchTerm = e.target.value; const pos = e.target.selectionStart; renderLibrary(); const el = document.getElementById("librarySearch"); el.focus(); el.setSelectionRange(pos, pos); });
+      document.getElementById("topicFilter").onchange = e => { const v = e.target.value; if (v !== "all") { currentTopic = Number(v); const match = resources.filter(r => r.topic === currentTopic); if (match.length) { searchTerm = ""; } } else currentTopic = "all"; renderLibrary(); };
+      document.querySelectorAll("[data-type]").forEach(b => b.onclick = () => { activeType = b.dataset.type; renderLibrary(); });
+    }
+    function renderLesson(topicId = 4) {
+      const t = topics.find(x => x.id === topicId) || topics[3];
+      const lessonName = resources.find(r => r.topic === topicId)?.lesson || t.title;
+      const rs = resources.filter(r => r.topic === topicId);
+      app.innerHTML = `<section class="page-head"><div class="breadcrumb">Trang chủ　›　Chủ đề ${t.id}　›　Bài học</div><h1>${esc(lessonName)}</h1><p>Khám phá tư liệu lịch sử, nguồn tham khảo và gợi ý khai thác.</p></section>
  <div class="lesson-tabs"><button class="active" data-ltab="overview">Tổng quan</button><button data-ltab="image">Hình ảnh</button><button data-ltab="text">Văn bản</button><button data-ltab="video">Video</button><button data-ltab="guide">Hỗ trợ học tập</button></div>
- <div id="lessonContent"><div class="lesson-layout"><div><section class="panel"><h2>Giới thiệu bài học</h2><p>${esc(t.desc)} Trang này tập hợp các tư liệu mẫu để người dùng tham khảo, đối chiếu nguồn và khai thác trong hoạt động dạy học.</p><div class="highlight">✦ <strong>Gợi ý học tập:</strong> Quan sát tư liệu, xác định thông tin có thể kiểm chứng, đối chiếu với sách giáo khoa và ghi rõ nguồn khi sử dụng.</div></section><section class="panel"><h2>Tư liệu trong bài học</h2><div class="resource-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">${rs.map(resourceCard).join("")||'<div class="empty">Nhóm có thể bổ sung tư liệu cho bài học này.</div>'}</div></section></div><div><section class="panel"><h2>Nội dung cần tìm hiểu</h2><ul><li>Bối cảnh lịch sử và điều kiện hình thành.</li><li>Những thành tựu tiêu biểu.</li><li>Đặc điểm và giá trị lịch sử.</li><li>Giao lưu, tiếp biến văn hóa và ảnh hưởng.</li></ul></section><section class="panel"><h2>Thông tin sử dụng tư liệu</h2><p>Kiểm tra nguồn, tác giả, niên đại và bản quyền trước khi đưa tư liệu vào bài giảng hoặc bài tập.</p><div class="highlight">Các tư liệu minh họa chưa có nguồn xác minh được đánh dấu để nhóm hoàn thiện trước khi công bố.</div></section></div></div></div>${footer()}`;
- bindCommon();
- document.querySelectorAll("[data-ltab]").forEach(b=>b.onclick=()=>{
-  document.querySelectorAll("[data-ltab]").forEach(x=>x.classList.toggle("active",x===b));
-  const type=b.dataset.ltab;
-  if(type==="overview"){renderLesson(topicId);return;}
-  if(type==="guide"){document.getElementById("lessonContent").innerHTML=`<section class="panel"><h2>Gợi ý khai thác tư liệu</h2><ol><li>Tư liệu cho biết thông tin gì về đối tượng lịch sử?</li><li>Tư liệu được tạo ra vào thời điểm nào, bởi ai hoặc tổ chức nào?</li><li>Thông tin nào có thể kiểm chứng từ nguồn khác?</li><li>Tư liệu giúp làm rõ nội dung nào trong bài học?</li></ol><div class="highlight">Giáo viên có thể sử dụng các câu hỏi này để tổ chức hoạt động quan sát, đọc hiểu, thảo luận và trình bày kết quả.</div></section>`;return;}
-  let list=rs.filter(r=>r.type===type);
-  document.getElementById("lessonContent").innerHTML=`<section class="panel"><h2>${typeNames[type]} trong bài học</h2><div class="resource-grid">${list.length?list.map(resourceCard).join(""):'<div class="empty">Chưa có tư liệu loại này. Hãy bổ sung tư liệu ở chế độ chỉnh sửa.</div>'}</div></section>`;
-  bindCommon();
- });
-}
-function renderInfo(page){
- const data={
- teachers:["Dành cho giáo viên","Tìm kiếm và lựa chọn tư liệu theo mục tiêu bài học; kiểm tra nguồn trước khi sử dụng; kết hợp hình ảnh, văn bản và video để tổ chức hoạt động học tập.","Gợi ý sử dụng","• Dùng bộ lọc để tìm tư liệu phù hợp với bài dạy.<br>• Đặt câu hỏi giúp học sinh quan sát, phân tích và đối chiếu tư liệu.<br>• Ghi nguồn đầy đủ trong bài giảng và học liệu."],
- students:["Dành cho học sinh","Chủ động tìm kiếm, đọc và phân tích tư liệu để mở rộng kiến thức, chuẩn bị bài học và thực hiện nhiệm vụ học tập.","Cách học với tư liệu","• Bắt đầu từ câu hỏi hoặc chủ đề cần tìm hiểu.<br>• Ghi lại thông tin chính và xuất xứ tư liệu.<br>• Đối chiếu nhiều nguồn trước khi kết luận."],
- about:["Về Sử Ký Số","Sử Ký Số là mô hình kho tư liệu học tập môn Lịch sử lớp 10, được tổ chức theo chủ đề và bài học, gồm hình ảnh, văn bản và video minh họa.","Nguyên tắc xây dựng","• Phân loại tư liệu rõ ràng.<br>• Ưu tiên nguồn có thể kiểm chứng.<br>• Hỗ trợ cả giáo viên và học sinh.<br>• Không thay thế việc đối chiếu với tài liệu học thuật và sách giáo khoa."]
- };
- const d=data[page]||data.about;
- app.innerHTML=`<section class="page-head"><div class="breadcrumb">Trang chủ　›　${d[0]}</div><h1>${d[0]}</h1><p>${d[1]}</p></section><section class="panel"><h2>${d[2]}</h2><p>${d[3].replaceAll("<br>","<br>")}</p></section>${footer()}`;bindCommon();
-}
-function footer(){return `<footer><span>© 2026 Sử Ký Số · Kho tư liệu Lịch sử 10</span><span>Bản demo có thể chỉnh sửa · Kiểm chứng nguồn tư liệu trước khi sử dụng</span></footer>`;}
-function bindCommon(){
- document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>go(b.dataset.page));
- document.querySelectorAll("[data-topic]").forEach(b=>b.onclick=()=>{currentTopic=Number(b.dataset.topic);renderLesson(currentTopic);currentPage="lesson";setActive("topics");});
- document.querySelectorAll("[data-resource]").forEach(b=>b.onclick=()=>openResource(Number(b.dataset.resource)));
- document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=()=>{const r=resources.find(x=>x.id===Number(b.dataset.copy));const citation=`${r.title}. ${r.source}. ${r.url}`;navigator.clipboard?.writeText(citation).then(()=>alert("Đã sao chép thông tin trích dẫn mẫu." )).catch(()=>prompt("Sao chép thông tin này:",citation));});
-}
-function go(page){currentPage=page;setActive(page);if(page==="home")renderHome();else if(page==="topics")renderTopics();else if(page==="library")renderLibrary();else if(page==="lesson")renderLesson(currentTopic);else renderInfo(page);}
-function openResource(id){
- const r=resources.find(x=>x.id===id);if(!r)return;
- document.getElementById("modalContent").innerHTML=`<img src="${r.img}" alt="${esc(r.title)}"><div class="modal-content"><div class="modal-top"><span class="modal-label">${typeNames[r.type]}</span><button class="close" id="closeModal">×</button></div><h2>${esc(r.title)}</h2><p>${esc(r.desc)}</p><p><strong>Thời kỳ:</strong> ${esc(r.period||"Chưa xác định")}<br><strong>Địa điểm:</strong> ${esc(r.place||"Chưa xác định")}</p><div class="source-box"><strong>Thông tin nguồn</strong><br>${esc(r.source||"Chưa bổ sung")}<br>${r.url?`<a href="${esc(r.url)}" target="_blank" rel="noopener" style="color:#344d86;word-break:break-word">${esc(r.url)}</a>`:"<em>Chưa có đường dẫn nguồn — cần bổ sung trước khi công bố.</em>"}<div class="edit-hint">Chuyển sang chế độ chỉnh sửa để cập nhật tên, mô tả, nguồn và liên kết.</div></div><div class="highlight"><strong>Gợi ý khai thác</strong><br>${esc(r.tip||"Bổ sung câu hỏi khai thác tư liệu.")}</div><button class="primary-btn" id="editThisResource">✎ Chỉnh sửa tư liệu này</button></div>`;
- document.getElementById("modalBackdrop").classList.add("open");
- document.getElementById("closeModal").onclick=closeModal;
- document.getElementById("editThisResource").onclick=()=>{closeModal();openEditor(r.id);};
-}
-function closeModal(){document.getElementById("modalBackdrop").classList.remove("open");}
-document.getElementById("modalBackdrop").addEventListener("click",e=>{if(e.target.id==="modalBackdrop")closeModal();});
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();});
-function openEditor(id=null){
- const r=id?resources.find(x=>x.id===id):{id:null,topic:currentTopic||4,lesson:"",type:"image",title:"",period:"",place:"",desc:"",source:"",url:"",img:"",tip:""};
- document.getElementById("modalContent").innerHTML=`<div class="modal-content" style="grid-column:1/-1"><div class="modal-top"><span class="modal-label">CHẾ ĐỘ CHỈNH SỬA</span><button class="close" id="closeModal">×</button></div><h2>${id?"Chỉnh sửa tư liệu":"Thêm tư liệu mới"}</h2><p>Thay đổi thông tin bên dưới rồi lưu. Nội dung được lưu trong trình duyệt của thiết bị này.</p><form id="resourceForm"><div class="form-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px"><label style="font-size:12px;font-weight:700">Tên tư liệu<input required name="title" value="${esc(r.title)}" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px"></label><label style="font-size:12px;font-weight:700">Loại tư liệu<select name="type" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px"><option value="image" ${r.type==="image"?"selected":""}>Hình ảnh</option><option value="text" ${r.type==="text"?"selected":""}>Văn bản</option><option value="video" ${r.type==="video"?"selected":""}>Video</option></select></label><label style="font-size:12px;font-weight:700">Chủ đề<select name="topic" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px">${topics.map(t=>`<option value="${t.id}" ${Number(r.topic)===t.id?"selected":""}>${t.id}. ${esc(t.title)}</option>`).join("")}</select></label><label style="font-size:12px;font-weight:700">Bài học<input name="lesson" value="${esc(r.lesson)}" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px"></label><label style="font-size:12px;font-weight:700">Thời kỳ<input name="period" value="${esc(r.period)}" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px"></label><label style="font-size:12px;font-weight:700">Địa điểm<input name="place" value="${esc(r.place)}" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px"></label><label style="font-size:12px;font-weight:700;grid-column:1/-1">Mô tả<textarea name="desc" rows="2" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px">${esc(r.desc)}</textarea></label><label style="font-size:12px;font-weight:700;grid-column:1/-1">Đường dẫn ảnh/video<input name="img" value="${esc(r.img)}" placeholder="https://..." style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px"></label><label style="font-size:12px;font-weight:700;grid-column:1/-1">Tên nguồn<input name="source" value="${esc(r.source)}" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px"></label><label style="font-size:12px;font-weight:700;grid-column:1/-1">Đường dẫn nguồn<input name="url" value="${esc(r.url)}" placeholder="https://..." style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px"></label><label style="font-size:12px;font-weight:700;grid-column:1/-1">Gợi ý khai thác<textarea name="tip" rows="2" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px">${esc(r.tip)}</textarea></label></div><div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap"><button class="primary-btn" type="submit">Lưu tư liệu</button><button class="secondary-btn" type="button" id="cancelEdit">Hủy</button>${id?'<button class="secondary-btn" type="button" id="deleteResource" style="color:#a33">Xóa tư liệu</button>':""}</div></form><p class="edit-hint">Lưu ý: đây là bản demo lưu dữ liệu cục bộ trên trình duyệt. Hãy xuất bản sao lưu JSON thường xuyên.</p></div>`;
- document.getElementById("modalBackdrop").classList.add("open");
- document.getElementById("closeModal").onclick=closeModal;document.getElementById("cancelEdit").onclick=closeModal;
- document.getElementById("resourceForm").onsubmit=e=>{
-  e.preventDefault();const fd=new FormData(e.target);const data=Object.fromEntries(fd.entries());data.id=id||Math.max(0,...resources.map(x=>x.id))+1;data.topic=Number(data.topic);
-  if(!data.img.trim())data.img="https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&w=1200&q=80";
-  if(id){resources=resources.map(x=>x.id===id?data:x);}else resources.push(data);
-  persist();closeModal();go("library");
- };
- const del=document.getElementById("deleteResource");if(del)del.onclick=()=>{if(confirm("Bạn có chắc muốn xóa tư liệu này?")){resources=resources.filter(x=>x.id!==id);persist();closeModal();go("library");}};
-}
-function persist(){try{localStorage.setItem("sukyso_resources",JSON.stringify(resources));}catch(e){}}
-function loadSaved(){try{const s=localStorage.getItem("sukyso_resources");if(s){const parsed=JSON.parse(s);if(Array.isArray(parsed))resources=parsed;}}catch(e){}}
-document.getElementById("editToggle").onclick=()=>{editMode=!editMode;document.getElementById("editToggle").textContent=editMode?"✓":"✎";document.getElementById("editToggle").title=editMode?"Thoát chế độ chỉnh sửa":"Bật chế độ chỉnh sửa";if(editMode){openEditor();}};
-loadSaved();renderHome();
-</script>
+ <div id="lessonContent"><div class="lesson-layout"><div><section class="panel"><h2>Giới thiệu bài học</h2><p>${esc(t.desc)} Trang này tập hợp các tư liệu mẫu để người dùng tham khảo, đối chiếu nguồn và khai thác trong hoạt động dạy học.</p><div class="highlight">✦ <strong>Gợi ý học tập:</strong> Quan sát tư liệu, xác định thông tin có thể kiểm chứng, đối chiếu với sách giáo khoa và ghi rõ nguồn khi sử dụng.</div></section><section class="panel"><h2>Tư liệu trong bài học</h2><div class="resource-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">${rs.map(resourceCard).join("") || '<div class="empty">Nhóm có thể bổ sung tư liệu cho bài học này.</div>'}</div></section></div><div><section class="panel"><h2>Nội dung cần tìm hiểu</h2><ul><li>Bối cảnh lịch sử và điều kiện hình thành.</li><li>Những thành tựu tiêu biểu.</li><li>Đặc điểm và giá trị lịch sử.</li><li>Giao lưu, tiếp biến văn hóa và ảnh hưởng.</li></ul></section><section class="panel"><h2>Thông tin sử dụng tư liệu</h2><p>Kiểm tra nguồn, tác giả, niên đại và bản quyền trước khi đưa tư liệu vào bài giảng hoặc bài tập.</p><div class="highlight">Các tư liệu minh họa chưa có nguồn xác minh được đánh dấu để nhóm hoàn thiện trước khi công bố.</div></section></div></div></div>${footer()}`;
+      bindCommon();
+      document.querySelectorAll("[data-ltab]").forEach(b => b.onclick = () => {
+        document.querySelectorAll("[data-ltab]").forEach(x => x.classList.toggle("active", x === b));
+        const type = b.dataset.ltab;
+        if (type === "overview") { renderLesson(topicId); return; }
+        if (type === "guide") { document.getElementById("lessonContent").innerHTML = `<section class="panel"><h2>Gợi ý khai thác tư liệu</h2><ol><li>Tư liệu cho biết thông tin gì về đối tượng lịch sử?</li><li>Tư liệu được tạo ra vào thời điểm nào, bởi ai hoặc tổ chức nào?</li><li>Thông tin nào có thể kiểm chứng từ nguồn khác?</li><li>Tư liệu giúp làm rõ nội dung nào trong bài học?</li></ol><div class="highlight">Giáo viên có thể sử dụng các câu hỏi này để tổ chức hoạt động quan sát, đọc hiểu, thảo luận và trình bày kết quả.</div></section>`; return; }
+        let list = rs.filter(r => r.type === type);
+        document.getElementById("lessonContent").innerHTML = `<section class="panel"><h2>${typeNames[type]} trong bài học</h2><div class="resource-grid">${list.length ? list.map(resourceCard).join("") : '<div class="empty">Chưa có tư liệu loại này. Hãy bổ sung tư liệu ở chế độ chỉnh sửa.</div>'}</div></section>`;
+        bindCommon();
+      });
+    }
+    function renderInfo(page) {
+      const data = {
+        teachers: ["Dành cho giáo viên", "Tìm kiếm và lựa chọn tư liệu theo mục tiêu bài học; kiểm tra nguồn trước khi sử dụng; kết hợp hình ảnh, văn bản và video để tổ chức hoạt động học tập.", "Gợi ý sử dụng", "• Dùng bộ lọc để tìm tư liệu phù hợp với bài dạy.<br>• Đặt câu hỏi giúp học sinh quan sát, phân tích và đối chiếu tư liệu.<br>• Ghi nguồn đầy đủ trong bài giảng và học liệu."],
+        students: ["Dành cho học sinh", "Chủ động tìm kiếm, đọc và phân tích tư liệu để mở rộng kiến thức, chuẩn bị bài học và thực hiện nhiệm vụ học tập.", "Cách học với tư liệu", "• Bắt đầu từ câu hỏi hoặc chủ đề cần tìm hiểu.<br>• Ghi lại thông tin chính và xuất xứ tư liệu.<br>• Đối chiếu nhiều nguồn trước khi kết luận."],
+        about: ["Về Sử Học Số", "Sử Học Số là mô hình kho tư liệu học tập môn Lịch sử lớp 10, được tổ chức theo chủ đề và bài học, gồm hình ảnh, văn bản và video minh họa.", "Nguyên tắc xây dựng", "• Phân loại tư liệu rõ ràng.<br>• Ưu tiên nguồn có thể kiểm chứng.<br>• Hỗ trợ cả giáo viên và học sinh.<br>• Không thay thế việc đối chiếu với tài liệu học thuật và sách giáo khoa."]
+      };
+      const d = data[page] || data.about;
+      app.innerHTML = `<section class="page-head"><div class="breadcrumb">Trang chủ　›　${d[0]}</div><h1>${d[0]}</h1><p>${d[1]}</p></section><section class="panel"><h2>${d[2]}</h2><p>${d[3].replaceAll("<br>", "<br>")}</p></section>${footer()}`; bindCommon();
+    }
+    function footer() { return `<footer><span>© 2026 Sử Học Số · Kho tư liệu Lịch sử 10</span><span>Bản demo có thể chỉnh sửa · Kiểm chứng nguồn tư liệu trước khi sử dụng</span></footer>`; }
+    function bindCommon() {
+      document.querySelectorAll("[data-page]").forEach(b => b.onclick = () => go(b.dataset.page));
+      document.querySelectorAll("[data-topic]").forEach(b => b.onclick = () => { currentTopic = Number(b.dataset.topic); renderLesson(currentTopic); currentPage = "lesson"; setActive("topics"); });
+      document.querySelectorAll("[data-resource]").forEach(b => b.onclick = () => openResource(Number(b.dataset.resource)));
+      document.querySelectorAll("[data-copy]").forEach(b => b.onclick = () => { const r = resources.find(x => x.id === Number(b.dataset.copy)); const citation = `${r.title}. ${r.source}. ${r.url}`; navigator.clipboard?.writeText(citation).then(() => alert("Đã sao chép thông tin trích dẫn mẫu.")).catch(() => prompt("Sao chép thông tin này:", citation)); });
+    }
+    function go(page) { currentPage = page; setActive(page); if (page === "home") renderHome(); else if (page === "topics") renderTopics(); else if (page === "library") renderLibrary(); else if (page === "lesson") renderLesson(currentTopic); else renderInfo(page); }
+    function openResource(id) {
+      const r = resources.find(x => x.id === id); if (!r) return;
+      document.getElementById("modalContent").innerHTML = `<img src="${r.img}" alt="${esc(r.title)}"><div class="modal-content"><div class="modal-top"><span class="modal-label">${typeNames[r.type]}</span><button class="close" id="closeModal">×</button></div><h2>${esc(r.title)}</h2><p>${esc(r.desc)}</p><p><strong>Thời kỳ:</strong> ${esc(r.period || "Chưa xác định")}<br><strong>Địa điểm:</strong> ${esc(r.place || "Chưa xác định")}</p><div class="source-box"><strong>Thông tin nguồn</strong><br>${esc(r.source || "Chưa bổ sung")}<br>${r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener" style="color:#344d86;word-break:break-word">${esc(r.url)}</a>` : "<em>Chưa có đường dẫn nguồn — cần bổ sung trước khi công bố.</em>"}<div class="edit-hint">Chuyển sang chế độ chỉnh sửa để cập nhật tên, mô tả, nguồn và liên kết.</div></div><div class="highlight"><strong>Gợi ý khai thác</strong><br>${esc(r.tip || "Bổ sung câu hỏi khai thác tư liệu.")}</div><button class="primary-btn" id="editThisResource">✎ Chỉnh sửa tư liệu này</button></div>`;
+      document.getElementById("modalBackdrop").classList.add("open");
+      document.getElementById("closeModal").onclick = closeModal;
+      document.getElementById("editThisResource").onclick = () => { closeModal(); openEditor(r.id); };
+    }
+    function closeModal() { document.getElementById("modalBackdrop").classList.remove("open"); }
+    document.getElementById("modalBackdrop").addEventListener("click", e => { if (e.target.id === "modalBackdrop") closeModal(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+    function openEditor(id = null) {
+      const r = id ? resources.find(x => x.id === id) : { id: null, topic: currentTopic || 4, lesson: "", type: "image", title: "", period: "", place: "", desc: "", source: "", url: "", img: "", tip: "" };
+      document.getElementById("modalContent").innerHTML = `<div class="modal-content" style="grid-column:1/-1"><div class="modal-top"><span class="modal-label">CHẾ ĐỘ CHỈNH SỬA</span><button class="close" id="closeModal">×</button></div><h2>${id ? "Chỉnh sửa tư liệu" : "Thêm tư liệu mới"}</h2><p>Thay đổi thông tin bên dưới rồi lưu. Nội dung được lưu trong trình duyệt của thiết bị này.</p><form id="resourceForm"><div class="form-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px"><label style="font-size:12px;font-weight:700">Tên tư liệu<input required name="title" value="${esc(r.title)}" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px"></label><label style="font-size:12px;font-weight:700">Loại tư liệu<select name="type" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px"><option value="image" ${r.type === "image" ? "selected" : ""}>Hình ảnh</option><option value="text" ${r.type === "text" ? "selected" : ""}>Văn bản</option><option value="video" ${r.type === "video" ? "selected" : ""}>Video</option></select></label><label style="font-size:12px;font-weight:700">Chủ đề<select name="topic" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px">${topics.map(t => `<option value="${t.id}" ${Number(r.topic) === t.id ? "selected" : ""}>${t.id}. ${esc(t.title)}</option>`).join("")}</select></label><label style="font-size:12px;font-weight:700">Bài học<input name="lesson" value="${esc(r.lesson)}" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px"></label><label style="font-size:12px;font-weight:700">Thời kỳ<input name="period" value="${esc(r.period)}" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px"></label><label style="font-size:12px;font-weight:700">Địa điểm<input name="place" value="${esc(r.place)}" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px"></label><label style="font-size:12px;font-weight:700;grid-column:1/-1">Mô tả<textarea name="desc" rows="2" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px">${esc(r.desc)}</textarea></label><label style="font-size:12px;font-weight:700;grid-column:1/-1">Đường dẫn ảnh/video<input name="img" value="${esc(r.img)}" placeholder="https://..." style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px"></label><label style="font-size:12px;font-weight:700;grid-column:1/-1">Tên nguồn<input name="source" value="${esc(r.source)}" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px"></label><label style="font-size:12px;font-weight:700;grid-column:1/-1">Đường dẫn nguồn<input name="url" value="${esc(r.url)}" placeholder="https://..." style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px"></label><label style="font-size:12px;font-weight:700;grid-column:1/-1">Gợi ý khai thác<textarea name="tip" rows="2" style="display:block;width:100%;padding:11px;border:1px solid #dce2ee;border-radius:9px;margin-top:6px">${esc(r.tip)}</textarea></label></div><div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap"><button class="primary-btn" type="submit">Lưu tư liệu</button><button class="secondary-btn" type="button" id="cancelEdit">Hủy</button>${id ? '<button class="secondary-btn" type="button" id="deleteResource" style="color:#a33">Xóa tư liệu</button>' : ""}</div></form><p class="edit-hint">Lưu ý: đây là bản demo lưu dữ liệu cục bộ trên trình duyệt. Hãy xuất bản sao lưu JSON thường xuyên.</p></div>`;
+      document.getElementById("modalBackdrop").classList.add("open");
+      document.getElementById("closeModal").onclick = closeModal; document.getElementById("cancelEdit").onclick = closeModal;
+      document.getElementById("resourceForm").onsubmit = e => {
+        e.preventDefault(); const fd = new FormData(e.target); const data = Object.fromEntries(fd.entries()); data.id = id || Math.max(0, ...resources.map(x => x.id)) + 1; data.topic = Number(data.topic);
+        if (!data.img.trim()) data.img = "https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&w=1200&q=80";
+        if (id) { resources = resources.map(x => x.id === id ? data : x); } else resources.push(data);
+        persist(); closeModal(); go("library");
+      };
+      const del = document.getElementById("deleteResource"); if (del) del.onclick = () => { if (confirm("Bạn có chắc muốn xóa tư liệu này?")) { resources = resources.filter(x => x.id !== id); persist(); closeModal(); go("library"); } };
+    }
+    function persist() { try { localStorage.setItem("sukyso_resources", JSON.stringify(resources)); } catch (e) { } }
+    function loadSaved() { try { const s = localStorage.getItem("sukyso_resources"); if (s) { const parsed = JSON.parse(s); if (Array.isArray(parsed)) resources = parsed; } } catch (e) { } }
+    document.getElementById("editToggle").onclick = () => { editMode = !editMode; document.getElementById("editToggle").textContent = editMode ? "✓" : "✎"; document.getElementById("editToggle").title = editMode ? "Thoát chế độ chỉnh sửa" : "Bật chế độ chỉnh sửa"; if (editMode) { openEditor(); } };
+    loadSaved(); renderHome();
+  </script>
 </body>
+
 </html>

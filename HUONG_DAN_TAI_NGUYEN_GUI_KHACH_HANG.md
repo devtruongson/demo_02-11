@@ -1,5 +1,5 @@
 # TÀI LIỆU YÊU CẦU CUNG CẤP TÀI NGUYÊN KỸ THUẬT
-## HỆ THỐNG HỌC LIỆU SỐ & MÔ PHỎNG 3D — SỬ KÝ SỐ (LỊCH SỬ 10)
+## HỆ THỐNG HỌC LIỆU SỐ & MÔ PHỎNG 3D — Sử Học Số (LỊCH SỬ 10)
 
 Kính gửi: **Quý Khách Hàng / Ban Quản Trị Dự Án**,
 
@@ -26,7 +26,7 @@ Kính gửi: **Quý Khách Hàng / Ban Quản Trị Dự Án**,
   * Vào menu bên trái: Chọn **APIs & Services** ➔ Chọn **OAuth consent screen**.
   * Chọn loại User Type: **External** (Người dùng ngoài) ➔ Bấm **Create**.
   * Nhập thông tin cơ bản:
-    * **App name (Tên ứng dụng):** `Sử Ký Số - Lịch Sử 10`
+    * **App name (Tên ứng dụng):** `Sử Học Số - Lịch Sử 10`
     * **User support email (Email hỗ trợ):** Chọn email của Quý khách.
     * **Developer contact information:** Nhập email kỹ thuật của Quý khách.
   * Bấm **Save and Continue** qua các bước Scopes (Phạm vi) đến khi hoàn tất.
@@ -34,7 +34,7 @@ Kính gửi: **Quý Khách Hàng / Ban Quản Trị Dự Án**,
   * Tại menu bên trái, chọn mục **Credentials (Thông tin xác thực)**.
   * Bấm nút **+ CREATE CREDENTIALS** ở phía trên ➔ Chọn **OAuth client ID**.
   * Chọn **Application type:** `Web application`.
-  * Đặt tên: `Sử Ký Số Web Client`.
+  * Đặt tên: `Sử Học Số Web Client`.
   * Tại mục **Authorized JavaScript origins (Nguồn gốc JavaScript được ủy quyền)**, bấm **+ ADD URI** và nhập 2 địa chỉ:
     * `https://kysu.fstack.asia` (Địa chỉ web chính thức khi chạy online)
     * `http://localhost:3000` (Địa chỉ test nội bộ khi duyệt bài)
@@ -61,7 +61,7 @@ Dành cho học sinh muốn liên kết tài khoản mạng xã hội Facebook �
 * **Bước 1:** Truy cập [https://developers.facebook.com](https://developers.facebook.com) và đăng nhập bằng tài khoản Facebook của quản trị viên.
 * **Bước 2:** Bấm vào **My Apps (Ứng dụng của tôi)** ở góc trên bên phải ➔ Bấm **Create App (Tạo ứng dụng)**.
 * **Bước 3:** Chọn mục đích sử dụng: Chọn **Authenticate and request data from users with Facebook Login (Đăng nhập bằng Facebook)** ➔ Bấm **Next**.
-* **Bước 4:** Chọn loại ứng dụng: **Website** ➔ Đặt tên hiển thị ứng dụng: `Sử Ký Số` ➔ Nhập email liên hệ ➔ Bấm **Create App**.
+* **Bước 4:** Chọn loại ứng dụng: **Website** ➔ Đặt tên hiển thị ứng dụng: `Sử Học Số` ➔ Nhập email liên hệ ➔ Bấm **Create App**.
 * **Bước 5: Cài đặt miền hợp lệ:**
   * Vào menu **App Settings (Cài đặt ứng dụng)** ➔ **Basic (Cơ bản)**.
   * Nhập mục **App Domains (Miền ứng dụng):** `kysu.fstack.asia`

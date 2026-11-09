@@ -3026,7 +3026,7 @@ async function initContactsTable() {
           full_name: 'Thầy Nguyễn Hữu Đức',
           email: 'huuduc.history@gmail.com',
           phone: '0912345678',
-          content: 'Kính gửi Ban biên tập Sử Ký Số. Tôi là giáo viên Lịch sử trường THPT Chuyên Hà Nội - Amsterdam. Tôi muốn xin phép trích xuất các tư liệu và liên kết mô hình 3D Trống đồng Ngọc Lũ vào giáo án điện tử thao giảng cấp tỉnh sắp tới. Rất mong nhận được phản hồi hỗ trợ của quý Ban.',
+          content: 'Kính gửi Ban biên tập Sử Học Số. Tôi là giáo viên Lịch sử trường THPT Chuyên Hà Nội - Amsterdam. Tôi muốn xin phép trích xuất các tư liệu và liên kết mô hình 3D Trống đồng Ngọc Lũ vào giáo án điện tử thao giảng cấp tỉnh sắp tới. Rất mong nhận được phản hồi hỗ trợ của quý Ban.',
           status: 'new'
         },
         {
@@ -3085,7 +3085,7 @@ app.post('/api/contacts', async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Gửi thông tin liên hệ thành công! Ban biên tập Sử Ký Số sẽ tiếp nhận và phản hồi sớm nhất.',
+      message: 'Gửi thông tin liên hệ thành công! Ban biên tập Sử Học Số sẽ tiếp nhận và phản hồi sớm nhất.',
       id: result.insertId
     });
   } catch (error) {

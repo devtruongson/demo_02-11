@@ -48,7 +48,7 @@ export default function ResourceDetailView({
 
   const handleCopyCitation = () => {
     if (!resource) return;
-    const citation = `Sử Ký Số (2026). "${resource.title}". Cổng học liệu số & Mô phỏng 3D Lịch sử 10 GDPT 2018. Truy xuất từ: ${window.location.href}`;
+    const citation = `Sử Học Số (2026). "${resource.title}". Cổng học liệu số & Mô phỏng 3D Lịch sử 10 GDPT 2018. Truy xuất từ: ${window.location.href}`;
     navigator.clipboard.writeText(citation);
     setCopiedCitation(true);
     setTimeout(() => setCopiedCitation(false), 2000);
@@ -86,7 +86,7 @@ export default function ResourceDetailView({
       .then((data) => {
         setResource(data);
         setDefaultMediaTab(data);
-        fetch(`/api/resources/${resourceId}/view`, { method: 'POST' }).catch(() => {});
+        fetch(`/api/resources/${resourceId}/view`, { method: 'POST' }).catch(() => { });
       })
       .catch((err) => {
         setError(err.message);
@@ -159,17 +159,17 @@ export default function ResourceDetailView({
 
   const relatedResources = resource && allResources
     ? allResources
-        .filter((r) => r.id !== resource.id && (r.topic_id === resource.topic_id || r.place === resource.place || r.lesson === resource.lesson))
-        .slice(0, 4)
+      .filter((r) => r.id !== resource.id && (r.topic_id === resource.topic_id || r.place === resource.place || r.lesson === resource.lesson))
+      .slice(0, 4)
     : [];
 
   const finalRelated = relatedResources.length >= 3
     ? relatedResources
     : resource && allResources
       ? [
-          ...relatedResources,
-          ...allResources.filter((r) => r.id !== resource.id && !relatedResources.some((item) => item.id === r.id))
-        ].slice(0, 4)
+        ...relatedResources,
+        ...allResources.filter((r) => r.id !== resource.id && !relatedResources.some((item) => item.id === r.id))
+      ].slice(0, 4)
       : [];
 
   const handleCopyLink = () => {
@@ -337,11 +337,10 @@ export default function ResourceDetailView({
             <div className="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-1.5 bg-slate-900/90 backdrop-blur-md p-1.5 rounded-2xl border border-white/20 shadow-lg">
               <button
                 onClick={() => setActiveMediaTab('gallery')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                  activeMediaTab === 'gallery'
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${activeMediaTab === 'gallery'
                     ? 'bg-white text-slate-950 shadow-md font-black'
                     : 'text-slate-300 hover:text-white'
-                }`}
+                  }`}
               >
                 <Image className="w-3.5 h-3.5 text-amber-500" />
                 <span>Ảnh ({galleryPhotos.length})</span>
@@ -350,11 +349,10 @@ export default function ResourceDetailView({
               {youtubeEmbedUrl && (
                 <button
                   onClick={() => setActiveMediaTab('video')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                    activeMediaTab === 'video'
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${activeMediaTab === 'video'
                       ? 'bg-rose-600 text-white shadow-md font-black'
                       : 'text-slate-300 hover:text-white'
-                  }`}
+                    }`}
                 >
                   <Film className="w-3.5 h-3.5 text-rose-300" />
                   <span>Video</span>
@@ -364,11 +362,10 @@ export default function ResourceDetailView({
               {resource.model_3d && (
                 <button
                   onClick={() => setActiveMediaTab('3d')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                    activeMediaTab === '3d'
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${activeMediaTab === '3d'
                       ? 'bg-gold text-slate-950 shadow-md font-black'
                       : 'text-slate-300 hover:text-white'
-                  }`}
+                    }`}
                 >
                   <Box className="w-3.5 h-3.5 text-slate-950" />
                   <span>Mô hình 3D</span>
@@ -377,9 +374,8 @@ export default function ResourceDetailView({
             </div>
 
             {/* Media Screen Viewport */}
-            <div className={`relative w-full overflow-hidden bg-slate-900 ${
-              activeMediaTab === 'video' ? 'aspect-video' : 'h-[420px] sm:h-[480px] lg:h-[520px] flex items-center justify-center'
-            }`}>
+            <div className={`relative w-full overflow-hidden bg-slate-900 ${activeMediaTab === 'video' ? 'aspect-video' : 'h-[420px] sm:h-[480px] lg:h-[520px] flex items-center justify-center'
+              }`}>
               {/* TAB 1: 3D MODEL */}
               {activeMediaTab === '3d' && resource.model_3d && (
                 <div className="w-full h-full min-h-[460px]">
@@ -486,11 +482,10 @@ export default function ResourceDetailView({
                   <button
                     key={idx}
                     onClick={() => setActivePhotoIdx(idx)}
-                    className={`relative w-16 h-11 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${
-                      activePhotoIdx === idx
+                    className={`relative w-16 h-11 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${activePhotoIdx === idx
                         ? 'border-gold scale-105 shadow-md ring-2 ring-gold/40'
                         : 'border-transparent opacity-60 hover:opacity-100'
-                    }`}
+                      }`}
                   >
                     <img src={photoUrl} alt={`Thumb ${idx + 1}`} className="w-full h-full object-cover" />
                   </button>
@@ -581,11 +576,10 @@ export default function ResourceDetailView({
                     setLightboxZoom(1);
                     setIsLightboxOpen(true);
                   }}
-                  className={`group/img cursor-pointer rounded-2xl overflow-hidden border transition bg-slate-50 flex flex-col ${
-                    activePhotoIdx === idx && activeMediaTab === 'gallery'
+                  className={`group/img cursor-pointer rounded-2xl overflow-hidden border transition bg-slate-50 flex flex-col ${activePhotoIdx === idx && activeMediaTab === 'gallery'
                       ? 'border-gold ring-2 ring-gold/40 shadow-md'
                       : 'border-slate-200 hover:border-slate-300 hover:shadow-sm'
-                  }`}
+                    }`}
                   title="Nhấn để phóng to toàn màn hình xem ảnh gốc"
                 >
                   <div className="relative h-24 overflow-hidden bg-slate-200">
@@ -816,9 +810,8 @@ export default function ResourceDetailView({
 
             {/* The Image (Uncropped, Full Display) */}
             <div
-              className={`max-w-full max-h-[82vh] transition-transform duration-200 flex items-center justify-center ${
-                lightboxZoom > 1 ? 'overflow-auto cursor-zoom-out' : 'cursor-zoom-in'
-              }`}
+              className={`max-w-full max-h-[82vh] transition-transform duration-200 flex items-center justify-center ${lightboxZoom > 1 ? 'overflow-auto cursor-zoom-out' : 'cursor-zoom-in'
+                }`}
               onClick={handleToggleZoom}
             >
               <img
@@ -860,11 +853,10 @@ export default function ResourceDetailView({
                     setLightboxPhotoIdx(idx);
                     setLightboxZoom(1);
                   }}
-                  className={`relative w-14 h-10 sm:w-18 sm:h-12 rounded-lg overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
-                    lightboxPhotoIdx === idx
+                  className={`relative w-14 h-10 sm:w-18 sm:h-12 rounded-lg overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${lightboxPhotoIdx === idx
                       ? 'border-amber-400 scale-105 shadow-lg ring-2 ring-amber-400/50'
                       : 'border-transparent opacity-50 hover:opacity-100'
-                  }`}
+                    }`}
                   title={`Xem ảnh #${idx + 1}`}
                 >
                   <img src={photoUrl} alt="" className="w-full h-full object-cover" />

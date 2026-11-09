@@ -166,7 +166,7 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
       };
       try {
         localStorage.setItem('sukyso_tasks_progress', JSON.stringify(next));
-      } catch {}
+      } catch { }
       return next;
     });
   };
@@ -184,7 +184,7 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
       };
       try {
         localStorage.setItem('sukyso_tasks_progress', JSON.stringify(next));
-      } catch {}
+      } catch { }
       return next;
     });
   };
@@ -200,7 +200,7 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
       setTaskProgress({});
       try {
         localStorage.removeItem('sukyso_tasks_progress');
-      } catch {}
+      } catch { }
     }
   };
 
@@ -212,12 +212,12 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
     const note = progress.note || '(Chưa có ghi chép)';
 
     const text = `=== BÀI NỘP NHIỆM VỤ LỊCH SỬ 10 ===\n` +
-      `Học sinh: ${currentUser?.full_name || 'Học sinh Sử Ký Số'}\n` +
+      `Học sinh: ${currentUser?.full_name || 'Học sinh Sử Học Số'}\n` +
       `Nhiệm vụ: ${task.title}\n` +
       `Bài học: ${task.lesson}\n` +
       `Tiến độ: ${completedCount}/${checklist.length} tiêu chí hoàn thành (${Math.round((completedCount / (checklist.length || 1)) * 100)}%)\n\n` +
       `* Ghi chép & Thu hoạch của em:\n${note}\n\n` +
-      `--- Nền tảng Sử Ký Số GDPT 2018 ---`;
+      `--- Nền tảng Sử Học Số GDPT 2018 ---`;
 
     navigator.clipboard.writeText(text).then(() => {
       setCopiedTaskId(task.id);
@@ -340,8 +340,8 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
   const studentRank = totalXPEarned >= 400
     ? { title: 'Chuyên Gia Di Sản Số', badge: 'Cấp độ III' }
     : totalXPEarned >= 150
-    ? { title: 'Nhà Khảo Cổ Trẻ', badge: 'Cấp độ II' }
-    : { title: 'Học Sinh Tập Sự', badge: 'Cấp độ I' };
+      ? { title: 'Nhà Khảo Cổ Trẻ', badge: 'Cấp độ II' }
+      : { title: 'Học Sinh Tập Sự', badge: 'Cấp độ I' };
 
   // 3 Method Steps definition
   const methodSteps = [
@@ -415,11 +415,10 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                 <NavLink
                   key={t.to}
                   to={t.to}
-                  className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold transition ${
-                    isActive
+                  className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold transition ${isActive
                       ? 'bg-[#FFFDF5] text-[#850B10] shadow-md font-bold'
                       : 'bg-black/25 hover:bg-black/40 text-white/90 border border-white/15'
-                  }`}
+                    }`}
                 >
                   <Icon className="w-3.5 h-3.5 shrink-0" />
                   <span>{t.label}</span>
@@ -477,20 +476,18 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                     key={s.step}
                     type="button"
                     onClick={() => setActiveMethodStep(idx)}
-                    className={`p-4 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between ${
-                      isSelected
+                    className={`p-4 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between ${isSelected
                         ? 'bg-[#FFFDF5] border-[#850B10] ring-1 ring-[#850B10] shadow-sm'
                         : 'bg-[#FAF5EB] hover:bg-[#FFFDF5] border-[#EBDBC5] text-[#2D1B08]'
-                    }`}
+                      }`}
                   >
                     <div>
                       <div className="flex items-center justify-between mb-2.5">
                         <span
-                          className={`w-7 h-7 rounded-lg font-bold flex items-center justify-center text-xs transition ${
-                            isSelected
+                          className={`w-7 h-7 rounded-lg font-bold flex items-center justify-center text-xs transition ${isSelected
                               ? 'bg-[#850B10] text-white shadow-xs'
                               : 'bg-[#EBDBC5]/70 text-[#850B10]'
-                          }`}
+                            }`}
                         >
                           {s.step}
                         </span>
@@ -689,11 +686,10 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
               <div className="flex flex-wrap items-center gap-1.5">
                 <button
                   onClick={() => setTaskLessonFilter('all')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-                    taskLessonFilter === 'all'
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${taskLessonFilter === 'all'
                       ? 'bg-[#850B10] text-white shadow-xs'
                       : 'bg-[#FAF5EB] text-[#2D1B08] border border-[#EBDBC5] hover:bg-[#FFFDF5]'
-                  }`}
+                    }`}
                 >
                   Tất cả bài học ({tasks.length})
                 </button>
@@ -701,11 +697,10 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                   <button
                     key={les}
                     onClick={() => setTaskLessonFilter(les)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-medium transition cursor-pointer ${
-                      taskLessonFilter === les
+                    className={`px-3 py-1.5 rounded-xl text-xs font-medium transition cursor-pointer ${taskLessonFilter === les
                         ? 'bg-[#850B10] text-white font-bold shadow-xs'
                         : 'bg-[#FAF5EB] text-[#2D1B08] border border-[#EBDBC5] hover:bg-[#FFFDF5]'
-                    }`}
+                      }`}
                   >
                     {les.split(':')[0]}
                   </button>
@@ -736,11 +731,10 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                   return (
                     <div
                       key={task.id}
-                      className={`bg-[#FFFDF5] rounded-3xl border transition-all duration-150 shadow-xs overflow-hidden ${
-                        isFullyCompleted
+                      className={`bg-[#FFFDF5] rounded-3xl border transition-all duration-150 shadow-xs overflow-hidden ${isFullyCompleted
                           ? 'border-emerald-300/80 bg-[#FAF5EB]/80'
                           : 'border-[#EBDBC5] hover:border-amber-300'
-                      }`}
+                        }`}
                     >
                       {/* Task Header */}
                       <div className="p-5 sm:p-6 space-y-3">
@@ -821,18 +815,16 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                                 key={idx}
                                 type="button"
                                 onClick={() => toggleTaskCheck(task.id, idx)}
-                                className={`w-full text-left p-3 rounded-xl border transition flex items-start gap-3 cursor-pointer ${
-                                  isChecked
+                                className={`w-full text-left p-3 rounded-xl border transition flex items-start gap-3 cursor-pointer ${isChecked
                                     ? 'bg-[#FAF5EB] border-[#EBDBC5] text-stone-500'
                                     : 'bg-[#FFFDF5] hover:bg-[#FAF5EB]/60 border-[#EBDBC5] text-[#2D1B08]'
-                                }`}
+                                  }`}
                               >
                                 <div
-                                  className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 mt-0.5 border transition ${
-                                    isChecked
+                                  className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 mt-0.5 border transition ${isChecked
                                       ? 'bg-[#850B10] border-[#850B10] text-white shadow-2xs'
                                       : 'border-[#EBDBC5] bg-white'
-                                  }`}
+                                    }`}
                                 >
                                   {isChecked && <Check className="w-3.5 h-3.5 stroke-[2.5]" />}
                                 </div>
@@ -976,27 +968,25 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                   return (
                     <div
                       key={student.id}
-                      className={`p-3.5 sm:p-4 flex items-center justify-between gap-3 transition rounded-2xl my-1 ${
-                        isTop1
+                      className={`p-3.5 sm:p-4 flex items-center justify-between gap-3 transition rounded-2xl my-1 ${isTop1
                           ? 'bg-amber-50/90 border border-amber-300 shadow-xs'
                           : isTop2
-                          ? 'bg-[#FAF5EB] border border-[#EBDBC5]'
-                          : isTop3
-                          ? 'bg-orange-50/60 border border-amber-200'
-                          : 'hover:bg-[#FAF5EB]'
-                      }`}
+                            ? 'bg-[#FAF5EB] border border-[#EBDBC5]'
+                            : isTop3
+                              ? 'bg-orange-50/60 border border-amber-200'
+                              : 'hover:bg-[#FAF5EB]'
+                        }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         {/* Rank Badge */}
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
-                          isTop1
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${isTop1
                             ? 'bg-[#850B10] text-[#FDE2A7] shadow-md ring-2 ring-amber-300'
                             : isTop2
-                            ? 'bg-[#EBDBC5] text-[#850B10]'
-                            : isTop3
-                            ? 'bg-amber-700 text-white'
-                            : 'bg-[#FAF5EB] text-stone-600 border border-[#EBDBC5]'
-                        }`}>
+                              ? 'bg-[#EBDBC5] text-[#850B10]'
+                              : isTop3
+                                ? 'bg-amber-700 text-white'
+                                : 'bg-[#FAF5EB] text-stone-600 border border-[#EBDBC5]'
+                          }`}>
                           {idx + 1}
                         </div>
 
@@ -1020,9 +1010,8 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
 
                       {/* Streak Display */}
                       <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FFFDF5] border border-[#EBDBC5] shadow-2xs shrink-0">
-                        <Flame className={`w-4 h-4 ${
-                          isTop1 ? 'text-orange-500 fill-orange-500 animate-pulse' : 'text-amber-500 fill-amber-500'
-                        }`} />
+                        <Flame className={`w-4 h-4 ${isTop1 ? 'text-orange-500 fill-orange-500 animate-pulse' : 'text-amber-500 fill-amber-500'
+                          }`} />
                         <span className="font-bold text-sm text-[#2D1B08]">
                           {student.streak_count || 1} ngày
                         </span>
@@ -1083,11 +1072,10 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={() => setSelectedLesson('all')}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-                    selectedLesson === 'all'
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${selectedLesson === 'all'
                       ? 'bg-[#850B10] text-white shadow-xs'
                       : 'bg-[#FAF5EB] hover:bg-[#FFFDF5] text-[#2D1B08] border border-[#EBDBC5]'
-                  }`}
+                    }`}
                 >
                   Tất cả các bài ({quizzes.length})
                 </button>
@@ -1096,11 +1084,10 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                   <button
                     key={les.lesson}
                     onClick={() => setSelectedLesson(les.lesson)}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 cursor-pointer ${
-                      selectedLesson === les.lesson
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 cursor-pointer ${selectedLesson === les.lesson
                         ? 'bg-[#850B10] text-white font-bold shadow-xs'
                         : 'bg-[#FAF5EB] hover:bg-[#FFFDF5] text-[#2D1B08] border border-[#EBDBC5]'
-                    }`}
+                      }`}
                   >
                     <span>{les.lesson}</span>
                     <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 text-[#850B10] font-bold border border-amber-300/40">

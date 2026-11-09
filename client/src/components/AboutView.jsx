@@ -9,7 +9,7 @@ export default function AboutView() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/15 text-[#FDE2A7] border border-amber-300/40 mb-3">
-            <Info className="w-4 h-4 text-[#FDE2A7]" /> Về Dự Án "Sử Ký Số"
+            <Info className="w-4 h-4 text-[#FDE2A7]" /> Về Dự Án "Sử Học Số"
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-white font-serif-royal">
             Số Hóa Tư Liệu & Trực Quan Hóa Lịch Sử 10

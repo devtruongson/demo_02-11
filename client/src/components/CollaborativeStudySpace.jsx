@@ -19,15 +19,15 @@ export default function CollaborativeStudySpace({
   const topicsList = topics && topics.length > 0
     ? [...topics.map(t => `Chủ đề ${t.order_index || t.id}: ${t.title}`), 'Thảo luận chung & Phương pháp ôn thi']
     : [
-        'Chủ đề 1: Lịch sử và Sử học',
-        'Chủ đề 2: Vai trò của Sử học',
-        'Chủ đề 3: Một số nền văn minh thời cổ - trung đại',
-        'Chủ đề 4: Các cuộc cách mạng công nghiệp',
-        'Chủ đề 5: Văn minh Đông Nam Á thời cổ - trung đại',
-        'Chủ đề 6: Một số nền văn minh trên đất nước Việt Nam',
-        'Chủ đề 7: Cộng đồng các dân tộc Việt Nam',
-        'Thảo luận chung & Phương pháp ôn thi'
-      ];
+      'Chủ đề 1: Lịch sử và Sử học',
+      'Chủ đề 2: Vai trò của Sử học',
+      'Chủ đề 3: Một số nền văn minh thời cổ - trung đại',
+      'Chủ đề 4: Các cuộc cách mạng công nghiệp',
+      'Chủ đề 5: Văn minh Đông Nam Á thời cổ - trung đại',
+      'Chủ đề 6: Một số nền văn minh trên đất nước Việt Nam',
+      'Chủ đề 7: Cộng đồng các dân tộc Việt Nam',
+      'Thảo luận chung & Phương pháp ôn thi'
+    ];
 
   // Form State
   const [newMessage, setNewMessage] = useState('');
@@ -219,11 +219,10 @@ export default function CollaborativeStudySpace({
             </span>
             <button
               onClick={() => setFilterTopic('all')}
-              className={`px-3 py-1 rounded-xl text-xs font-bold transition shrink-0 cursor-pointer ${
-                filterTopic === 'all'
+              className={`px-3 py-1 rounded-xl text-xs font-bold transition shrink-0 cursor-pointer ${filterTopic === 'all'
                   ? 'bg-[#850B10] text-white shadow-xs'
                   : 'bg-[#FAF5EB] border border-[#EBDBC5] text-[#2D1B08] hover:bg-[#FFFDF5]'
-              }`}
+                }`}
             >
               Tất cả chủ đề ({messages.length})
             </button>
@@ -231,11 +230,10 @@ export default function CollaborativeStudySpace({
               <button
                 key={idx}
                 onClick={() => setFilterTopic(t)}
-                className={`px-3 py-1 rounded-xl text-xs font-bold transition shrink-0 truncate max-w-[200px] cursor-pointer ${
-                  filterTopic === t
+                className={`px-3 py-1 rounded-xl text-xs font-bold transition shrink-0 truncate max-w-[200px] cursor-pointer ${filterTopic === t
                     ? 'bg-[#850B10] text-white shadow-xs'
                     : 'bg-[#FAF5EB] border border-[#EBDBC5] text-[#2D1B08] hover:bg-[#FFFDF5]'
-                }`}
+                  }`}
               >
                 {t}
               </button>
@@ -262,21 +260,19 @@ export default function CollaborativeStudySpace({
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2.5">
-                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
-                        msg.user_role === 'teacher' || msg.user_role === 'admin'
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${msg.user_role === 'teacher' || msg.user_role === 'admin'
                           ? 'bg-[#850B10] text-[#FDE2A7] shadow-xs'
                           : 'bg-[#FAF5EB] text-[#850B10] border border-[#EBDBC5]'
-                      }`}>
+                        }`}>
                         {msg.user_role === 'teacher' ? <GraduationCap className="w-4 h-4" /> : <User className="w-4 h-4" />}
                       </div>
                       <div>
                         <div className="flex items-center gap-1.5">
                           <span className="font-bold text-xs text-[#2D1B08]">{msg.user_name}</span>
-                          <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${
-                            msg.user_role === 'teacher' || msg.user_role === 'admin'
+                          <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${msg.user_role === 'teacher' || msg.user_role === 'admin'
                               ? 'bg-amber-100 text-[#850B10] border border-amber-300/40'
                               : 'bg-[#FAF5EB] text-stone-700 border border-[#EBDBC5]'
-                          }`}>
+                            }`}>
                             {msg.user_role === 'teacher' ? 'Giáo viên' : msg.user_role === 'admin' ? 'Admin' : 'Học sinh'}
                           </span>
                         </div>
@@ -348,27 +344,25 @@ export default function CollaborativeStudySpace({
                   return (
                     <div
                       key={student.id}
-                      className={`p-2.5 rounded-2xl flex items-center justify-between gap-2.5 border transition ${
-                        isTop1
+                      className={`p-2.5 rounded-2xl flex items-center justify-between gap-2.5 border transition ${isTop1
                           ? 'bg-amber-50/90 border-amber-300 shadow-xs'
                           : isTop2
-                          ? 'bg-[#FAF5EB] border border-[#EBDBC5]'
-                          : isTop3
-                          ? 'bg-orange-50/60 border border-amber-200'
-                          : 'bg-[#FFFDF5] border-[#EBDBC5] hover:bg-[#FAF5EB]'
-                      }`}
+                            ? 'bg-[#FAF5EB] border border-[#EBDBC5]'
+                            : isTop3
+                              ? 'bg-orange-50/60 border border-amber-200'
+                              : 'bg-[#FFFDF5] border-[#EBDBC5] hover:bg-[#FAF5EB]'
+                        }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         {/* Rank Badge */}
-                        <div className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-[11px] shrink-0 ${
-                          isTop1
+                        <div className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-[11px] shrink-0 ${isTop1
                             ? 'bg-[#850B10] text-[#FDE2A7] shadow-xs'
                             : isTop2
-                            ? 'bg-[#EBDBC5] text-[#850B10]'
-                            : isTop3
-                            ? 'bg-amber-700 text-white'
-                            : 'bg-[#FAF5EB] text-stone-600 border border-[#EBDBC5]'
-                        }`}>
+                              ? 'bg-[#EBDBC5] text-[#850B10]'
+                              : isTop3
+                                ? 'bg-amber-700 text-white'
+                                : 'bg-[#FAF5EB] text-stone-600 border border-[#EBDBC5]'
+                          }`}>
                           {idx + 1}
                         </div>
 
@@ -385,9 +379,8 @@ export default function CollaborativeStudySpace({
 
                       {/* Streak Flame Badge */}
                       <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-[#FFFDF5] border border-[#EBDBC5] shadow-2xs shrink-0">
-                        <Flame className={`w-3.5 h-3.5 ${
-                          isTop1 ? 'text-orange-500 fill-orange-500 animate-pulse' : 'text-amber-500 fill-amber-500'
-                        }`} />
+                        <Flame className={`w-3.5 h-3.5 ${isTop1 ? 'text-orange-500 fill-orange-500 animate-pulse' : 'text-amber-500 fill-amber-500'
+                          }`} />
                         <span className="font-bold text-xs text-[#2D1B08]">
                           {student.streak_count || 1}d
                         </span>
@@ -400,7 +393,7 @@ export default function CollaborativeStudySpace({
 
             <div className="p-3 rounded-2xl bg-[#FAF5EB] border border-[#EBDBC5] text-[11px] text-stone-700 leading-relaxed">
               <strong className="text-[#850B10] block mb-0.5">💡 Quy tắc tính chuỗi Streak:</strong>
-              Mỗi ngày đăng nhập vào Sử Ký Số học bài hoặc làm đề trắc nghiệm sẽ tăng thêm 1 ngày chuỗi Streak. Nếu bỏ lỡ 1 ngày, chuỗi sẽ bắt đầu lại từ ngày 1!
+              Mỗi ngày đăng nhập vào Sử Học Số học bài hoặc làm đề trắc nghiệm sẽ tăng thêm 1 ngày chuỗi Streak. Nếu bỏ lỡ 1 ngày, chuỗi sẽ bắt đầu lại từ ngày 1!
             </div>
           </div>
         </div>
