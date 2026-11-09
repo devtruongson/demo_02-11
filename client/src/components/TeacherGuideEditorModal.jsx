@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   GraduationCap, BookOpen, FileText, HelpCircle, Save, X, Sparkles,
-  CheckCircle2, ArrowRight, Layers, Tag, AlignLeft, Hash, Link as LinkIcon
+  CheckCircle2, ArrowRight, Layers, Tag, AlignLeft, Hash, Link as LinkIcon, ExternalLink
 } from 'lucide-react';
 
 export default function TeacherGuideEditorModal({
@@ -19,6 +19,7 @@ export default function TeacherGuideEditorModal({
     content: '',
     technique: '',
     topic_url: '',
+    doc_url: '',
     answer: '',
     order_index: 1
   });
@@ -53,6 +54,7 @@ export default function TeacherGuideEditorModal({
         content: material.content || '',
         technique: extra?.technique || extra?.method || '',
         topic_url: extra?.topic_url || extra?.link || '',
+        doc_url: extra?.doc_url || extra?.doc_link || extra?.giao_an_url || extra?.lesson_plan_url || '',
         answer: extra?.answer || '',
         order_index: material.order_index ?? 1
       });
@@ -65,6 +67,7 @@ export default function TeacherGuideEditorModal({
         content: '',
         technique: '',
         topic_url: defaultCategory === 'ke_hoach_5512' ? '/kho-tu-lieu?topic=4' : '',
+        doc_url: '',
         answer: '',
         order_index: 1
       });
@@ -92,6 +95,7 @@ export default function TeacherGuideEditorModal({
       const extra_data = {};
       if (formData.technique.trim()) extra_data.technique = formData.technique.trim();
       if (formData.topic_url.trim()) extra_data.topic_url = formData.topic_url.trim();
+      if (formData.doc_url.trim()) extra_data.doc_url = formData.doc_url.trim();
       if (formData.answer.trim()) extra_data.answer = formData.answer.trim();
 
       const payload = {
@@ -287,31 +291,53 @@ export default function TeacherGuideEditorModal({
 
           {/* Category specific fields */}
           {formData.category === 'ke_hoach_5512' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-2xl bg-amber-50/60 border border-amber-200/70">
-              <div>
-                <label className="block text-amber-900 font-bold mb-1">
-                  Kỹ thuật / Phương pháp dạy học (5512)
-                </label>
-                <input
-                  type="text"
-                  value={formData.technique}
-                  onChange={(e) => setFormData({ ...formData, technique: e.target.value })}
-                  placeholder="VD: Kỹ thuật quan sát 3D / Phương pháp trạm di sản số / Khăn trải bàn..."
-                  className="w-full px-3.5 py-2 rounded-xl bg-white border border-amber-200 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#850B10]"
-                />
+            <div className="space-y-3.5 p-4 rounded-2xl bg-amber-50/60 border border-amber-200/70">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-amber-900 font-bold mb-1">
+                    Kỹ thuật / Phương pháp dạy học (5512)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.technique}
+                    onChange={(e) => setFormData({ ...formData, technique: e.target.value })}
+                    placeholder="VD: Kỹ thuật quan sát 3D / Phương pháp trạm di sản số / Khăn trải bàn..."
+                    className="w-full px-3.5 py-2 rounded-xl bg-white border border-amber-200 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#850B10]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-amber-900 font-bold mb-1">
+                    Đường dẫn liên kết tư liệu (URL)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.topic_url}
+                    onChange={(e) => setFormData({ ...formData, topic_url: e.target.value })}
+                    placeholder="VD: /kho-tu-lieu?topic=4"
+                    className="w-full px-3.5 py-2 rounded-xl bg-white border border-amber-200 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#850B10]"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block text-amber-900 font-bold mb-1">
-                  Đường dẫn liên kết tư liệu (URL)
+                <label className="block text-amber-900 font-bold mb-1 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Link giáo án Google Docs (URL)</span>
+                  </span>
+                  <span className="text-[10px] text-amber-800/80 font-normal">Sẽ mở trong tab mới khi người dùng nhấn vào</span>
                 </label>
-                <input
-                  type="text"
-                  value={formData.topic_url}
-                  onChange={(e) => setFormData({ ...formData, topic_url: e.target.value })}
-                  placeholder="VD: /kho-tu-lieu?topic=4"
-                  className="w-full px-3.5 py-2 rounded-xl bg-white border border-amber-200 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#850B10]"
-                />
+                <div className="relative">
+                  <input
+                    type="url"
+                    value={formData.doc_url}
+                    onChange={(e) => setFormData({ ...formData, doc_url: e.target.value })}
+                    placeholder="VD: https://docs.google.com/document/d/... (hoặc link chia sẻ giáo án online)"
+                    className="w-full pl-9 pr-3.5 py-2 rounded-xl bg-white border border-amber-200 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#850B10]"
+                  />
+                  <LinkIcon className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
               </div>
             </div>
           )}
@@ -391,6 +417,24 @@ export default function TeacherGuideEditorModal({
               <p className="text-xs text-slate-600 leading-relaxed font-normal whitespace-pre-line">
                 {formData.content || '(Chưa có nội dung)'}
               </p>
+              {formData.doc_url && (
+                <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-[11px] font-bold">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <FileText className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                    <span className="shrink-0">Giáo án Google Docs:</span>
+                    <span className="font-mono text-[10px] text-blue-600 truncate">{formData.doc_url}</span>
+                  </div>
+                  <a
+                    href={formData.doc_url.startsWith('http') ? formData.doc_url : `https://${formData.doc_url}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold shrink-0 transition"
+                  >
+                    <span>Mở tab mới</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              )}
               {formData.answer && (
                 <div className="text-[11px] font-bold text-emerald-700 bg-emerald-50 p-2 rounded-lg border border-emerald-200">
                   ✓ Đáp án: {formData.answer}

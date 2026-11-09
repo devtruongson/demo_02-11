@@ -1841,7 +1841,19 @@ export default function AdminDashboard({
                               🔗 {extra.topic_url}
                             </span>
                           )}
-                          {!extra?.technique && !extra?.answer && !extra?.topic_url && (
+                          {(extra?.doc_url || extra?.doc_link || extra?.giao_an_url) && (
+                            <a
+                              href={(extra.doc_url || extra.doc_link || extra.giao_an_url).startsWith('http') ? (extra.doc_url || extra.doc_link || extra.giao_an_url) : `https://${extra.doc_url || extra.doc_link || extra.giao_an_url}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 hover:underline font-bold text-[10px] mt-0.5"
+                              title="Mở giáo án Google Docs trong tab mới"
+                            >
+                              📄 Giáo án Google Docs
+                              <ExternalLink className="w-2.5 h-2.5" />
+                            </a>
+                          )}
+                          {!extra?.technique && !extra?.answer && !extra?.topic_url && !extra?.doc_url && !extra?.doc_link && !extra?.giao_an_url && (
                             <span className="text-slate-500">—</span>
                           )}
                         </td>

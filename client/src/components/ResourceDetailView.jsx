@@ -659,13 +659,28 @@ export default function ResourceDetailView({
 
             <div className="space-y-3 text-xs sm:text-sm text-amber-950 leading-relaxed">
               {learningActivities.map((act, idx) => (
-                <div key={act.id || idx} className="p-3.5 bg-white/90 rounded-2xl border border-amber-200/70 space-y-1">
+                <div key={act.id || idx} className="p-3.5 bg-white/90 rounded-2xl border border-amber-200/70 space-y-1.5">
                   <strong className="text-slate-900 block font-bold text-xs uppercase tracking-wider text-amber-800">
                     {act.title}
                   </strong>
                   <p className="text-xs text-slate-700 whitespace-pre-line leading-relaxed">
                     {act.content}
                   </p>
+                  {(act.doc_url || act.link) && (
+                    <div className="pt-1">
+                      <a
+                        href={(act.doc_url || act.link).startsWith('http') ? (act.doc_url || act.link) : `https://${act.doc_url || act.link}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 font-bold transition text-[11px] shadow-2xs group/doc cursor-pointer"
+                        title="Mở giáo án Google Docs trong tab mới"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-blue-600 group-hover/doc:scale-110 transition-transform" />
+                        <span>Mở giáo án Google Docs</span>
+                        <ExternalLink className="w-3 h-3 text-blue-500" />
+                      </a>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

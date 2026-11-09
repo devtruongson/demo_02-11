@@ -540,15 +540,34 @@ export default function TeachersView({ currentUser, authToken }) {
                     {act.content}
                   </p>
 
-                  {extra.topic_url && (
-                    <div className="mt-2 pt-2 border-t border-[#EBDBC5]">
-                      <Link
-                        to={extra.topic_url}
-                        className="inline-flex items-center gap-1 font-bold text-[#850B10] hover:underline transition text-[11px]"
-                      >
-                        <span>Mở tư liệu tham khảo liên kết</span>
-                        <ExternalLink className="w-3 h-3 text-[#850B10]" />
-                      </Link>
+                  {(extra.topic_url || extra.doc_url || extra.doc_link || extra.giao_an_url || extra.lesson_plan_url) && (
+                    <div className="mt-3 pt-2.5 border-t border-[#EBDBC5] flex flex-wrap items-center gap-2.5">
+                      {extra.topic_url && (
+                        <Link
+                          to={extra.topic_url}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FFFDF5] hover:bg-amber-100/70 border border-[#EBDBC5] font-bold text-[#850B10] transition text-[11px] shadow-2xs group/ref cursor-pointer"
+                        >
+                          <span>Mở tư liệu tham khảo liên kết</span>
+                          <ExternalLink className="w-3 h-3 text-[#850B10] group-hover/ref:translate-x-0.5 transition-transform" />
+                        </Link>
+                      )}
+                      {(extra.doc_url || extra.doc_link || extra.giao_an_url || extra.lesson_plan_url) && (() => {
+                        const rawUrl = extra.doc_url || extra.doc_link || extra.giao_an_url || extra.lesson_plan_url;
+                        const fullUrl = rawUrl.startsWith('http://') || rawUrl.startsWith('https://') ? rawUrl : `https://${rawUrl}`;
+                        return (
+                          <a
+                            href={fullUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 font-bold transition text-[11px] shadow-2xs group/doc cursor-pointer"
+                            title="Mở giáo án Google Docs trong tab mới"
+                          >
+                            <FileText className="w-3.5 h-3.5 text-blue-600 group-hover/doc:scale-110 transition-transform" />
+                            <span>Mở giáo án Google Docs</span>
+                            <ExternalLink className="w-3 h-3 text-blue-500" />
+                          </a>
+                        );
+                      })()}
                     </div>
                   )}
                 </div>

@@ -33,7 +33,8 @@ export function parseLearningActivities(tipValue) {
     return tipValue.map((item, idx) => ({
       id: item.id || `act-${idx}`,
       title: item.title || `Hoạt động ${idx + 1}:`,
-      content: item.content || item.desc || (typeof item === 'string' ? item : '')
+      content: item.content || item.desc || (typeof item === 'string' ? item : ''),
+      doc_url: item.doc_url || item.doc_link || item.link || item.giao_an_url || ''
     }));
   }
 
@@ -47,21 +48,24 @@ export function parseLearningActivities(tipValue) {
         return parsed.map((item, idx) => ({
           id: item.id || `act-${idx}`,
           title: item.title || `Hoạt động ${idx + 1}:`,
-          content: item.content || item.desc || (typeof item === 'string' ? item : '')
+          content: item.content || item.desc || (typeof item === 'string' ? item : ''),
+          doc_url: item.doc_url || item.doc_link || item.link || item.giao_an_url || ''
         }));
       }
       if (typeof parsed === 'string' && parsed.trim()) {
         return [{
           id: 'act-0',
           title: 'Gợi ý sư phạm:',
-          content: parsed.trim()
+          content: parsed.trim(),
+          doc_url: ''
         }];
       }
     } catch {
       return [{
         id: 'act-0',
         title: 'Gợi ý sư phạm:',
-        content: trimmed
+        content: trimmed,
+        doc_url: ''
       }];
     }
   }

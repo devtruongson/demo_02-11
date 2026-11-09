@@ -67,7 +67,8 @@ export default function ResourceEditorModal({ resource, topics, onClose, onSave 
           initActs = resource.tip.map((item, idx) => ({
             id: item.id || `act-${Date.now()}-${idx}`,
             title: item.title || `Hoạt động ${idx + 1}:`,
-            content: item.content || item.desc || (typeof item === 'string' ? item : '')
+            content: item.content || item.desc || (typeof item === 'string' ? item : ''),
+            doc_url: item.doc_url || item.doc_link || item.link || item.giao_an_url || ''
           }));
         } else if (typeof resource.tip === 'string') {
           try {
@@ -76,13 +77,15 @@ export default function ResourceEditorModal({ resource, topics, onClose, onSave 
               initActs = parsed.map((item, idx) => ({
                 id: item.id || `act-${Date.now()}-${idx}`,
                 title: item.title || `Hoạt động ${idx + 1}:`,
-                content: item.content || item.desc || (typeof item === 'string' ? item : '')
+                content: item.content || item.desc || (typeof item === 'string' ? item : ''),
+                doc_url: item.doc_url || item.doc_link || item.link || item.giao_an_url || ''
               }));
             } else if (typeof parsed === 'string' && parsed.trim()) {
               initActs = [{
                 id: `act-${Date.now()}-0`,
                 title: 'Gợi ý sư phạm:',
-                content: parsed.trim()
+                content: parsed.trim(),
+                doc_url: ''
               }];
             }
           } catch {
@@ -90,7 +93,8 @@ export default function ResourceEditorModal({ resource, topics, onClose, onSave 
               initActs = [{
                 id: `act-${Date.now()}-0`,
                 title: 'Gợi ý sư phạm:',
-                content: resource.tip.trim()
+                content: resource.tip.trim(),
+                doc_url: ''
               }];
             }
           }
@@ -681,6 +685,16 @@ export default function ResourceEditorModal({ resource, topics, onClose, onSave 
                             onChange={(e) => handleUpdateActivity(index, 'content', e.target.value)}
                             placeholder="Nội dung chi tiết, câu hỏi định hướng, gợi ý giao nhiệm vụ cho học sinh..."
                             className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-800 placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:ring-1 focus:ring-amber-500 bg-slate-50/50 leading-relaxed"
+                          />
+                        </div>
+
+                        <div>
+                          <input
+                            type="url"
+                            value={act.doc_url || ''}
+                            onChange={(e) => handleUpdateActivity(index, 'doc_url', e.target.value)}
+                            placeholder="Link giáo án Google Docs (tùy chọn, VD: https://docs.google.com/...)"
+                            className="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-[11px] font-medium text-slate-800 placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:ring-1 focus:ring-amber-500 bg-slate-50/50"
                           />
                         </div>
                       </div>
