@@ -52,7 +52,7 @@
   font-feature-settings: normal;
 }
 .font-serif-cinzel {
-  font-family: 'Cinzel', 'Playfair Display', 'Times New Roman', serif;
+  font-family: 'Playfair Display', 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
 }
 
 .title {
@@ -66,7 +66,7 @@
 }
 
 .hero-subtitle {
-  font-family: 'Cinzel', 'Playfair Display', 'Times New Roman', serif;
+  font-family: 'Playfair Display', 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 4px 12px rgba(0, 0, 0, 0.85);
 }
 
