@@ -49,14 +49,9 @@ export default function Footer() {
             {/* Description Card with border (Matching mockup) */}
             <div className="p-5 sm:p-6 rounded-3xl bg-[#6B060B]/85 border border-white/35 shadow-2xl max-w-xl">
               <p className="text-xs sm:text-sm text-white/95 leading-relaxed font-normal">
-                Dự án số hóa học liệu lịch sử tích hợp công nghệ tương tác 3D 360°, hệ thống bài tập trắc nghiệm năng lực và không gian học tập chung phục vụ đổi mới căn bản, toàn diện giáo dục lịch sử phổ thông.
+                Dự án “Sử học số” xây dựng nền tảng học liệu số với không gian 3D, hệ thống hóa bài tập kiểm tra - đánh giá, đa dạng hóa hình thức dạy học thông qua tích hợp kế hoạch giảng dạy theo Chương trình GDPT 2018. Từ đó, dự án nhằm hỗ trợ cộng đồng giáo viên, sinh viên sư phạm đổi mới phương pháp dạy học đồng thời phát huy tính chủ động, sáng tạo của học sinh; đưa lịch sử đến gần với bước tiến công nghệ số.
               </p>
             </div>
-
-            {/* Additional Project Statement (Matching mockup) */}
-            <p className="text-xs sm:text-sm text-white/90 leading-relaxed max-w-xl font-normal pt-1">
-              Dự án số hóa học liệu lịch sử tích hợp công nghệ tương tác 3D 360°, hệ thống bài tập trắc nghiệm năng lực và không gian học tập chung phục vụ đổi mới căn bản, toàn diện giáo dục lịch sử phổ thông.
-            </p>
           </div>
 
           {/* ================= RIGHT COLUMN: INSTRUCTOR & STUDENTS ================= */}
