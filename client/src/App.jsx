@@ -697,12 +697,17 @@ export default function App() {
               }
             />
 
-            {/* ================= ROUTE: STUDIO 3D WITH REAL SLUGS ================= */}
+            {/* ================= ROUTE: STUDIO 3D ================= */}
             <Route
               path="/studio-3d"
               element={
                 <ProtectedRoute currentUser={currentUser} onOpenLogin={() => setIsLoginModalOpen(true)}>
-                  <Navigate to="/studio-3d/co-vat/dong_son_drum" replace />
+                  <Studio3DView
+                    artifacts3d={artifacts3d}
+                    currentUser={currentUser}
+                    authToken={authToken}
+                    onArtifacts3DChange={fetchInitialData}
+                  />
                 </ProtectedRoute>
               }
             />
