@@ -53,7 +53,7 @@ export default function CoreFeaturesShowcase({
         </h2>
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs sm:text-sm font-semibold text-[#850b10]/90">
           <span>• Kho tư liệu</span>
-          <span>• Studio 3D</span>
+          <span>• Không gian 3D</span>
           <span>• Kiểm tra - Đánh giá</span>
           <span>• Không gian học tập</span>
         </div>
@@ -87,7 +87,7 @@ export default function CoreFeaturesShowcase({
             </div>
 
             <p className="text-xs text-slate-700 leading-relaxed mb-4">
-              Nguồn tư liệu khảo cổ học, bản đồ di tích, hình ảnh tư liệu gốc độ phân giải cao và video bài giảng được phân chia mạch lạc theo từng bài học.
+              Kho học liệu số đa dạng (hình ảnh, video, infographic) đã được kiểm chứng, chuẩn hóa thông tin. Tích hợp sẵn gợi ý giải pháp sư phạm, kế hoạch bài dạy 5512 và hệ thống câu hỏi thảo luận theo từng chủ đề.
             </p>
 
             {/* Topics scroll preview */}
@@ -134,7 +134,7 @@ export default function CoreFeaturesShowcase({
           </div>
         </div>
 
-        {/* ================= FEATURE 2: STUDIO 3D ================= */}
+        {/* ================= FEATURE 2: KHÔNG GIAN 3D ================= */}
         <div className="bg-gradient-to-b from-[#2a0406] to-[#1c0204] text-white rounded-3xl border border-amber-500/30 p-5 sm:p-6 shadow-xl flex flex-col justify-between overflow-hidden relative group">
           <div>
             <div className="flex items-center justify-between gap-2 mb-3">
@@ -144,7 +144,7 @@ export default function CoreFeaturesShowcase({
                 </div>
                 <div>
                   <h3 className="font-black text-base sm:text-lg text-[#fef08a] uppercase tracking-wide leading-tight">
-                    Studio 3D
+                    Không gian 3D
                   </h3>
                   <span className="text-[11px] text-amber-300/80 font-medium">Xoay 360° • Bóc tách hoa văn • Khảo cổ</span>
                 </div>
@@ -154,7 +154,7 @@ export default function CoreFeaturesShowcase({
                 onClick={handleActionClick}
                 className="text-xs font-bold text-amber-300 hover:text-white flex items-center gap-1 transition"
               >
-                <span>Vào Studio 3D</span>
+                <span>Vào Không gian 3D</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -203,7 +203,7 @@ export default function CoreFeaturesShowcase({
           <div className="pt-3 border-t border-amber-500/20 flex items-center justify-between text-xs text-amber-200/80 mt-2">
             <span>🔍 Tương tác mượt mà trên cả máy tính & điện thoại</span>
             <Link to="/studio-3d" onClick={handleActionClick} className="font-bold text-amber-300 hover:text-white">
-              Khám phá Studio →
+              Khám phá Không gian 3D →
             </Link>
           </div>
         </div>
