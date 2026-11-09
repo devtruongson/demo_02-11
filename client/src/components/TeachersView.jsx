@@ -338,20 +338,21 @@ export default function TeachersView({ currentUser, authToken }) {
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in max-w-5xl mx-auto">
       {/* Header Banner */}
-      <div className="bg-[#182338] text-white p-6 sm:p-8 rounded-2xl border border-slate-800 shadow-xs relative overflow-hidden">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-white/10 text-slate-300 border border-white/10 mb-3">
-          <GraduationCap className="w-3.5 h-3.5 text-slate-300" />
+      <div className="bg-gradient-to-r from-[#70070B] via-[#850B10] to-[#9E0D14] text-white p-6 sm:p-8 rounded-3xl border border-amber-300/30 shadow-lg relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/15 text-[#FDE2A7] border border-amber-300/40 mb-3">
+          <GraduationCap className="w-3.5 h-3.5 text-[#FDE2A7]" />
           <span>Không Gian Sư Phạm Lịch Sử 10</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-serif-royal">
           Cẩm Nang Khai Thác Tư Liệu Cho Giáo Viên
         </h2>
-        <p className="mt-2 text-slate-300 text-xs sm:text-sm leading-relaxed max-w-3xl font-normal">
+        <p className="mt-2 text-[#FFF7E8]/90 text-xs sm:text-sm leading-relaxed max-w-3xl font-normal">
           Định hướng tổ chức dạy học phát triển năng lực môn Lịch sử theo Chương trình GDPT 2018. Khai thác hiệu quả các nguồn sử liệu hình ảnh, bia ký và mô hình 3D trong bài dạy.
         </p>
 
         {/* Sub-Tab Navigation with Real Slugs */}
-        <div className="flex flex-wrap items-center gap-2 mt-6 pt-5 border-t border-white/10">
+        <div className="flex flex-wrap items-center gap-2 mt-6 pt-5 border-t border-white/15">
           {teacherTabs.map((t) => {
             const Icon = t.icon;
             const isActive = tab === t.id;
@@ -361,8 +362,8 @@ export default function TeachersView({ currentUser, authToken }) {
                 to={t.to}
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition ${
                   isActive
-                    ? 'bg-white text-slate-900 shadow-xs font-bold'
-                    : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10'
+                    ? 'bg-[#FFFDF5] text-[#850B10] shadow-md font-bold'
+                    : 'bg-black/25 hover:bg-black/40 text-white/90 border border-white/15'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -375,9 +376,9 @@ export default function TeachersView({ currentUser, authToken }) {
 
       {/* Action Bar for Tab */}
       {tab === 'giao-bai-tap' ? (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 rounded-xl bg-slate-50 border border-slate-200 gap-3">
-          <div className="flex items-center gap-2 text-xs text-slate-700 font-medium">
-            <Award className="w-4 h-4 text-amber-600 shrink-0" />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-[#FFFDF5] border border-[#EBDBC5] gap-3 shadow-xs">
+          <div className="flex items-center gap-2 text-xs text-[#2D1B08] font-medium">
+            <Award className="w-4 h-4 text-[#850B10] shrink-0" />
             <span>
               {isTeacherOrAdmin
                 ? 'Khu vực quản lý Đề thi & Giao bài: Tạo bài trắc nghiệm từ ngân hàng câu hỏi, chọn học sinh và theo dõi bảng điểm.'
@@ -388,24 +389,24 @@ export default function TeachersView({ currentUser, authToken }) {
           {isTeacherOrAdmin && (
             <button
               onClick={handleOpenNewAssignment}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition shadow-xs active:scale-95 shrink-0"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white text-xs font-bold transition shadow-md active:scale-95 shrink-0 cursor-pointer"
             >
-              <PlusCircle className="w-3.5 h-3.5 text-amber-400" />
+              <PlusCircle className="w-3.5 h-3.5 text-[#FDE2A7]" />
               <span>+ Tạo Đề Thi & Giao Bài</span>
             </button>
           )}
         </div>
       ) : (
         isAdmin && (
-          <div className="flex items-center justify-between p-3.5 sm:p-4 rounded-xl bg-slate-50 border border-slate-200">
-            <div className="flex items-center gap-2 text-xs text-slate-700 font-medium">
-              <ShieldCheck className="w-4 h-4 text-slate-600 shrink-0" />
+          <div className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-[#FFFDF5] border border-[#EBDBC5] shadow-xs">
+            <div className="flex items-center gap-2 text-xs text-[#2D1B08] font-medium">
+              <ShieldCheck className="w-4 h-4 text-[#850B10] shrink-0" />
               <span>Chế độ Quản trị viên: Bạn có thể trực tiếp sửa, xóa hoặc bổ sung tài liệu sư phạm cho tab này.</span>
             </div>
 
             <button
               onClick={handleOpenAdd}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition shadow-xs active:scale-95 shrink-0"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white text-xs font-bold transition shadow-md active:scale-95 shrink-0 cursor-pointer"
             >
               <PlusCircle className="w-3.5 h-3.5" />
               <span>Thêm mục mới</span>
@@ -429,7 +430,7 @@ export default function TeachersView({ currentUser, authToken }) {
             {tabMaterials.map((item, idx) => (
               <div
                 key={item.id}
-                className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-3 relative group transition hover:border-slate-300 hover:shadow-sm"
+                className="bg-[#FFFDF5] p-5 sm:p-6 rounded-3xl border border-[#EBDBC5] shadow-xs space-y-3 relative group transition hover:border-amber-300 hover:shadow-md"
               >
                 {/* Admin Edit/Delete Controls */}
                 {isAdmin && (
@@ -437,32 +438,32 @@ export default function TeachersView({ currentUser, authToken }) {
                     <button
                       onClick={() => handleOpenEdit(item)}
                       title="Chỉnh sửa nội dung này"
-                      className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition border border-slate-200"
+                      className="p-1.5 rounded-lg bg-[#FAF5EB] hover:bg-amber-100 text-[#850B10] transition border border-[#EBDBC5]"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => handleDeleteMaterial(item.id, item.title)}
                       title="Xóa mục này"
-                      className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 transition border border-slate-200"
+                      className="p-1.5 rounded-lg bg-[#FAF5EB] hover:bg-rose-50 text-slate-700 hover:text-rose-600 transition border border-[#EBDBC5]"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 )}
 
-                <div className="w-9 h-9 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center font-bold text-sm">
+                <div className="w-9 h-9 rounded-xl bg-amber-100/90 border border-amber-300/60 text-[#850B10] flex items-center justify-center font-bold text-sm">
                   {item.badge || idx + 1}
                 </div>
-                <h3 className="font-bold text-base text-slate-900 pr-12 leading-snug">
+                <h3 className="font-bold text-base text-[#1A120B] group-hover:text-[#850B10] transition-colors pr-12 leading-snug">
                   {item.title}
                 </h3>
                 {item.subtitle && (
-                  <p className="text-xs font-medium text-slate-500">
+                  <p className="text-xs font-semibold text-[#850B10]/80">
                     {item.subtitle}
                   </p>
                 )}
-                <p className="text-xs text-slate-600 leading-relaxed font-normal whitespace-pre-line">
+                <p className="text-xs text-[#3A2A1A] leading-relaxed font-normal whitespace-pre-line">
                   {item.content}
                 </p>
               </div>
@@ -473,19 +474,19 @@ export default function TeachersView({ currentUser, authToken }) {
 
       {/* ================= TAB 2: KẾ HOẠCH BÀI DẠY 5512 ================= */}
       {tab === 'ke-hoach-5512' && (
-        <div className="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-xs space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-4">
+        <div className="bg-[#FFFDF5] rounded-3xl p-5 sm:p-7 border border-[#EBDBC5] shadow-xs space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#EBDBC5] gap-4">
             <div>
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <span className="text-xs font-bold text-[#850B10] uppercase tracking-wider">
                 Khung kế hoạch bài dạy mẫu (Phụ lục IV Công văn 5512/BGDĐT)
               </span>
-              <h3 className="text-lg sm:text-xl font-bold text-slate-900 mt-1">
+              <h3 className="text-lg sm:text-xl font-bold text-[#1A120B] font-serif-royal mt-1">
                 Chuyên đề: Văn minh Đông Nam Á thời cổ – trung đại
               </h3>
             </div>
             <Link
               to="/kho-tu-lieu?topic=4"
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white hover:bg-slate-800 transition shadow-xs text-center inline-block shrink-0"
+              className="px-4 py-2 rounded-xl text-xs font-bold bg-[#850B10] text-white hover:bg-[#68070B] transition shadow-xs text-center inline-block shrink-0"
             >
               Mở kho tư liệu Chủ đề 4
             </Link>
@@ -497,50 +498,50 @@ export default function TeachersView({ currentUser, authToken }) {
               return (
                 <div
                   key={act.id}
-                  className="p-4 rounded-xl bg-slate-50 border border-slate-200 relative group transition hover:border-slate-300"
+                  className="p-4 rounded-2xl bg-[#FAF5EB] border border-[#EBDBC5] relative group transition hover:border-amber-300"
                 >
                   {isAdmin && (
                     <div className="absolute top-3 right-3 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
                       <button
                         onClick={() => handleOpenEdit(act)}
                         title="Chỉnh sửa hoạt động này"
-                        className="p-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 transition border border-slate-200 shadow-2xs"
+                        className="p-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 transition border border-[#EBDBC5] shadow-2xs"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleDeleteMaterial(act.id, act.title)}
                         title="Xóa hoạt động này"
-                        className="p-1.5 rounded-lg bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 transition border border-slate-200 shadow-2xs"
+                        className="p-1.5 rounded-lg bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 transition border border-[#EBDBC5] shadow-2xs"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   )}
 
-                  <h4 className="font-bold text-sm text-slate-900 mb-1.5 flex items-center gap-2 pr-14">
-                    <CheckCircle2 className="w-4 h-4 text-slate-700 shrink-0" />
+                  <h4 className="font-bold text-sm text-[#1A120B] mb-1.5 flex items-center gap-2 pr-14">
+                    <CheckCircle2 className="w-4 h-4 text-[#850B10] shrink-0" />
                     <span>{act.title}</span>
                   </h4>
 
                   {extra.technique && (
-                    <div className="mb-2 text-slate-700 font-medium bg-white p-2.5 rounded-lg border border-slate-200">
+                    <div className="mb-2 text-[#2D1B08] font-medium bg-[#FFFDF5] p-2.5 rounded-xl border border-[#EBDBC5]">
                       {extra.technique}
                     </div>
                   )}
 
-                  <p className="text-slate-600 leading-relaxed whitespace-pre-line font-normal">
+                  <p className="text-[#3A2A1A] leading-relaxed whitespace-pre-line font-normal">
                     {act.content}
                   </p>
 
                   {extra.topic_url && (
-                    <div className="mt-2 pt-2 border-t border-slate-200/60">
+                    <div className="mt-2 pt-2 border-t border-[#EBDBC5]">
                       <Link
                         to={extra.topic_url}
-                        className="inline-flex items-center gap-1 font-semibold text-slate-900 hover:text-slate-700 transition text-[11px]"
+                        className="inline-flex items-center gap-1 font-bold text-[#850B10] hover:underline transition text-[11px]"
                       >
                         <span>Mở tư liệu tham khảo liên kết</span>
-                        <ExternalLink className="w-3 h-3 text-slate-500" />
+                        <ExternalLink className="w-3 h-3 text-[#850B10]" />
                       </Link>
                     </div>
                   )}
@@ -553,12 +554,12 @@ export default function TeachersView({ currentUser, authToken }) {
 
       {/* ================= TAB 3: NGÂN HÀNG CÂU HỎI TRẮC NGHIỆM ================= */}
       {tab === 'ngan-hang-cau-hoi' && (
-        <div className="bg-white rounded-2xl p-5 sm:p-7 border border-slate-200 shadow-xs space-y-5">
+        <div className="bg-[#FFFDF5] rounded-3xl p-5 sm:p-7 border border-[#EBDBC5] shadow-xs space-y-5">
           <div>
-            <h3 className="text-lg sm:text-xl font-bold text-slate-900">
+            <h3 className="text-lg sm:text-xl font-bold text-[#850B10] font-serif-royal">
               Ngân Hàng Câu Hỏi Trắc Nghiệm Đánh Giá Theo Mức Độ
             </h3>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#5C4A3A] mt-1">
               Phân theo 4 cấp độ nhận thức: Nhận biết, Thông hiểu, Vận dụng và Vận dụng cao.
             </p>
           </div>
@@ -569,21 +570,21 @@ export default function TeachersView({ currentUser, authToken }) {
               return (
                 <div
                   key={q.id}
-                  className="p-4 sm:p-5 rounded-xl bg-slate-50/70 border border-slate-200 space-y-2 relative group transition hover:border-slate-300"
+                  className="p-4 sm:p-5 rounded-2xl bg-[#FAF5EB] border border-[#EBDBC5] space-y-2 relative group transition hover:border-amber-300"
                 >
                   {isAdmin && (
                     <div className="absolute top-3 right-3 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
                       <button
                         onClick={() => handleOpenEdit(q)}
                         title="Chỉnh sửa câu hỏi này"
-                        className="p-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 transition border border-slate-200 shadow-2xs"
+                        className="p-1.5 rounded-lg bg-white hover:bg-amber-100 text-[#850B10] transition border border-[#EBDBC5] shadow-2xs"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleDeleteMaterial(q.id, q.title)}
                         title="Xóa câu hỏi này"
-                        className="p-1.5 rounded-lg bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 transition border border-slate-200 shadow-2xs"
+                        className="p-1.5 rounded-lg bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 transition border border-[#EBDBC5] shadow-2xs"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -591,18 +592,18 @@ export default function TeachersView({ currentUser, authToken }) {
                   )}
 
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-slate-700 bg-white border border-slate-200 px-2 py-0.5 rounded-md text-[11px]">
+                    <span className="font-bold text-[#850B10] bg-amber-100/80 border border-amber-300/50 px-2.5 py-0.5 rounded-md text-[11px]">
                       {q.badge || q.subtitle || `Câu hỏi ${idx + 1}`}
                     </span>
                   </div>
-                  <p className="font-bold text-slate-900 pr-14 leading-snug">
+                  <p className="font-bold text-[#1A120B] pr-14 leading-snug">
                     {q.title}
                   </p>
-                  <div className="text-slate-600 pl-2.5 border-l-2 border-slate-200 leading-relaxed whitespace-pre-line font-normal">
+                  <div className="text-[#3A2A1A] pl-2.5 border-l-2 border-[#850B10]/40 leading-relaxed whitespace-pre-line font-normal">
                     {q.content}
                   </div>
                   {extra.answer && (
-                    <div className="mt-2 text-xs font-medium text-slate-800 bg-slate-100/90 p-2.5 rounded-lg border border-slate-200 flex items-center gap-1.5">
+                    <div className="mt-2 text-xs font-semibold text-emerald-900 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 flex items-center gap-1.5">
                       <span className="text-emerald-700 font-bold">✓ Đáp án:</span>
                       <span>{extra.answer}</span>
                     </div>
@@ -618,23 +619,23 @@ export default function TeachersView({ currentUser, authToken }) {
       {tab === 'giao-bai-tap' && (
         <div className="space-y-6">
           {loadingAssignments && assignments.length === 0 ? (
-            <div className="p-12 text-center text-slate-400 text-xs font-medium flex items-center justify-center gap-2">
-              <RefreshCw className="w-4 h-4 animate-spin text-slate-500" />
+            <div className="p-12 text-center text-[#8C7A6B] text-xs font-medium flex items-center justify-center gap-2">
+              <RefreshCw className="w-4 h-4 animate-spin text-[#850B10]" />
               <span>Đang tải danh sách bài tập & đề thi...</span>
             </div>
           ) : assignments.length === 0 ? (
-            <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center space-y-3">
-              <Award className="w-10 h-10 text-slate-300 mx-auto" />
-              <h3 className="text-base font-bold text-slate-800">Chưa có bài kiểm tra hoặc bài tập nào</h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
+            <div className="bg-[#FFFDF5] rounded-3xl p-8 border border-[#EBDBC5] text-center space-y-3">
+              <Award className="w-10 h-10 text-amber-600/50 mx-auto" />
+              <h3 className="text-base font-bold text-[#1A120B]">Chưa có bài kiểm tra hoặc bài tập nào</h3>
+              <p className="text-xs text-[#5C4A3A] max-w-md mx-auto">
                 Giáo viên và Admin có thể tạo bài kiểm tra từ ngân hàng câu hỏi trắc nghiệm đã có và giao cho học sinh.
               </p>
               {isTeacherOrAdmin && (
                 <button
                   onClick={handleOpenNewAssignment}
-                  className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition shadow-xs"
+                  className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white text-xs font-bold transition shadow-md"
                 >
-                  <PlusCircle className="w-4 h-4 text-amber-400" />
+                  <PlusCircle className="w-4 h-4 text-[#FDE2A7]" />
                   <span>Tạo bài thi đầu tiên</span>
                 </button>
               )}
@@ -650,7 +651,7 @@ export default function TeachersView({ currentUser, authToken }) {
                 return (
                   <div
                     key={item.id}
-                    className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between relative group transition hover:border-slate-300 hover:shadow-sm"
+                    className="bg-[#FFFDF5] p-5 sm:p-6 rounded-3xl border border-[#EBDBC5] shadow-xs flex flex-col justify-between relative group transition hover:border-amber-300 hover:shadow-md"
                   >
                     <div>
                       {/* Admin/Teacher Edit & Delete */}
@@ -659,14 +660,14 @@ export default function TeachersView({ currentUser, authToken }) {
                           <button
                             onClick={() => handleOpenEditAssignment(item)}
                             title="Chỉnh sửa bài thi & giao học sinh"
-                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition border border-slate-200"
+                            className="p-1.5 rounded-lg bg-[#FAF5EB] hover:bg-amber-100 text-[#850B10] transition border border-[#EBDBC5]"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => handleDeleteAssignment(item.id, item.title)}
                             title="Xóa bài thi này"
-                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 transition border border-slate-200"
+                            className="p-1.5 rounded-lg bg-[#FAF5EB] hover:bg-rose-50 text-slate-700 hover:text-rose-600 transition border border-[#EBDBC5]"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -674,7 +675,7 @@ export default function TeachersView({ currentUser, authToken }) {
                       )}
 
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200/80 text-[11px] font-bold">
+                        <span className="px-2.5 py-0.5 rounded-md bg-amber-100 text-[#850B10] border border-amber-300/60 text-[11px] font-bold">
                           Đề kiểm tra
                         </span>
                         {item.due_date && new Date(item.due_date) < new Date() && (
@@ -684,31 +685,31 @@ export default function TeachersView({ currentUser, authToken }) {
                         )}
                       </div>
 
-                      <h3 className="font-bold text-base text-slate-900 pr-14 leading-snug">
+                      <h3 className="font-bold text-base text-[#1A120B] group-hover:text-[#850B10] transition-colors pr-14 leading-snug">
                         {item.title}
                       </h3>
 
                       {item.description && (
-                        <p className="text-xs text-slate-600 mt-1.5 leading-relaxed font-normal line-clamp-2">
+                        <p className="text-xs text-[#5C4A3A] mt-1.5 leading-relaxed font-normal line-clamp-2">
                           {item.description}
                         </p>
                       )}
 
                       {/* Metadata Chips */}
-                      <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-100 text-xs text-slate-600">
+                      <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-[#EBDBC5] text-xs text-[#5C4A3A]">
                         <div className="flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                          <span>Thời lượng: <strong>{item.duration_minutes || 15} phút</strong></span>
+                          <Clock className="w-3.5 h-3.5 text-[#850B10] shrink-0" />
+                          <span>Thời lượng: <strong className="text-[#1A120B]">{item.duration_minutes || 15} phút</strong></span>
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <HelpCircle className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                          <span>Số câu hỏi: <strong>{questionCount} câu</strong></span>
+                          <HelpCircle className="w-3.5 h-3.5 text-[#850B10] shrink-0" />
+                          <span>Số câu hỏi: <strong className="text-[#1A120B]">{questionCount} câu</strong></span>
                         </div>
                         <div className="flex items-center gap-1.5 col-span-2">
-                          <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <Calendar className="w-3.5 h-3.5 text-[#850B10] shrink-0" />
                           <span>
                             Hạn nộp:{' '}
-                            <strong>
+                            <strong className="text-[#1A120B]">
                               {item.due_date
                                 ? new Date(item.due_date).toLocaleString('vi-VN', {
                                     hour: '2-digit',
@@ -722,10 +723,10 @@ export default function TeachersView({ currentUser, authToken }) {
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5 col-span-2">
-                          <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <Users className="w-3.5 h-3.5 text-[#850B10] shrink-0" />
                           <span>
                             Đối tượng giao:{' '}
-                            <strong className="text-slate-800">
+                            <strong className="text-[#1A120B]">
                               {isAllStudents ? 'Toàn bộ học sinh' : `${studentIds.length} học sinh cụ thể`}
                             </strong>
                           </span>
@@ -734,20 +735,29 @@ export default function TeachersView({ currentUser, authToken }) {
                     </div>
 
                     {/* Bottom Action Footer */}
-                    <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+                    <div className="mt-5 pt-3 border-t border-[#EBDBC5] flex items-center justify-between gap-3">
                       <div className="flex items-center gap-1.5 text-xs">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                        <span className="text-slate-700 font-medium">
+                        <span className="text-[#2D1B08] font-medium">
                           <strong>{submissionCount}</strong> học sinh đã nộp bài
                         </span>
                       </div>
 
                       <button
                         onClick={() => setViewingSubmissionsAssignment(item)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition shadow-2xs active:scale-95 cursor-pointer"
+                        className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white text-xs font-bold transition shadow-xs active:scale-95 cursor-pointer"
                       >
-                        <Eye className="w-3.5 h-3.5 text-slate-300" />
+                        <Eye className="w-3.5 h-3.5 text-[#FDE2A7]" />
                         <span>Xem bảng điểm</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
                       </button>
                     </div>
                   </div>

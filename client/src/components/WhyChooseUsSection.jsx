@@ -1,5 +1,41 @@
 import React from 'react';
-import { Sparkles, ArrowRight } from 'lucide-react';
+
+/**
+ * Traditional Imperial Tally / Lacquer Tablet Tag (Thẻ bài sơn son thếp vàng)
+ * Shape and design matching /design/image copy.png
+ */
+function TraditionalTabletTag({ num }) {
+  return (
+    <div className="relative w-11 sm:w-12 h-16 sm:h-18 shrink-0 flex items-center justify-center select-none filter drop-shadow-[0_2px_6px_rgba(0,0,0,0.2)]">
+      <svg
+        viewBox="0 0 46 80"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-full h-full"
+      >
+        {/* Outer Red Lacquer Body with bracketed notches */}
+        <path
+          d="M4 0 H42 C44.2 0 46 1.8 46 4 V12 C46 14.2 44.2 16 42 16 H39 V64 H42 C44.2 64 46 65.8 46 68 V76 C46 78.2 44.2 80 42 80 H4 C1.8 80 0 78.2 0 76 V68 C0 65.8 1.8 64 4 64 H7 V16 H4 C1.8 16 0 14.2 0 12 V4 C0 1.8 1.8 0 4 0 Z"
+          fill="#850B10"
+        />
+        {/* Inner Fine Gold/Cream Border */}
+        <path
+          d="M6 3 H40 C41.1 3 42 3.9 42 5 V11 C42 12.1 41.1 13 40 13 H36 V67 H40 C41.1 67 42 67.9 42 69 V75 C42 76.1 41.1 77 40 77 H6 C4.9 77 4 76.1 4 75 V69 C4 67.9 4.9 67 6 67 H10 V13 H6 C4.9 13 4 12.1 4 11 V5 C4 3.9 4.9 3 6 3 Z"
+          stroke="#FFF7E8"
+          strokeWidth="1.2"
+          strokeOpacity="0.9"
+        />
+      </svg>
+      {/* Number centered in cream with serif font */}
+      <span
+        className="absolute inset-0 flex items-center justify-center font-bold text-lg sm:text-xl text-[#FFF7E8] tracking-tight"
+        style={{ fontFamily: "'Cinzel', 'Playfair Display', Georgia, serif" }}
+      >
+        {num}
+      </span>
+    </div>
+  );
+}
 
 export default function WhyChooseUsSection({ onOpenLogin, currentUser }) {
   const points = [
@@ -21,66 +57,72 @@ export default function WhyChooseUsSection({ onOpenLogin, currentUser }) {
   ];
 
   return (
-    <section className="bg-gradient-to-r from-[#fef8ee] via-[#fdf5e8] to-[#faedd9] rounded-3xl border border-[#ecd7ba] p-6 sm:p-10 shadow-xs relative overflow-hidden">
-      {/* Background clouds */}
-      <div className="absolute -bottom-8 -left-8 w-60 opacity-20 pointer-events-none">
-        <img src="/home-assets/cloud_1.png" alt="Mây cổ" className="w-full h-auto" />
+    <section className="relative w-full py-8 sm:py-12 lg:py-16 overflow-hidden select-none">
+      {/* Decorative Traditional Clouds at bottom-left and bottom-right (matching design/image copy.png) */}
+      <div className="absolute -bottom-10 -left-12 w-64 sm:w-80 opacity-40 pointer-events-none select-none z-0">
+        <img
+          src="/home-assets/cloud_1.png"
+          alt=""
+          className="w-full h-auto object-contain filter sepia(0.8) saturate(2.5) hue-rotate(5deg) brightness(1.15)"
+        />
+      </div>
+      <div className="absolute -bottom-12 -right-12 w-72 sm:w-96 opacity-40 pointer-events-none select-none z-0">
+        <img
+          src="/home-assets/cloud_2.png"
+          alt=""
+          className="w-full h-auto object-contain filter sepia(0.8) saturate(2.5) hue-rotate(5deg) brightness(1.15)"
+        />
       </div>
 
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-        {/* Left Column (Matching Slide 2) */}
-        <div className="lg:col-span-5 space-y-4">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-[#850b10] text-[#fff8ee] text-xs font-bold uppercase tracking-wider shadow-xs">
-            Tại sao chọn Sử Học Số?
-          </span>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 xl:gap-20 items-center">
+          {/* ================= LEFT COLUMN (matching design/image copy.png) ================= */}
+          <div className="lg:col-span-5 space-y-4 sm:space-y-5">
+            {/* Red Cartouche Badge */}
+            <div className="inline-block">
+              <span className="inline-flex items-center px-5 py-1.5 rounded-full bg-[#850B10] text-[#FFFDF5] text-xs sm:text-sm font-bold tracking-wide shadow-md">
+                Tại sao chọn Sử Học Số?
+              </span>
+            </div>
 
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#850b10] font-serif-royal leading-tight uppercase tracking-tight">
-            ĐƯỢC XÂY DỰNG CHO CÔNG VIỆC THẬT CỦA GIÁO VIÊN & HỌC SINH
-          </h2>
+            {/* Main 3-line Headline: Black lines 1-2, Crimson Red line 3 */}
+            <h2 className="text-2xl sm:text-3xl lg:text-[2.5rem] xl:text-[2.85rem] font-black font-serif-royal leading-[1.2] tracking-tight uppercase">
+              <span className="text-[#1A120B] block">ĐƯỢC XÂY DỰNG CHO</span>
+              <span className="text-[#1A120B] block">CÔNG VIỆC THẬT CỦA</span>
+              <span className="text-[#850B10] block">GIÁO VIÊN & HỌC SINH</span>
+            </h2>
 
-          <div className="w-16 h-1 bg-[#850b10] rounded-full" />
+            {/* Red Underline Divider */}
+            <div className="w-28 sm:w-36 h-[2.5px] bg-[#850B10] rounded-full" />
 
-          <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
-            Không chỉ là kho lưu trữ số, <strong>Sử Học Số</strong> mang đến hệ sinh thái học tập đa phương tiện tương tác, giúp việc dạy và học Lịch sử 10 trở nên trực quan, sinh động và tràn đầy cảm hứng.
-          </p>
+            {/* Description Text */}
+            <p className="text-sm sm:text-base text-[#3A2A1A] leading-relaxed font-normal max-w-xl">
+              Không chỉ là kho lưu trữ số, <strong className="font-bold text-[#1A120B]">Sử Ký Số</strong> mang đến hệ sinh thái học tập đa phương tiện tương tác, giúp việc dạy và học Lịch sử 10 trở nên trực quan, sinh động và tràn đầy cảm hứng.
+            </p>
+          </div>
 
-          {!currentUser && (
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={onOpenLogin}
-                className="px-6 py-2.5 rounded-xl bg-[#850b10] hover:bg-[#68070b] text-white text-xs font-bold shadow-md transition flex items-center gap-2 cursor-pointer"
+          {/* ================= RIGHT COLUMN (matching design/image copy.png) ================= */}
+          <div className="lg:col-span-7 space-y-7 sm:space-y-9">
+            {points.map((p, idx) => (
+              <div
+                key={idx}
+                className="flex items-start gap-4 sm:gap-6 group transition-transform duration-200 hover:translate-x-1"
               >
-                <span>Trải nghiệm ngay</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-        </div>
+                {/* Traditional Vietnamese Tally Tag (Thẻ bài đỏ) */}
+                <TraditionalTabletTag num={p.num} />
 
-        {/* Right Column: 3 Items with Red Traditional Badges (Matching Slide 2) */}
-        <div className="lg:col-span-7 space-y-4">
-          {points.map((p, idx) => (
-            <div
-              key={idx}
-              className="flex items-start gap-4 p-4 rounded-2xl bg-white/70 backdrop-blur-xs border border-[#ecd7ba]/80 hover:bg-white hover:border-[#dfc3a1] transition-all shadow-2xs group"
-            >
-              {/* Red Badge with Number */}
-              <div className="w-11 h-14 rounded-xl bg-gradient-to-b from-[#940a0e] to-[#73070b] text-[#fef08a] font-serif-cinzel font-black text-base flex items-center justify-center shrink-0 shadow-md border border-amber-300/40 relative">
-                <span className="drop-shadow-xs">{p.num}</span>
+                {/* Feature Text */}
+                <div className="flex-1 pt-1 min-w-0">
+                  <h3 className="text-base sm:text-lg lg:text-xl font-bold text-[#1A120B] leading-snug group-hover:text-[#850B10] transition-colors">
+                    {p.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[#4A4A4A] mt-1.5 leading-relaxed font-normal">
+                    {p.desc}
+                  </p>
+                </div>
               </div>
-
-              {/* Text content */}
-              <div className="min-w-0 flex-1 pt-0.5">
-                <h4 className="font-extrabold text-sm sm:text-base text-slate-900 group-hover:text-[#850b10] transition leading-snug">
-                  {p.title}
-                </h4>
-                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                  {p.desc}
-                </p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>

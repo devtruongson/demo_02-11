@@ -20,6 +20,7 @@ import TopicEditorModal from './components/TopicEditorModal.jsx';
 import Footer from './components/Footer.jsx';
 import CoreFeaturesShowcase from './components/CoreFeaturesShowcase.jsx';
 import AuthenticatedHomeSection from './components/AuthenticatedHomeSection.jsx';
+import WhyChooseUsSection from './components/WhyChooseUsSection.jsx';
 import CollaborativeStudySpace from './components/CollaborativeStudySpace.jsx';
 import AuthPage from './components/AuthPage.jsx';
 import { createResourceSlug } from './utils/slugify.js';
@@ -429,13 +430,22 @@ export default function App() {
                   >
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                       {!currentUser ? (
-                        /* Giao diện khi chưa đăng nhập: Core Features Showcase (Slide 2 / image copy 2.png) */
-                        <CoreFeaturesShowcase
-                          topics={topics}
-                          artifacts3d={artifacts3d}
-                          currentUser={currentUser}
-                          onOpenLogin={() => setIsLoginModalOpen(true)}
-                        />
+                        /* Giao diện khi chưa đăng nhập: CÁC CHỨC NĂNG CHÍNH CỦA TRANG WEB trước, sau đó là TẠI SAO CHỌN SỬ HỌC SỐ */
+                        <div className="space-y-16 sm:space-y-20">
+                          {/* 1. Các chức năng chính của trang web (image copy 2.png) */}
+                          <CoreFeaturesShowcase
+                            topics={topics}
+                            artifacts3d={artifacts3d}
+                            currentUser={currentUser}
+                            onOpenLogin={() => setIsLoginModalOpen(true)}
+                          />
+
+                          {/* 2. Tại sao chọn Sử Học Số (image copy.png) đặt bên dưới */}
+                          <WhyChooseUsSection
+                            onOpenLogin={() => setIsLoginModalOpen(true)}
+                            currentUser={currentUser}
+                          />
+                        </div>
                       ) : (
                         /* Giao diện sau khi đăng nhập: Giáo viên (image copy 3.png) hoặc Học sinh (image copy 4.png) */
                         <AuthenticatedHomeSection
