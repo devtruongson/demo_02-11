@@ -14,16 +14,30 @@ export function slugify(str) {
     .replace(/-+/g, '-'); // collapse dashes
 }
 
-export function createResourceSlug(id, title) {
+export function createResourceSlug(first, second) {
+  let id = first;
+  let title = second;
+  // Handle both (id, title) and (title, id) gracefully
+  if (typeof first === 'string' && (typeof second === 'number' || (!isNaN(Number(second)) && String(second).trim() !== ''))) {
+    id = second;
+    title = first;
+  }
   const cleanTitle = slugify(title);
   return `${id}-${cleanTitle}`;
 }
 
 export function parseIdFromSlug(slug) {
   if (!slug) return null;
-  // Match leading numbers before dash, or just number
-  const match = slug.match(/^(\d+)/);
-  return match ? Number(match[1]) : null;
+  const decoded = decodeURIComponent(slug).trim();
+  // Match leading numbers before dash: e.g. "12-trong-dong"
+  const leadingMatch = decoded.match(/^(\d+)/);
+  if (leadingMatch) return Number(leadingMatch[1]);
+  // Match trailing numbers after dash: e.g. "trong-dong-12"
+  const trailingMatch = decoded.match(/-(\d+)$/);
+  if (trailingMatch) return Number(trailingMatch[1]);
+  // Pure numeric slug: e.g. "12"
+  if (!isNaN(Number(decoded)) && decoded !== '') return Number(decoded);
+  return null;
 }
 
 export function formatYouTubeEmbedUrl(url) {

@@ -128,28 +128,28 @@ export default function CollaborativeStudySpace({
   return (
     <div className="space-y-6 animate-fade-in pb-16">
       {/* Header Banner */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-navy via-slate-900 to-navy text-white shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#70070B] via-[#850B10] to-[#9E0D14] text-white shadow-lg border border-amber-300/30 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black bg-gold/20 text-gold border border-gold/40">
-            <Users className="w-3.5 h-3.5 text-gold" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white/15 text-[#FDE2A7] border border-amber-300/40">
+            <Users className="w-3.5 h-3.5 text-[#FDE2A7]" />
             <span>Phòng Học Trực Tuyến & Tương Tác Đồng Đẳng</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white font-serif-royal tracking-tight">
             Không Gian Học Tập Chung & Bảng Vàng Streak
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#FFF7E8]/90 leading-relaxed font-normal">
             Nơi học sinh và thầy cô cùng trao đổi bài học, giải đáp câu hỏi khó môn Lịch Sử 10, chia sẻ mẹo ghi nhớ niên đại và duy trì chuỗi ngày đăng nhập học tập liên tục.
           </p>
 
           {/* Current User Streak Status */}
           {currentUser && (
             <div className="pt-2 flex items-center gap-3">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/10 border border-white/20 text-xs font-bold text-amber-200">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-black/25 border border-white/20 text-xs font-bold text-[#FDE2A7]">
                 <Flame className="w-4 h-4 text-orange-400 fill-orange-400 animate-pulse" />
                 <span>Chuỗi học tập của bạn: <strong>{currentUser.streak_count || 1} ngày</strong></span>
               </div>
-              <span className="text-xs text-slate-400">
+              <span className="text-xs text-[#FFF7E8]/80">
                 • Vai trò: <strong className="text-white uppercase">{currentUser.role === 'teacher' ? 'Giáo viên' : currentUser.role === 'admin' ? 'Quản trị viên' : 'Học sinh'}</strong>
               </span>
             </div>
@@ -162,13 +162,13 @@ export default function CollaborativeStudySpace({
         {/* Left Column: Discussion & Questions Feed */}
         <div className="lg:col-span-8 space-y-5">
           {/* Post New Question Box */}
-          <div className="p-5 rounded-3xl bg-white border border-slate-200/90 shadow-xs space-y-3">
+          <div className="p-5 rounded-3xl bg-[#FFFDF5] border border-[#EBDBC5] shadow-xs space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                <MessageSquare className="w-4 h-4 text-navy" />
+              <span className="text-xs font-bold uppercase tracking-wider text-[#850B10] flex items-center gap-1.5">
+                <MessageSquare className="w-4 h-4 text-[#850B10]" />
                 Đặt câu hỏi hoặc chia sẻ góc nhìn học tập
               </span>
-              <span className="text-[11px] text-slate-400">
+              <span className="text-[11px] text-stone-500 font-medium">
                 {currentUser ? `Đang đăng bài: ${currentUser.full_name || currentUser.username}` : 'Đăng nhập để thảo luận'}
               </span>
             </div>
@@ -178,7 +178,7 @@ export default function CollaborativeStudySpace({
                 <select
                   value={selectedTopic}
                   onChange={(e) => setSelectedTopic(e.target.value)}
-                  className="px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-navy sm:w-64"
+                  className="px-3.5 py-2 rounded-xl bg-[#FAF5EB] border border-[#EBDBC5] text-xs font-bold text-[#2D1B08] focus:outline-none focus:ring-2 focus:ring-[#850B10] sm:w-64"
                 >
                   {topicsList.map((t, idx) => (
                     <option key={idx} value={t}>{t}</option>
@@ -196,12 +196,12 @@ export default function CollaborativeStudySpace({
                         : 'Vui lòng đăng nhập để gửi câu hỏi thảo luận...'
                     }
                     disabled={!currentUser || submitting}
-                    className="w-full pl-3.5 pr-24 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-navy disabled:bg-slate-100"
+                    className="w-full pl-3.5 pr-24 py-2 rounded-xl bg-[#FAF5EB] border border-[#EBDBC5] text-xs font-medium text-[#2D1B08] placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-[#850B10] disabled:bg-stone-100"
                   />
                   <button
                     type="submit"
                     disabled={!currentUser || submitting || !newMessage.trim()}
-                    className="absolute right-1.5 top-1/2 -translate-y-1/2 px-3.5 py-1.5 rounded-lg bg-navy hover:bg-navy-light text-white text-xs font-bold transition flex items-center gap-1 disabled:opacity-40 cursor-pointer active:scale-95"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 px-3.5 py-1.5 rounded-lg bg-[#850B10] hover:bg-[#68070B] text-white text-xs font-bold transition flex items-center gap-1 disabled:opacity-40 cursor-pointer active:scale-95 shadow-xs"
                   >
                     <span>Gửi</span>
                     <Send className="w-3 h-3" />
@@ -213,16 +213,16 @@ export default function CollaborativeStudySpace({
 
           {/* Topic Filter Pills */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <span className="text-xs text-slate-400 font-bold shrink-0 flex items-center gap-1">
-              <Filter className="w-3 h-3" />
+            <span className="text-xs text-stone-500 font-bold shrink-0 flex items-center gap-1">
+              <Filter className="w-3 h-3 text-[#850B10]" />
               Lọc theo:
             </span>
             <button
               onClick={() => setFilterTopic('all')}
-              className={`px-3 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
+              className={`px-3 py-1 rounded-xl text-xs font-bold transition shrink-0 cursor-pointer ${
                 filterTopic === 'all'
-                  ? 'bg-navy text-white shadow-xs'
-                  : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                  ? 'bg-[#850B10] text-white shadow-xs'
+                  : 'bg-[#FAF5EB] border border-[#EBDBC5] text-[#2D1B08] hover:bg-[#FFFDF5]'
               }`}
             >
               Tất cả chủ đề ({messages.length})
@@ -231,10 +231,10 @@ export default function CollaborativeStudySpace({
               <button
                 key={idx}
                 onClick={() => setFilterTopic(t)}
-                className={`px-3 py-1 rounded-xl text-xs font-bold transition shrink-0 truncate max-w-[200px] ${
+                className={`px-3 py-1 rounded-xl text-xs font-bold transition shrink-0 truncate max-w-[200px] cursor-pointer ${
                   filterTopic === t
-                    ? 'bg-navy text-white shadow-xs'
-                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                    ? 'bg-[#850B10] text-white shadow-xs'
+                    : 'bg-[#FAF5EB] border border-[#EBDBC5] text-[#2D1B08] hover:bg-[#FFFDF5]'
                 }`}
               >
                 {t}
@@ -244,47 +244,43 @@ export default function CollaborativeStudySpace({
 
           {/* Messages Feed */}
           {loading ? (
-            <div className="text-center py-12 bg-white rounded-3xl border border-slate-200">
-              <div className="w-6 h-6 border-2 border-navy border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-              <p className="text-xs text-slate-500">Đang tải thảo luận học tập...</p>
+            <div className="text-center py-12 bg-[#FFFDF5] rounded-3xl border border-[#EBDBC5]">
+              <div className="w-6 h-6 border-2 border-[#850B10] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              <p className="text-xs text-stone-500 font-medium">Đang tải thảo luận học tập...</p>
             </div>
           ) : filteredMessages.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-3xl border border-slate-200">
-              <MessageSquare className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <p className="text-xs text-slate-500 font-medium">Chưa có câu hỏi nào trong chủ đề này. Hãy là người đầu tiên đặt câu hỏi!</p>
+            <div className="text-center py-12 bg-[#FFFDF5] rounded-3xl border border-[#EBDBC5]">
+              <MessageSquare className="w-10 h-10 text-stone-300 mx-auto mb-2" />
+              <p className="text-xs text-stone-600 font-medium">Chưa có câu hỏi nào trong chủ đề này. Hãy là người đầu tiên đặt câu hỏi!</p>
             </div>
           ) : (
             <div className="space-y-3">
               {filteredMessages.map((msg) => (
                 <div
                   key={msg.id}
-                  className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-slate-300 transition space-y-2.5"
+                  className="p-4 sm:p-5 rounded-2xl bg-[#FFFDF5] border border-[#EBDBC5] shadow-2xs hover:border-amber-300 transition space-y-2.5"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2.5">
                       <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
-                        msg.user_role === 'teacher'
-                          ? 'bg-blue-600 text-white'
-                          : msg.user_role === 'admin'
-                          ? 'bg-amber-600 text-white'
-                          : 'bg-navy text-white'
+                        msg.user_role === 'teacher' || msg.user_role === 'admin'
+                          ? 'bg-[#850B10] text-[#FDE2A7] shadow-xs'
+                          : 'bg-[#FAF5EB] text-[#850B10] border border-[#EBDBC5]'
                       }`}>
                         {msg.user_role === 'teacher' ? <GraduationCap className="w-4 h-4" /> : <User className="w-4 h-4" />}
                       </div>
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <span className="font-extrabold text-xs text-slate-900">{msg.user_name}</span>
+                          <span className="font-bold text-xs text-[#2D1B08]">{msg.user_name}</span>
                           <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded ${
-                            msg.user_role === 'teacher'
-                              ? 'bg-blue-100 text-blue-800'
-                              : msg.user_role === 'admin'
-                              ? 'bg-amber-100 text-amber-800'
-                              : 'bg-slate-100 text-slate-600'
+                            msg.user_role === 'teacher' || msg.user_role === 'admin'
+                              ? 'bg-amber-100 text-[#850B10] border border-amber-300/40'
+                              : 'bg-[#FAF5EB] text-stone-700 border border-[#EBDBC5]'
                           }`}>
                             {msg.user_role === 'teacher' ? 'Giáo viên' : msg.user_role === 'admin' ? 'Admin' : 'Học sinh'}
                           </span>
                         </div>
-                        <span className="text-[10px] text-slate-400">
+                        <span className="text-[10px] text-stone-400">
                           {new Date(msg.created_at).toLocaleString('vi-VN', {
                             dateStyle: 'short',
                             timeStyle: 'short'
@@ -293,24 +289,24 @@ export default function CollaborativeStudySpace({
                       </div>
                     </div>
 
-                    <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 shrink-0 truncate max-w-[200px]">
+                    <span className="text-[11px] font-semibold px-2.5 py-1 rounded-xl bg-[#FAF5EB] text-[#850B10] border border-[#EBDBC5] shrink-0 truncate max-w-[200px]">
                       {msg.topic_title}
                     </span>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal pl-1">
+                  <p className="text-xs sm:text-sm text-[#2D1B08] leading-relaxed font-normal pl-1">
                     {msg.message}
                   </p>
 
-                  <div className="pt-2 flex items-center justify-between border-t border-slate-100 text-xs">
+                  <div className="pt-2 flex items-center justify-between border-t border-[#EBDBC5]/50 text-xs">
                     <button
                       onClick={() => handleLikeMessage(msg.id)}
-                      className="flex items-center gap-1.5 text-slate-500 hover:text-navy transition px-2.5 py-1 rounded-lg hover:bg-slate-100 font-semibold cursor-pointer"
+                      className="flex items-center gap-1.5 text-stone-600 hover:text-[#850B10] transition px-2.5 py-1 rounded-lg hover:bg-[#FAF5EB] font-bold cursor-pointer"
                     >
-                      <ThumbsUp className="w-3.5 h-3.5 text-amber-600" />
+                      <ThumbsUp className="w-3.5 h-3.5 text-[#850B10]" />
                       <span>Hữu ích ({msg.likes || 0})</span>
                     </button>
-                    <span className="text-[11px] text-slate-400">Trao đổi học tập</span>
+                    <span className="text-[11px] text-stone-400 font-medium">Trao đổi học tập</span>
                   </div>
                 </div>
               ))}
@@ -320,28 +316,28 @@ export default function CollaborativeStudySpace({
 
         {/* Right Column: Streak Leaderboard (Bảng Vàng Chuỗi Học Tập) */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="p-5 rounded-3xl bg-white border border-slate-200/90 shadow-xs space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="p-5 rounded-3xl bg-[#FFFDF5] border border-[#EBDBC5] shadow-xs space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#EBDBC5]/60">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-orange-500/10 text-orange-600 flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-xl bg-amber-100 text-[#850B10] border border-amber-300/40 flex items-center justify-center font-bold">
                   <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-sm text-slate-900 leading-tight">
+                  <h3 className="font-bold text-sm text-[#2D1B08] leading-tight">
                     Bảng Vàng Chuỗi Streak
                   </h3>
-                  <span className="text-[10px] text-slate-400 font-medium">Top học sinh chăm chỉ nhất</span>
+                  <span className="text-[10px] text-stone-500 font-medium">Top học sinh chăm chỉ nhất</span>
                 </div>
               </div>
-              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-100 text-amber-900">
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-100 text-[#850B10] border border-amber-300/40">
                 Liên tục 🔥
               </span>
             </div>
 
             {loadingLeaderboard ? (
-              <div className="text-center py-6 text-xs text-slate-400">Đang nạp bảng xếp hạng...</div>
+              <div className="text-center py-6 text-xs text-stone-400">Đang nạp bảng xếp hạng...</div>
             ) : leaderboard.length === 0 ? (
-              <div className="text-center py-6 text-xs text-slate-400">Chưa có dữ liệu xếp hạng</div>
+              <div className="text-center py-6 text-xs text-stone-400">Chưa có dữ liệu xếp hạng</div>
             ) : (
               <div className="space-y-2">
                 {leaderboard.map((student, idx) => {
@@ -354,45 +350,45 @@ export default function CollaborativeStudySpace({
                       key={student.id}
                       className={`p-2.5 rounded-2xl flex items-center justify-between gap-2.5 border transition ${
                         isTop1
-                          ? 'bg-amber-50/70 border-amber-200'
+                          ? 'bg-amber-50/90 border-amber-300 shadow-xs'
                           : isTop2
-                          ? 'bg-slate-50 border-slate-200'
+                          ? 'bg-[#FAF5EB] border border-[#EBDBC5]'
                           : isTop3
-                          ? 'bg-orange-50/50 border-orange-200'
-                          : 'bg-white border-slate-100 hover:bg-slate-50'
+                          ? 'bg-orange-50/60 border border-amber-200'
+                          : 'bg-[#FFFDF5] border-[#EBDBC5] hover:bg-[#FAF5EB]'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         {/* Rank Badge */}
-                        <div className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-[11px] shrink-0 ${
+                        <div className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-[11px] shrink-0 ${
                           isTop1
-                            ? 'bg-amber-500 text-slate-950 shadow-xs'
+                            ? 'bg-[#850B10] text-[#FDE2A7] shadow-xs'
                             : isTop2
-                            ? 'bg-slate-300 text-slate-800'
+                            ? 'bg-[#EBDBC5] text-[#850B10]'
                             : isTop3
                             ? 'bg-amber-700 text-white'
-                            : 'bg-slate-100 text-slate-600'
+                            : 'bg-[#FAF5EB] text-stone-600 border border-[#EBDBC5]'
                         }`}>
                           {idx + 1}
                         </div>
 
                         {/* Student Name */}
                         <div className="min-w-0">
-                          <p className="font-extrabold text-xs text-slate-900 truncate">
+                          <p className="font-bold text-xs text-[#2D1B08] truncate">
                             {student.full_name || student.username}
                           </p>
-                          <span className="text-[10px] text-slate-400 font-mono">
+                          <span className="text-[10px] text-stone-500 font-mono">
                             @{student.username}
                           </span>
                         </div>
                       </div>
 
                       {/* Streak Flame Badge */}
-                      <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-white border border-slate-200/80 shadow-2xs shrink-0">
+                      <div className="flex items-center gap-1 px-2 py-1 rounded-xl bg-[#FFFDF5] border border-[#EBDBC5] shadow-2xs shrink-0">
                         <Flame className={`w-3.5 h-3.5 ${
                           isTop1 ? 'text-orange-500 fill-orange-500 animate-pulse' : 'text-amber-500 fill-amber-500'
                         }`} />
-                        <span className="font-black text-xs text-slate-900">
+                        <span className="font-bold text-xs text-[#2D1B08]">
                           {student.streak_count || 1}d
                         </span>
                       </div>
@@ -402,8 +398,8 @@ export default function CollaborativeStudySpace({
               </div>
             )}
 
-            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 text-[11px] text-slate-600 leading-relaxed">
-              <strong className="text-slate-900 block mb-0.5">💡 Quy tắc tính chuỗi Streak:</strong>
+            <div className="p-3 rounded-2xl bg-[#FAF5EB] border border-[#EBDBC5] text-[11px] text-stone-700 leading-relaxed">
+              <strong className="text-[#850B10] block mb-0.5">💡 Quy tắc tính chuỗi Streak:</strong>
               Mỗi ngày đăng nhập vào Sử Ký Số học bài hoặc làm đề trắc nghiệm sẽ tăng thêm 1 ngày chuỗi Streak. Nếu bỏ lỡ 1 ngày, chuỗi sẽ bắt đầu lại từ ngày 1!
             </div>
           </div>

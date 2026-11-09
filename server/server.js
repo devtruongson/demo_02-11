@@ -16,7 +16,7 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4999;
 const JWT_SECRET = process.env.JWT_SECRET || 'sukyso_jwt_secret_key_2026';
 
 // Ensure uploads folder exists
@@ -991,17 +991,25 @@ app.put('/api/topics/reorder', requireAdmin, async (req, res) => {
 // POST /api/topics (requireAdmin) - Create new topic
 app.post('/api/topics', requireAdmin, async (req, res) => {
   try {
-    const { title, description, img } = req.body;
+    const { title, description, img, game_quiz_ids, game_image } = req.body;
     if (!title || !title.trim()) {
       return res.status(400).json({ error: 'Vui lòng nhập tên chủ đề học tập.' });
     }
 
     const [maxOrderRows] = await pool.query('SELECT COALESCE(MAX(order_index), 0) + 1 AS next_order FROM topics');
     const nextOrder = maxOrderRows[0]?.next_order || 1;
+    const quizIdsJson = game_quiz_ids ? JSON.stringify(Array.isArray(game_quiz_ids) ? game_quiz_ids : [game_quiz_ids]) : null;
 
     const [result] = await pool.query(
-      'INSERT INTO topics (title, description, img, order_index) VALUES (?, ?, ?, ?)',
-      [title.trim(), description ? description.trim() : '', img ? img.trim() : '', nextOrder]
+      'INSERT INTO topics (title, description, img, order_index, game_quiz_ids, game_image) VALUES (?, ?, ?, ?, ?, ?)',
+      [
+        title.trim(),
+        description ? description.trim() : '',
+        img ? img.trim() : '',
+        nextOrder,
+        quizIdsJson,
+        game_image || null
+      ]
     );
 
     await logActivity(req.user?.username || 'admin', 'CREATE_TOPIC', `Tạo chủ đề mới ID ${result.insertId}: ${title.trim()}`);
@@ -1017,7 +1025,7 @@ app.post('/api/topics', requireAdmin, async (req, res) => {
 app.put('/api/topics/:id', requireAdmin, async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const { title, description, img } = req.body;
+    const { title, description, img, game_quiz_ids, game_image } = req.body;
 
     if (!title || !title.trim()) {
       return res.status(400).json({ error: 'Vui lòng nhập tên chủ đề học tập.' });
@@ -1028,10 +1036,30 @@ app.put('/api/topics/:id', requireAdmin, async (req, res) => {
       return res.status(404).json({ error: 'Không tìm thấy chủ đề học tập cần chỉnh sửa.' });
     }
 
-    await pool.query(
-      'UPDATE topics SET title = ?, description = ?, img = ? WHERE id = ?',
-      [title.trim(), description ? description.trim() : '', img ? img.trim() : '', id]
-    );
+    const quizIdsJson = game_quiz_ids !== undefined
+      ? (game_quiz_ids ? JSON.stringify(Array.isArray(game_quiz_ids) ? game_quiz_ids : [game_quiz_ids]) : null)
+      : undefined;
+
+    let updateSql = 'UPDATE topics SET title = ?, description = ?, img = ?';
+    const updateParams = [
+      title.trim(),
+      description ? description.trim() : '',
+      img ? img.trim() : ''
+    ];
+
+    if (quizIdsJson !== undefined) {
+      updateSql += ', game_quiz_ids = ?';
+      updateParams.push(quizIdsJson);
+    }
+    if (game_image !== undefined) {
+      updateSql += ', game_image = ?';
+      updateParams.push(game_image || null);
+    }
+
+    updateSql += ' WHERE id = ?';
+    updateParams.push(id);
+
+    await pool.query(updateSql, updateParams);
 
     await logActivity(req.user?.username || 'admin', 'UPDATE_TOPIC', `Đổi tên/Cập nhật chủ đề ID ${id}: ${title.trim()}`);
     const [updated] = await pool.query('SELECT * FROM topics WHERE id = ?', [id]);
@@ -1129,7 +1157,8 @@ app.post('/api/resources', requireAdmin, async (req, res) => {
   try {
     const {
       topic_id, lesson, type, title, period, place,
-      description, source, url, img, gallery, tip, model_3d, video_url
+      description, source, url, img, gallery, tip, model_3d, video_url,
+      game_quiz_ids, game_image
     } = req.body;
 
     if (!title || !topic_id) {
@@ -1137,12 +1166,14 @@ app.post('/api/resources', requireAdmin, async (req, res) => {
     }
 
     const galleryJson = gallery ? JSON.stringify(Array.isArray(gallery) ? gallery : [gallery]) : JSON.stringify([img]);
+    const quizIdsJson = game_quiz_ids ? JSON.stringify(Array.isArray(game_quiz_ids) ? game_quiz_ids : [game_quiz_ids]) : null;
 
     const [result] = await pool.query(`
       INSERT INTO resources (
         topic_id, lesson, type, title, period, place,
-        description, source, url, img, gallery, tip, model_3d, video_url, view_count
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+        description, source, url, img, gallery, tip, model_3d, video_url,
+        game_quiz_ids, game_image, view_count
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
     `, [
       Number(topic_id),
       lesson || '',
@@ -1157,7 +1188,9 @@ app.post('/api/resources', requireAdmin, async (req, res) => {
       galleryJson,
       tip || '',
       model_3d || null,
-      video_url || null
+      video_url || null,
+      quizIdsJson,
+      game_image || null
     ]);
 
     await logActivity(req.user.username, 'CREATE_RESOURCE', `Admin thêm tư liệu mới: ${title}`);
@@ -1175,7 +1208,8 @@ app.put('/api/resources/:id', requireAdmin, async (req, res) => {
     const id = Number(req.params.id);
     const {
       topic_id, lesson, type, title, period, place,
-      description, source, url, img, gallery, tip, model_3d, video_url
+      description, source, url, img, gallery, tip, model_3d, video_url,
+      game_quiz_ids, game_image
     } = req.body;
 
     const [exists] = await pool.query('SELECT id FROM resources WHERE id = ?', [id]);
@@ -1184,13 +1218,16 @@ app.put('/api/resources/:id', requireAdmin, async (req, res) => {
     }
 
     const galleryJson = gallery ? JSON.stringify(Array.isArray(gallery) ? gallery : [gallery]) : null;
+    const quizIdsJson = game_quiz_ids !== undefined
+      ? (game_quiz_ids ? JSON.stringify(Array.isArray(game_quiz_ids) ? game_quiz_ids : [game_quiz_ids]) : null)
+      : undefined;
 
-    await pool.query(`
+    let updateSql = `
       UPDATE resources SET
         topic_id = ?, lesson = ?, type = ?, title = ?, period = ?, place = ?,
         description = ?, source = ?, url = ?, img = ?, gallery = COALESCE(?, gallery), tip = ?, model_3d = ?, video_url = ?
-      WHERE id = ?
-    `, [
+    `;
+    const updateParams = [
       Number(topic_id),
       lesson || '',
       type || 'image',
@@ -1204,9 +1241,22 @@ app.put('/api/resources/:id', requireAdmin, async (req, res) => {
       galleryJson,
       tip || '',
       model_3d || null,
-      video_url || null,
-      id
-    ]);
+      video_url || null
+    ];
+
+    if (quizIdsJson !== undefined) {
+      updateSql += `, game_quiz_ids = ?`;
+      updateParams.push(quizIdsJson);
+    }
+    if (game_image !== undefined) {
+      updateSql += `, game_image = ?`;
+      updateParams.push(game_image || null);
+    }
+
+    updateSql += ` WHERE id = ?`;
+    updateParams.push(id);
+
+    await pool.query(updateSql, updateParams);
 
     await logActivity(req.user.username, 'UPDATE_RESOURCE', `Admin chỉnh sửa tư liệu: ${title}`);
 
@@ -1953,6 +2003,315 @@ async function initQuizzesTable() {
   }
 }
 initQuizzesTable();
+
+// Ensure resources and topics tables have game columns
+async function initResourceGameColumns() {
+  try {
+    const [cols] = await pool.query("SHOW COLUMNS FROM resources LIKE 'game_quiz_ids'");
+    if (cols.length === 0) {
+      await pool.query('ALTER TABLE resources ADD COLUMN game_quiz_ids JSON NULL');
+      console.log('✅ Added game_quiz_ids to resources table');
+    }
+    const [imgCols] = await pool.query("SHOW COLUMNS FROM resources LIKE 'game_image'");
+    if (imgCols.length === 0) {
+      await pool.query('ALTER TABLE resources ADD COLUMN game_image TEXT NULL');
+      console.log('✅ Added game_image to resources table');
+    }
+  } catch (err) {
+    console.error('Error checking game columns in resources:', err.message);
+  }
+}
+initResourceGameColumns();
+
+async function initTopicGameColumns() {
+  try {
+    const [cols] = await pool.query("SHOW COLUMNS FROM topics LIKE 'game_quiz_ids'");
+    if (cols.length === 0) {
+      await pool.query('ALTER TABLE topics ADD COLUMN game_quiz_ids JSON NULL');
+      console.log('✅ Added game_quiz_ids to topics table');
+    }
+    const [imgCols] = await pool.query("SHOW COLUMNS FROM topics LIKE 'game_image'");
+    if (imgCols.length === 0) {
+      await pool.query('ALTER TABLE topics ADD COLUMN game_image TEXT NULL');
+      console.log('✅ Added game_image to topics table');
+    }
+  } catch (err) {
+    console.error('Error checking game columns in topics:', err.message);
+  }
+}
+initTopicGameColumns();
+
+// ==========================================
+// TILE PUZZLE GAME API (Lật ô chữ mở hình ảnh)
+// ==========================================
+
+// GET /api/resources/:id/game-quizzes (Get 4 quiz questions for the Tile Puzzle Game)
+app.get('/api/resources/:id/game-quizzes', async (req, res) => {
+  try {
+    const resourceId = Number(req.params.id);
+    const [resourceRows] = await pool.query(
+      'SELECT id, title, lesson, topic_id, img, gallery, game_quiz_ids, game_image FROM resources WHERE id = ?',
+      [resourceId]
+    );
+
+    if (resourceRows.length === 0) {
+      return res.status(404).json({ error: 'Tư liệu không tồn tại' });
+    }
+
+    const resource = resourceRows[0];
+    let selectedQuizIds = [];
+
+    // Parse game_quiz_ids if exists
+    if (resource.game_quiz_ids) {
+      try {
+        const parsed = typeof resource.game_quiz_ids === 'string'
+          ? JSON.parse(resource.game_quiz_ids)
+          : resource.game_quiz_ids;
+        if (Array.isArray(parsed)) {
+          selectedQuizIds = parsed.map(Number).filter((n) => !isNaN(n) && n > 0);
+        }
+      } catch (e) {
+        console.warn('Failed to parse game_quiz_ids:', e.message);
+      }
+    }
+
+    let finalQuizzes = [];
+
+    // 1. If explicit quiz IDs are selected by Admin
+    if (selectedQuizIds.length > 0) {
+      const placeholders = selectedQuizIds.map(() => '?').join(',');
+      const [chosenRows] = await pool.query(
+        `SELECT * FROM quizzes WHERE id IN (${placeholders}) ORDER BY FIELD(id, ${placeholders})`,
+        [...selectedQuizIds, ...selectedQuizIds]
+      );
+      finalQuizzes = chosenRows;
+    }
+
+    // 2. If fewer than 4 quizzes, fill up with lesson/resource quizzes
+    if (finalQuizzes.length < 4) {
+      const existingIds = finalQuizzes.map((q) => q.id);
+      let fallbackQuery = 'SELECT * FROM quizzes WHERE 1=1';
+      const fallbackParams = [];
+
+      if (existingIds.length > 0) {
+        fallbackQuery += ` AND id NOT IN (${existingIds.map(() => '?').join(',')})`;
+        fallbackParams.push(...existingIds);
+      }
+
+      if (resource.lesson) {
+        fallbackQuery += ' AND (resource_id = ? OR lesson = ?)';
+        fallbackParams.push(resource.id, resource.lesson);
+      } else {
+        fallbackQuery += ' AND resource_id = ?';
+        fallbackParams.push(resource.id);
+      }
+
+      fallbackQuery += ` LIMIT ${4 - finalQuizzes.length}`;
+      const [fallbackRows] = await pool.query(fallbackQuery, fallbackParams);
+      finalQuizzes.push(...fallbackRows);
+    }
+
+    // 3. If still fewer than 4, take from same topic or any quiz
+    if (finalQuizzes.length < 4) {
+      const existingIds = finalQuizzes.map((q) => q.id);
+      let broadQuery = 'SELECT * FROM quizzes WHERE 1=1';
+      const broadParams = [];
+
+      if (existingIds.length > 0) {
+        broadQuery += ` AND id NOT IN (${existingIds.map(() => '?').join(',')})`;
+        broadParams.push(...existingIds);
+      }
+
+      if (resource.topic_id) {
+        broadQuery += ' AND topic_id = ?';
+        broadParams.push(resource.topic_id);
+      }
+
+      broadQuery += ` LIMIT ${4 - finalQuizzes.length}`;
+      const [broadRows] = await pool.query(broadQuery, broadParams);
+      finalQuizzes.push(...broadRows);
+    }
+
+    // 4. Format options JSON
+    const formattedQuizzes = finalQuizzes.map((q, idx) => ({
+      id: q.id,
+      tile_number: idx + 1,
+      tile_label: `0${idx + 1}`,
+      question: q.question,
+      options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options,
+      correct_index: q.correct_index,
+      explanation: q.explanation || 'Chính xác! Bạn đã mở được một ô tranh bí ẩn.',
+      difficulty: q.difficulty || 'thong_hieu'
+    }));
+
+    // Determine the secret image behind the 4 tiles
+    let secretImage = resource.game_image || resource.img;
+    if (!secretImage && resource.gallery) {
+      try {
+        const gal = typeof resource.gallery === 'string' ? JSON.parse(resource.gallery) : resource.gallery;
+        if (Array.isArray(gal) && gal.length > 0) secretImage = gal[0];
+      } catch { }
+    }
+
+    res.json({
+      resource_id: resource.id,
+      title: resource.title,
+      lesson: resource.lesson,
+      game_image: secretImage || 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=85',
+      game_quiz_ids: selectedQuizIds,
+      quizzes: formattedQuizzes
+    });
+  } catch (error) {
+    console.error('Get game quizzes error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT /api/resources/:id/game-config (Admin only - set game quizzes and image)
+app.put('/api/resources/:id/game-config', requireAdmin, async (req, res) => {
+  try {
+    const resourceId = Number(req.params.id);
+    const { game_quiz_ids, game_image } = req.body;
+
+    const quizIdsJson = game_quiz_ids ? JSON.stringify(game_quiz_ids) : null;
+
+    await pool.query(
+      'UPDATE resources SET game_quiz_ids = ?, game_image = COALESCE(?, game_image) WHERE id = ?',
+      [quizIdsJson, game_image || null, resourceId]
+    );
+
+    res.json({ success: true, message: 'Cập nhật cấu hình game thành công' });
+  } catch (error) {
+    console.error('Update game config error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/topics/:id/game-quizzes (Get 4 quiz questions for the Topic's Tile Puzzle Game)
+app.get('/api/topics/:id/game-quizzes', async (req, res) => {
+  try {
+    const topicId = Number(req.params.id);
+    const [topicRows] = await pool.query(
+      'SELECT id, title, description, img, game_quiz_ids, game_image FROM topics WHERE id = ?',
+      [topicId]
+    );
+
+    if (topicRows.length === 0) {
+      return res.status(404).json({ error: 'Chủ đề không tồn tại' });
+    }
+
+    const topic = topicRows[0];
+    let selectedQuizIds = [];
+
+    // Parse game_quiz_ids if exists
+    if (topic.game_quiz_ids) {
+      try {
+        const parsed = typeof topic.game_quiz_ids === 'string'
+          ? JSON.parse(topic.game_quiz_ids)
+          : topic.game_quiz_ids;
+        if (Array.isArray(parsed)) {
+          selectedQuizIds = parsed.map(Number).filter((n) => !isNaN(n) && n > 0);
+        }
+      } catch (e) {
+        console.warn('Failed to parse topic game_quiz_ids:', e.message);
+      }
+    }
+
+    let finalQuizzes = [];
+
+    // 1. If explicit quiz IDs are selected by Admin
+    if (selectedQuizIds.length > 0) {
+      const placeholders = selectedQuizIds.map(() => '?').join(',');
+      const [chosenRows] = await pool.query(
+        `SELECT * FROM quizzes WHERE id IN (${placeholders}) ORDER BY FIELD(id, ${placeholders})`,
+        [...selectedQuizIds, ...selectedQuizIds]
+      );
+      finalQuizzes = chosenRows;
+    }
+
+    // 2. If fewer than 4 quizzes, take quizzes belonging to this topic or resources in this topic
+    if (finalQuizzes.length < 4) {
+      const existingIds = finalQuizzes.map((q) => q.id);
+      let topicQuery = `
+        SELECT q.* FROM quizzes q
+        LEFT JOIN resources r ON q.resource_id = r.id
+        WHERE (q.topic_id = ? OR r.topic_id = ?)
+      `;
+      const topicParams = [topicId, topicId];
+
+      if (existingIds.length > 0) {
+        topicQuery += ` AND q.id NOT IN (${existingIds.map(() => '?').join(',')})`;
+        topicParams.push(...existingIds);
+      }
+
+      topicQuery += ` LIMIT ${4 - finalQuizzes.length}`;
+      const [topicQuizRows] = await pool.query(topicQuery, topicParams);
+      finalQuizzes.push(...topicQuizRows);
+    }
+
+    // 3. If still fewer than 4, take any quizzes from quizzes table
+    if (finalQuizzes.length < 4) {
+      const existingIds = finalQuizzes.map((q) => q.id);
+      let anyQuery = 'SELECT * FROM quizzes WHERE 1=1';
+      const anyParams = [];
+
+      if (existingIds.length > 0) {
+        anyQuery += ` AND id NOT IN (${existingIds.map(() => '?').join(',')})`;
+        anyParams.push(...existingIds);
+      }
+
+      anyQuery += ` LIMIT ${4 - finalQuizzes.length}`;
+      const [anyRows] = await pool.query(anyQuery, anyParams);
+      finalQuizzes.push(...anyRows);
+    }
+
+    // 4. Format options JSON
+    const formattedQuizzes = finalQuizzes.map((q, idx) => ({
+      id: q.id,
+      tile_number: idx + 1,
+      tile_label: `0${idx + 1}`,
+      question: q.question,
+      options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options,
+      correct_index: q.correct_index,
+      explanation: q.explanation || 'Chính xác! Bạn đã mở được một ô tranh bí ẩn.',
+      difficulty: q.difficulty || 'thong_hieu'
+    }));
+
+    // Secret image behind the 4 tiles (configured custom image or topic cover image)
+    const secretImage = topic.game_image || topic.img || 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=85';
+
+    res.json({
+      topic_id: topic.id,
+      title: topic.title,
+      game_image: secretImage,
+      game_quiz_ids: selectedQuizIds,
+      quizzes: formattedQuizzes
+    });
+  } catch (error) {
+    console.error('Get topic game quizzes error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT /api/topics/:id/game-config (Admin only - set game quizzes and image)
+app.put('/api/topics/:id/game-config', requireAdmin, async (req, res) => {
+  try {
+    const topicId = Number(req.params.id);
+    const { game_quiz_ids, game_image } = req.body;
+
+    const quizIdsJson = game_quiz_ids ? JSON.stringify(game_quiz_ids) : null;
+
+    await pool.query(
+      'UPDATE topics SET game_quiz_ids = ?, game_image = COALESCE(?, game_image) WHERE id = ?',
+      [quizIdsJson, game_image || null, topicId]
+    );
+
+    res.json({ success: true, message: 'Cập nhật cấu hình trò chơi chủ đề thành công' });
+  } catch (error) {
+    console.error('Update topic game config error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // GET /api/quizzes (Public, with filters)
 app.get('/api/quizzes', async (req, res) => {

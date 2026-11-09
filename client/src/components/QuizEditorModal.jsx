@@ -133,19 +133,20 @@ export default function QuizEditorModal({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto bg-black/60 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-4xl bg-[#FFFDF5] rounded-3xl shadow-2xl border border-[#EBDBC5] overflow-hidden flex flex-col max-h-[92vh]">
         {/* Modal Header */}
-        <div className="bg-gradient-to-r from-navy via-navy-light to-slate-900 text-white px-6 py-5 flex items-center justify-between border-b border-white/10 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gold/20 border border-gold/40 flex items-center justify-center text-gold">
+        <div className="bg-gradient-to-r from-[#70070B] via-[#850B10] to-[#9E0D14] text-white px-6 py-5 flex items-center justify-between border-b border-amber-300/30 shrink-0 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="relative z-10 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-white/15 border border-amber-300/40 flex items-center justify-center text-[#FDE2A7]">
               <Award className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[11px] font-black uppercase tracking-wider text-gold-light">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#FDE2A7]">
                 {quiz ? 'Chỉnh Sửa Câu Hỏi Trắc Nghiệm' : 'Thêm Câu Hỏi Trắc Nghiệm Mới'}
               </span>
-              <h3 className="text-lg font-black text-white">
+              <h3 className="text-lg font-bold text-white font-serif-royal">
                 Ngân Hàng Trắc Nghiệm Năng Lực Theo Bài Học
               </h3>
             </div>
@@ -153,7 +154,7 @@ export default function QuizEditorModal({
 
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition"
+            className="relative z-10 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#FFF7E8] transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -178,7 +179,7 @@ export default function QuizEditorModal({
                 value={formData.lesson}
                 onChange={(e) => setFormData({ ...formData, lesson: e.target.value })}
                 placeholder="VD: Bài 11: Một số nền văn minh cổ trên đất nước Việt Nam"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-navy"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#850B10]"
                 required
               />
             </div>
@@ -190,7 +191,7 @@ export default function QuizEditorModal({
               <select
                 value={formData.topic_id}
                 onChange={(e) => setFormData({ ...formData, topic_id: Number(e.target.value) })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-navy"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#850B10]"
               >
                 <option value={1}>Chủ đề 1: Lịch sử và Sử học</option>
                 <option value={2}>Chủ đề 2: Văn minh Ai Cập & Tây Á</option>
@@ -212,7 +213,7 @@ export default function QuizEditorModal({
               <select
                 value={formData.resource_id}
                 onChange={(e) => setFormData({ ...formData, resource_id: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-navy"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#850B10]"
               >
                 <option value="">-- Không gắn cố định với hiện vật cụ thể (Toàn bài) --</option>
                 {allResources.map((r) => (
@@ -230,7 +231,7 @@ export default function QuizEditorModal({
               <select
                 value={formData.difficulty}
                 onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-navy"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#850B10]"
               >
                 <option value="nhan_biet">Cấp độ 1: Nhận biết</option>
                 <option value="thong_hieu">Cấp độ 2: Thông hiểu</option>
@@ -250,7 +251,7 @@ export default function QuizEditorModal({
               value={formData.question}
               onChange={(e) => setFormData({ ...formData, question: e.target.value })}
               placeholder="VD: Hình ảnh ngôi sao 14 cánh ở tâm mặt Trống đồng Ngọc Lũ biểu thị tín ngưỡng nào của cư dân Đông Sơn?"
-              className="w-full p-3.5 rounded-2xl bg-slate-50 border border-slate-200 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-navy leading-relaxed"
+              className="w-full p-3.5 rounded-2xl bg-slate-50 border border-slate-200 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#850B10] leading-relaxed"
               required
             />
           </div>
@@ -293,7 +294,7 @@ export default function QuizEditorModal({
                     value={formData[key]}
                     onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
                     placeholder={`Nội dung phương án ${letter}...`}
-                    className={`flex-1 px-3.5 py-2 rounded-xl bg-white border text-xs font-medium focus:outline-none focus:ring-2 focus:ring-navy ${
+                    className={`flex-1 px-3.5 py-2 rounded-xl bg-white border text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#850B10] ${
                       isCorrect ? 'border-emerald-300 ring-1 ring-emerald-200 text-slate-900 font-bold' : 'border-slate-200 text-slate-800'
                     }`}
                     required
@@ -313,7 +314,7 @@ export default function QuizEditorModal({
               value={formData.explanation}
               onChange={(e) => setFormData({ ...formData, explanation: e.target.value })}
               placeholder="VD: Ngôi sao 14 cánh ở trung tâm tượng trưng cho Mặt Trời - nguồn năng lượng đem lại sự sinh sôi cho vạn vật trong nền nông nghiệp lúa nước..."
-              className="w-full p-3.5 rounded-2xl bg-slate-50 border border-slate-200 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-navy leading-relaxed"
+              className="w-full p-3.5 rounded-2xl bg-slate-50 border border-slate-200 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#850B10] leading-relaxed"
             />
           </div>
 
@@ -326,7 +327,7 @@ export default function QuizEditorModal({
               type="number"
               value={formData.order_index}
               onChange={(e) => setFormData({ ...formData, order_index: e.target.value })}
-              className="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-navy"
+              className="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#850B10]"
             />
           </div>
 
@@ -362,11 +363,11 @@ export default function QuizEditorModal({
         </form>
 
         {/* Modal Footer */}
-        <div className="p-4 sm:px-6 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
+        <div className="p-4 sm:px-6 bg-[#FAF5EB] border-t border-[#EBDBC5] flex items-center justify-between shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition"
+            className="px-4 py-2 rounded-xl text-xs font-bold text-stone-600 hover:text-stone-900 hover:bg-stone-200/60 transition cursor-pointer"
           >
             Hủy bỏ
           </button>
@@ -374,9 +375,9 @@ export default function QuizEditorModal({
           <button
             onClick={handleSubmit}
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 font-black text-xs transition shadow-md active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white font-bold text-xs transition shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-4 h-4 text-[#FDE2A7]" />
             <span>{saving ? 'Đang lưu...' : quiz ? 'Cập nhật câu hỏi' : 'Lưu câu hỏi mới'}</span>
           </button>
         </div>

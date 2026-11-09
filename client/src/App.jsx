@@ -17,15 +17,32 @@ import StudentsView from './components/StudentsView.jsx';
 import AboutView from './components/AboutView.jsx';
 import ContactView from './components/ContactView.jsx';
 import TopicEditorModal from './components/TopicEditorModal.jsx';
+import TilePuzzleGame from './components/TilePuzzleGame.jsx';
 import Footer from './components/Footer.jsx';
 import CoreFeaturesShowcase from './components/CoreFeaturesShowcase.jsx';
+import AuthenticatedHomeSection from './components/AuthenticatedHomeSection.jsx';
 import WhyChooseUsSection from './components/WhyChooseUsSection.jsx';
 import CollaborativeStudySpace from './components/CollaborativeStudySpace.jsx';
 import AuthPage from './components/AuthPage.jsx';
 import { createResourceSlug } from './utils/slugify.js';
-import { Filter, Layers, Box, Search, RotateCcw, ArrowRight, BookOpen, Sparkles, AlertCircle, LayoutDashboard, Globe, ShieldCheck, Users, X, PlusCircle, Edit3 } from 'lucide-react';
+import { Filter, Layers, Box, Search, RotateCcw, ArrowRight, ArrowDown, BookOpen, Sparkles, AlertCircle, LayoutDashboard, Globe, ShieldCheck, Users, X, PlusCircle, Edit3 } from 'lucide-react';
 
 const API_BASE = '/api';
+
+// Route Guard: When not logged in, users can ONLY view the home page
+function ProtectedRoute({ currentUser, onOpenLogin, children }) {
+  useEffect(() => {
+    if (!currentUser) {
+      onOpenLogin();
+    }
+  }, [currentUser, onOpenLogin]);
+
+  if (!currentUser) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
 
 export default function App() {
   const navigate = useNavigate();
@@ -74,8 +91,10 @@ export default function App() {
   // Topic Management State for Admin
   const [editingTopic, setEditingTopic] = useState(null);
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
+  const [activeGameTopic, setActiveGameTopic] = useState(null);
 
   // Is this the full-width detail page or full-screen dashboard?
+  const isHomePage = location.pathname === '/';
   const isDetailPage = location.pathname.startsWith('/tu-lieu/');
   const isDashboard = location.pathname.startsWith('/dashboard');
 
@@ -212,7 +231,7 @@ export default function App() {
       if (data.resource) {
         setResources(prev => prev.map(item => item.id === resource.id ? { ...item, view_count: data.resource.view_count } : item));
       }
-    }).catch(() => {});
+    }).catch(() => { });
   };
 
   // CRUD Operations (Protected with real Admin JWT)
@@ -352,7 +371,7 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col selection:bg-gold selection:text-slate-950 font-sans ${isDashboard ? 'bg-slate-950 text-slate-100' : 'bg-[#f6f8fc]'}`}>
+    <div className={`min-h-screen flex flex-col selection:bg-[#850b10] selection:text-[#fff8ee] font-sans ${isDashboard ? 'bg-slate-950 text-slate-100' : isHomePage ? 'bg-[#850B10]' : 'bg-[#FFF7E8] text-[#2D1B08]'}`}>
       {/* Top Navbar: Hidden on Admin Dashboard */}
       {!isDashboard && (
         <Navbar
@@ -364,9 +383,15 @@ export default function App() {
       )}
 
       {/* Main Container Wrapper */}
-      <div className={isDashboard ? 'min-h-screen bg-slate-950 flex-1 flex flex-col px-3 sm:px-8 lg:px-12 py-3 sm:py-4' : 'container mx-auto px-3 sm:px-6 lg:px-8 flex-1 flex my-2 sm:my-4 gap-4 sm:gap-6'}>
-        {/* Left Sidebar: HIDDEN on detail view and on dashboard */}
-        {!isDetailPage && !isDashboard && (
+      <div className={
+        isDashboard
+          ? 'min-h-screen bg-slate-950 flex-1 flex flex-col px-3 sm:px-8 lg:px-12 py-3 sm:py-4'
+          : isHomePage
+            ? 'w-full flex-1 flex flex-col'
+            : 'container mx-auto px-3 sm:px-6 lg:px-8 flex-1 flex my-2 sm:my-4 gap-4 sm:gap-6'
+      }>
+        {/* Left Sidebar: HIDDEN on home page, detail view, and on dashboard */}
+        {!isHomePage && !isDetailPage && !isDashboard && (
           <Sidebar
             stats={stats}
             currentUser={currentUser}
@@ -376,101 +401,61 @@ export default function App() {
         )}
 
         {/* Dynamic Main Workspace Content */}
-        <main className={`flex-1 min-w-0 ${isDetailPage || isDashboard ? 'w-full' : ''} ${!isDashboard ? 'pb-12' : ''}`}>
+        <main className={`flex-1 min-w-0 ${isHomePage || isDetailPage || isDashboard ? 'w-full' : ''} ${!isDashboard ? 'pb-12' : ''}`}>
           <Routes>
             {/* ================= ROUTE: HOME ================= */}
             <Route
               path="/"
               element={
-                <div className="space-y-8 animate-fade-in">
-                  {/* Hero Banner */}
+                <div className="w-full animate-fade-in">
+                  {/* Full-screen Edge-to-Edge Hero Banner */}
                   <Hero
                     searchQuery={inputSearch}
                     setSearchQuery={setInputSearch}
                     onSearchSubmit={handleSearchSubmit}
-                    onOpenStudio3D={() => navigate('/studio-3d')}
+                    onOpenStudio3D={() => {
+                      if (!currentUser) {
+                        setIsLoginModalOpen(true);
+                      } else {
+                        navigate('/studio-3d');
+                      }
+                    }}
                     bannerSlides={bannerSlides}
                     onOpenBannerConfig={() => setIsBannerModalOpen(true)}
                     isAdmin={currentUser?.role === 'admin'}
                   />
 
-                  {/* Core Features Showcase (Replacing old teaser as requested in Feedback) */}
-                  <CoreFeaturesShowcase
-                    topics={topics}
-                    artifacts3d={artifacts3d}
-                  />
+                  {/* Main Homepage Sections - Nền /home-assets/bg.png - Căn Đều 2 Bên */}
+                  <div
+                    className="w-full bg-[#FAF5EB] bg-repeat py-10 sm:py-16 shadow-inner"
+                    style={{ backgroundImage: "url('/home-assets/bg.png')" }}
+                  >
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                      {!currentUser ? (
+                        /* Giao diện khi chưa đăng nhập: CÁC CHỨC NĂNG CHÍNH CỦA TRANG WEB trước, sau đó là TẠI SAO CHỌN SỬ HỌC SỐ */
+                        <div className="space-y-16 sm:space-y-20">
+                          {/* 1. Các chức năng chính của trang web (image copy 2.png) */}
+                          <CoreFeaturesShowcase
+                            topics={topics}
+                            artifacts3d={artifacts3d}
+                            currentUser={currentUser}
+                            onOpenLogin={() => setIsLoginModalOpen(true)}
+                          />
 
-                  {/* Why Choose Us / Ưu điểm của trang web (As requested in Feedback) */}
-                  <WhyChooseUsSection
-                    onOpenLogin={() => setIsLoginModalOpen(true)}
-                    currentUser={currentUser}
-                  />
-
-                  {/* 7 Curriculum Topics Grid */}
-                  <div>
-                    <div className="flex items-end justify-between mb-4">
-                      <div>
-                        <h2 className="text-xl font-black text-slate-900 tracking-tight">
-                          Các Chủ Đề Lịch Sử 10
-                        </h2>
-                        <p className="text-xs text-slate-500 mt-0.5">
-                          Chọn chủ đề để xem danh mục bài học và tư liệu tương ứng
-                        </p>
-                      </div>
-                      <Link
-                        to="/chu-de"
-                        className="text-xs font-bold text-navy hover:text-gold-dark transition flex items-center gap-1"
-                      >
-                        <span>Xem tất cả ({topics.length})</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                      {topics.map((t) => (
-                        <TopicCard
-                          key={t.id}
-                          topic={t}
-                          isAdmin={currentUser?.role === 'admin'}
-                          onEdit={handleOpenEditTopic}
-                          onDelete={handleDeleteTopic}
-                          onSelect={(topic) => {
-                            navigate(`/kho-tu-lieu?topic=${topic.id}`);
-                          }}
+                          {/* 2. Tại sao chọn Sử Học Số (image copy.png) đặt bên dưới */}
+                          <WhyChooseUsSection
+                            onOpenLogin={() => setIsLoginModalOpen(true)}
+                            currentUser={currentUser}
+                          />
+                        </div>
+                      ) : (
+                        /* Giao diện sau khi đăng nhập: Giáo viên (image copy 3.png) hoặc Học sinh (image copy 4.png) */
+                        <AuthenticatedHomeSection
+                          currentUser={currentUser}
+                          topics={topics}
+                          artifacts3d={artifacts3d}
                         />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Featured Artifacts Spotlight */}
-                  <div>
-                    <div className="flex items-end justify-between mb-4">
-                      <div>
-                        <h2 className="text-xl font-black text-slate-900 tracking-tight">
-                          Hiện Vật & Tư Liệu Tiêu Biểu
-                        </h2>
-                        <p className="text-xs text-slate-500 mt-0.5">
-                          Bảo vật quốc gia, di sản khảo cổ học và nguồn tư liệu lịch sử nổi bật
-                        </p>
-                      </div>
-                      <Link
-                        to="/kho-tu-lieu"
-                        className="text-xs font-bold text-navy hover:text-gold-dark transition flex items-center gap-1"
-                      >
-                        <span>Khám phá toàn bộ kho ({resources.length})</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                      {resources.slice(0, 6).map((res) => (
-                        <ResourceCard
-                          key={res.id}
-                          resource={res}
-                          onSelect={handleSelectResource}
-                          onOpen3D={(code) => navigate(`/studio-3d/co-vat/${code}`)}
-                        />
-                      ))}
+                      )}
                     </div>
                   </div>
                 </div>
@@ -481,43 +466,46 @@ export default function App() {
             <Route
               path="/chu-de"
               element={
-                <div className="space-y-6 animate-fade-in">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                      <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-                        {topics.length} Chủ Đề Học Tập Môn Lịch Sử 10
-                      </h2>
-                      <p className="text-xs text-slate-500 mt-1">
-                        Được xây dựng theo mạch nội dung chuẩn của Chương trình GDPT 2018
-                      </p>
+                <ProtectedRoute currentUser={currentUser} onOpenLogin={() => setIsLoginModalOpen(true)}>
+                  <div className="space-y-6 animate-fade-in">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                          {topics.length} Chủ Đề Học Tập Môn Lịch Sử 10
+                        </h2>
+                        <p className="text-xs text-slate-500 mt-1">
+                          Được xây dựng theo mạch nội dung chuẩn của Chương trình GDPT 2018
+                        </p>
+                      </div>
+
+                      {currentUser?.role === 'admin' && (
+                        <button
+                          onClick={handleOpenNewTopic}
+                          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 text-xs font-black transition shadow-sm active:scale-95 shrink-0"
+                        >
+                          <PlusCircle className="w-4 h-4" />
+                          <span>Thêm chủ đề mới</span>
+                        </button>
+                      )}
                     </div>
 
-                    {currentUser?.role === 'admin' && (
-                      <button
-                        onClick={handleOpenNewTopic}
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 text-xs font-black transition shadow-sm active:scale-95 shrink-0"
-                      >
-                        <PlusCircle className="w-4 h-4" />
-                        <span>Thêm chủ đề mới</span>
-                      </button>
-                    )}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                      {topics.map((t) => (
+                        <TopicCard
+                          key={t.id}
+                          topic={t}
+                          isAdmin={currentUser?.role === 'admin'}
+                          onEdit={handleOpenEditTopic}
+                          onDelete={handleDeleteTopic}
+                          onPlayGame={(top) => setActiveGameTopic(top)}
+                          onSelect={(topic) => {
+                            navigate(`/kho-tu-lieu?topic=${topic.id}`);
+                          }}
+                        />
+                      ))}
+                    </div>
                   </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {topics.map((t) => (
-                      <TopicCard
-                        key={t.id}
-                        topic={t}
-                        isAdmin={currentUser?.role === 'admin'}
-                        onEdit={handleOpenEditTopic}
-                        onDelete={handleDeleteTopic}
-                        onSelect={(topic) => {
-                          navigate(`/kho-tu-lieu?topic=${topic.id}`);
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
+                </ProtectedRoute>
               }
             />
 
@@ -525,169 +513,256 @@ export default function App() {
             <Route
               path="/kho-tu-lieu"
               element={
-                <div className="space-y-6 animate-fade-in">
-                  {/* Filter & Search Bar */}
-                  <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/90 shadow-sm space-y-4">
-                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                      {/* Search Form */}
-                      <form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          updateFilters({ q: inputSearch.trim() });
-                        }}
-                        className="relative flex-1 w-full flex items-center gap-2"
-                      >
-                        <div className="relative flex-1">
-                          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                          <input
-                            type="text"
-                            value={inputSearch}
-                            onChange={(e) => setInputSearch(e.target.value)}
-                            placeholder="Tìm kiếm tư liệu, bảo vật, địa danh, di tích..."
-                            className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-navy"
-                          />
-                          {inputSearch && (
+                <ProtectedRoute currentUser={currentUser} onOpenLogin={() => setIsLoginModalOpen(true)}>
+                  <div className="space-y-6 animate-fade-in">
+                    {/* Topic Header Summary (when a specific topic is selected) */}
+                    {selectedTopicId !== 'all' && (() => {
+                      const currentTopic = topics.find((t) => String(t.id) === String(selectedTopicId));
+                      if (!currentTopic) return null;
+                      return (
+                        <div className="bg-[#FAF5EB] p-4 sm:p-5 rounded-3xl border border-[#EBDBC5] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
+                          <div>
+                            <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#850B10] text-[#FFFDF8] mb-1">
+                              Chủ đề {currentTopic.order_index || currentTopic.id}
+                            </span>
+                            <h2 className="text-lg sm:text-xl font-black text-slate-900 font-serif-royal">
+                              {currentTopic.title}
+                            </h2>
+                            {currentTopic.description && (
+                              <p className="text-xs text-slate-600 mt-0.5 max-w-2xl line-clamp-2">
+                                {currentTopic.description}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            <a
+                              href="#tro-choi-chu-de"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                document.getElementById('tro-choi-chu-de')?.scrollIntoView({ behavior: 'smooth' });
+                              }}
+                              className="px-3.5 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-[#850B10] border border-amber-300/80 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                            >
+                              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                              <span>Trò chơi lật ô tranh</span>
+                              <ArrowDown className="w-3.5 h-3.5" />
+                            </a>
+
+                            {currentUser?.role === 'admin' && (
+                              <button
+                                onClick={() => handleOpenEditTopic(currentTopic)}
+                                className="px-3 py-2 rounded-xl bg-white border border-[#EBDBC5] hover:bg-slate-50 text-slate-700 text-xs font-bold transition flex items-center gap-1 shadow-2xs cursor-pointer"
+                                title="Đổi tên chủ đề & cấu hình trò chơi"
+                              >
+                                <Edit3 className="w-3.5 h-3.5 text-amber-600" />
+                                <span>Sửa</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Filter & Search Bar */}
+                    <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/90 shadow-sm space-y-4">
+                      <div className="flex flex-col sm:flex-row items-center gap-3">
+                        {/* Search Form */}
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            updateFilters({ q: inputSearch.trim() });
+                          }}
+                          className="relative flex-1 w-full flex items-center gap-2"
+                        >
+                          <div className="relative flex-1">
+                            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                            <input
+                              type="text"
+                              value={inputSearch}
+                              onChange={(e) => setInputSearch(e.target.value)}
+                              placeholder="Tìm kiếm tư liệu, bảo vật, địa danh, di tích..."
+                              className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-navy"
+                            />
+                            {inputSearch && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setInputSearch('');
+                                  updateFilters({ q: '' });
+                                }}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-full cursor-pointer"
+                                title="Xóa từ khóa tìm kiếm"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                          <button
+                            type="submit"
+                            className="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition active:scale-95 shrink-0 cursor-pointer shadow-2xs"
+                          >
+                            Tìm kiếm
+                          </button>
+                        </form>
+
+                        {/* Topic Filter */}
+                        <select
+                          value={selectedTopicId}
+                          onChange={(e) => updateFilters({ topic: e.target.value })}
+                          className="w-full sm:w-auto px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-navy"
+                        >
+                          <option value="all">Tất cả các chủ đề (7)</option>
+                          {topics.map((t) => (
+                            <option key={t.id} value={t.id}>
+                              Chủ đề {t.id}: {t.title}
+                            </option>
+                          ))}
+                        </select>
+
+                        {/* Format Filter */}
+                        <select
+                          value={selectedType}
+                          onChange={(e) => updateFilters({ type: e.target.value })}
+                          className="w-full sm:w-auto px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-navy"
+                        >
+                          <option value="all">Tất cả định dạng</option>
+                          <option value="3d">Mô hình 3D tương tác</option>
+                          <option value="image">Hình ảnh khảo cổ</option>
+                          <option value="video">Video bài học</option>
+                          <option value="text">Văn bản / Bia ký</option>
+                        </select>
+
+                        {/* Reset Button */}
+                        {(searchQuery || selectedTopicId !== 'all' || selectedType !== 'all') && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setInputSearch('');
+                              navigate('/kho-tu-lieu');
+                            }}
+                            className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition cursor-pointer"
+                            title="Đặt lại bộ lọc"
+                          >
+                            <RotateCcw className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Active search pill indicator */}
+                      {searchQuery && (
+                        <div className="flex items-center gap-2 pt-1">
+                          <span className="text-xs text-slate-500 font-medium">Từ khóa tìm kiếm:</span>
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900 text-white text-xs font-semibold shadow-2xs">
+                            <span>"{searchQuery}"</span>
                             <button
                               type="button"
                               onClick={() => {
                                 setInputSearch('');
                                 updateFilters({ q: '' });
                               }}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-full cursor-pointer"
-                              title="Xóa từ khóa tìm kiếm"
+                              className="p-0.5 hover:bg-white/20 rounded-full cursor-pointer transition"
+                              title="Xóa tìm kiếm"
                             >
-                              <X className="w-3.5 h-3.5" />
+                              <X className="w-3 h-3" />
                             </button>
-                          )}
+                          </span>
                         </div>
-                        <button
-                          type="submit"
-                          className="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition active:scale-95 shrink-0 cursor-pointer shadow-2xs"
-                        >
-                          Tìm kiếm
-                        </button>
-                      </form>
+                      )}
 
-                      {/* Topic Filter */}
-                      <select
-                        value={selectedTopicId}
-                        onChange={(e) => updateFilters({ topic: e.target.value })}
-                        className="w-full sm:w-auto px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-navy"
-                      >
-                        <option value="all">Tất cả các chủ đề (7)</option>
-                        {topics.map((t) => (
-                          <option key={t.id} value={t.id}>
-                            Chủ đề {t.id}: {t.title}
-                          </option>
-                        ))}
-                      </select>
+                      {/* Results Count & Quick Format Pills */}
+                      <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
+                        <span>
+                          Hiển thị <strong>{resources.length}</strong> tư liệu học tập
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => updateFilters({ type: selectedType === '3d' ? 'all' : '3d' })}
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 ${selectedType === '3d'
+                                ? 'bg-amber-500 text-slate-950 font-black'
+                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                              }`}
+                          >
+                            <Box className="w-3.5 h-3.5" /> 3D Models
+                          </button>
+                        </div>
+                      </div>
+                    </div>
 
-                      {/* Format Filter */}
-                      <select
-                        value={selectedType}
-                        onChange={(e) => updateFilters({ type: e.target.value })}
-                        className="w-full sm:w-auto px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-navy"
-                      >
-                        <option value="all">Tất cả định dạng</option>
-                        <option value="3d">Mô hình 3D tương tác</option>
-                        <option value="image">Hình ảnh khảo cổ</option>
-                        <option value="video">Video bài học</option>
-                        <option value="text">Văn bản / Bia ký</option>
-                      </select>
-
-                      {/* Reset Button */}
-                      {(searchQuery || selectedTopicId !== 'all' || selectedType !== 'all') && (
+                    {/* Resource Cards Grid */}
+                    {resources.length === 0 ? (
+                      <div className="p-10 sm:p-14 text-center bg-white rounded-2xl border border-dashed border-slate-300">
+                        <AlertCircle className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+                        <h4 className="font-bold text-sm text-slate-800">
+                          {searchQuery
+                            ? `Không tìm thấy tư liệu nào khớp với từ khóa "${searchQuery}"`
+                            : 'Không tìm thấy tư liệu phù hợp với bộ lọc'}
+                        </h4>
+                        <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto leading-relaxed">
+                          Hãy thử tìm kiếm với các từ khóa lịch sử phổ biến như: <em>Trống đồng, Đông Sơn, Angkor, Phù Nam, Bia Võ Cạnh, Champa</em> hoặc bấm nút bên dưới để xem toàn bộ kho học liệu.
+                        </p>
                         <button
                           type="button"
                           onClick={() => {
                             setInputSearch('');
                             navigate('/kho-tu-lieu');
                           }}
-                          className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition cursor-pointer"
-                          title="Đặt lại bộ lọc"
+                          className="mt-4 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition cursor-pointer"
                         >
-                          <RotateCcw className="w-4 h-4" />
+                          Xem tất cả tư liệu
                         </button>
-                      )}
-                    </div>
-
-                    {/* Active search pill indicator */}
-                    {searchQuery && (
-                      <div className="flex items-center gap-2 pt-1">
-                        <span className="text-xs text-slate-500 font-medium">Từ khóa tìm kiếm:</span>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900 text-white text-xs font-semibold shadow-2xs">
-                          <span>"{searchQuery}"</span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setInputSearch('');
-                              updateFilters({ q: '' });
-                            }}
-                            className="p-0.5 hover:bg-white/20 rounded-full cursor-pointer transition"
-                            title="Xóa tìm kiếm"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </span>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {resources.map((res) => (
+                          <ResourceCard
+                            key={res.id}
+                            resource={res}
+                            onSelect={handleSelectResource}
+                            onOpen3D={(code) => navigate(`/studio-3d/co-vat/${code}`)}
+                          />
+                        ))}
                       </div>
                     )}
 
-                    {/* Results Count & Quick Format Pills */}
-                    <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
-                      <span>
-                        Hiển thị <strong>{resources.length}</strong> tư liệu học tập
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => updateFilters({ type: selectedType === '3d' ? 'all' : '3d' })}
-                          className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 ${
-                            selectedType === '3d'
-                              ? 'bg-amber-500 text-slate-950 font-black'
-                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                          }`}
-                        >
-                          <Box className="w-3.5 h-3.5" /> 3D Models
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                    {/* ============================================================== */}
+                    {/* MỤC TRÒ CHƠI LẬT Ô CHỮ CHỦ ĐỀ (KÉO XUỐNG DƯỚI TƯ LIỆU ĐỂ CHƠI) */}
+                    {/* ============================================================== */}
+                    {selectedTopicId !== 'all' && (() => {
+                      const currentTopic = topics.find((t) => String(t.id) === String(selectedTopicId));
+                      if (!currentTopic) return null;
+                      return (
+                        <div id="tro-choi-chu-de" className="pt-8 border-t-2 border-dashed border-[#EBDBC5] space-y-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="flex items-center gap-2">
+                              <span className="w-3 h-3 rounded-full bg-[#850B10] shrink-0" />
+                              <h3 className="text-base sm:text-lg font-black text-slate-900 uppercase font-serif-royal">
+                                Trò Chơi Trắc Nghiệm Mở Khóa Ô Tranh: {currentTopic.title}
+                              </h3>
+                            </div>
 
-                  {/* Resource Cards Grid */}
-                  {resources.length === 0 ? (
-                    <div className="p-10 sm:p-14 text-center bg-white rounded-2xl border border-dashed border-slate-300">
-                      <AlertCircle className="w-10 h-10 text-slate-400 mx-auto mb-3" />
-                      <h4 className="font-bold text-sm text-slate-800">
-                        {searchQuery
-                          ? `Không tìm thấy tư liệu nào khớp với từ khóa "${searchQuery}"`
-                          : 'Không tìm thấy tư liệu phù hợp với bộ lọc'}
-                      </h4>
-                      <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto leading-relaxed">
-                        Hãy thử tìm kiếm với các từ khóa lịch sử phổ biến như: <em>Trống đồng, Đông Sơn, Angkor, Phù Nam, Bia Võ Cạnh, Champa</em> hoặc bấm nút bên dưới để xem toàn bộ kho học liệu.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setInputSearch('');
-                          navigate('/kho-tu-lieu');
-                        }}
-                        className="mt-4 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition cursor-pointer"
-                      >
-                        Xem tất cả tư liệu
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                      {resources.map((res) => (
-                        <ResourceCard
-                          key={res.id}
-                          resource={res}
-                          onSelect={handleSelectResource}
-                          onOpen3D={(code) => navigate(`/studio-3d/co-vat/${code}`)}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
+                            {currentUser?.role === 'admin' && (
+                              <button
+                                onClick={() => handleOpenEditTopic(currentTopic)}
+                                className="px-3.5 py-1.5 rounded-xl bg-white border border-[#EBDBC5] hover:bg-slate-50 text-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer self-start sm:self-auto"
+                              >
+                                <Edit3 className="w-3.5 h-3.5 text-amber-600" />
+                                <span>Cấu hình Game & Đổi ảnh bí ẩn</span>
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Interactive Game for this Topic */}
+                          <TilePuzzleGame
+                            topicId={currentTopic.id}
+                            topicTitle={currentTopic.title}
+                            topicImg={currentTopic.game_image || currentTopic.img}
+                          />
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </ProtectedRoute>
               }
             />
 
@@ -695,65 +770,96 @@ export default function App() {
             <Route
               path="/tu-lieu/:slug"
               element={
-                <ResourceDetailView
-                  allResources={resources}
-                  currentUser={currentUser}
-                  authToken={authToken}
-                  onEdit={(res) => {
-                    setEditorResource(res);
-                    setIsEditorOpen(true);
-                  }}
-                  onDelete={handleDeleteResource}
-                />
+                <ProtectedRoute currentUser={currentUser} onOpenLogin={() => setIsLoginModalOpen(true)}>
+                  <ResourceDetailView
+                    allResources={resources}
+                    currentUser={currentUser}
+                    authToken={authToken}
+                    onEdit={(res) => {
+                      setEditorResource(res);
+                      setIsEditorOpen(true);
+                    }}
+                    onDelete={handleDeleteResource}
+                  />
+                </ProtectedRoute>
               }
             />
 
-            {/* ================= ROUTE: STUDIO 3D WITH REAL SLUGS ================= */}
+            {/* ================= ROUTE: STUDIO 3D ================= */}
             <Route
               path="/studio-3d"
-              element={<Navigate to="/studio-3d/co-vat/dong_son_drum" replace />}
+              element={
+                <ProtectedRoute currentUser={currentUser} onOpenLogin={() => setIsLoginModalOpen(true)}>
+                  <Studio3DView
+                    artifacts3d={artifacts3d}
+                    currentUser={currentUser}
+                    authToken={authToken}
+                    onArtifacts3DChange={fetchInitialData}
+                  />
+                </ProtectedRoute>
+              }
             />
             <Route
               path="/studio-3d/:mode"
               element={
-                <Studio3DView
-                  artifacts3d={artifacts3d}
-                  currentUser={currentUser}
-                  authToken={authToken}
-                  onArtifacts3DChange={fetchInitialData}
-                />
+                <ProtectedRoute currentUser={currentUser} onOpenLogin={() => setIsLoginModalOpen(true)}>
+                  <Studio3DView
+                    artifacts3d={artifacts3d}
+                    currentUser={currentUser}
+                    authToken={authToken}
+                    onArtifacts3DChange={fetchInitialData}
+                  />
+                </ProtectedRoute>
               }
             />
             <Route
               path="/studio-3d/:mode/:artifactCode"
               element={
-                <Studio3DView
-                  artifacts3d={artifacts3d}
-                  currentUser={currentUser}
-                  authToken={authToken}
-                  onArtifacts3DChange={fetchInitialData}
-                />
+                <ProtectedRoute currentUser={currentUser} onOpenLogin={() => setIsLoginModalOpen(true)}>
+                  <Studio3DView
+                    artifacts3d={artifacts3d}
+                    currentUser={currentUser}
+                    authToken={authToken}
+                    onArtifacts3DChange={fetchInitialData}
+                  />
+                </ProtectedRoute>
               }
             />
 
             {/* ================= ROUTE: TEACHERS WITH REAL SLUGS ================= */}
             <Route
               path="/giao-vien"
-              element={<Navigate to="/giao-vien/cam-nang" replace />}
+              element={
+                <ProtectedRoute currentUser={currentUser} onOpenLogin={() => setIsLoginModalOpen(true)}>
+                  <Navigate to="/giao-vien/cam-nang" replace />
+                </ProtectedRoute>
+              }
             />
             <Route
               path="/giao-vien/:tab"
-              element={<TeachersView currentUser={currentUser} authToken={authToken} />}
+              element={
+                <ProtectedRoute currentUser={currentUser} onOpenLogin={() => setIsLoginModalOpen(true)}>
+                  <TeachersView currentUser={currentUser} authToken={authToken} />
+                </ProtectedRoute>
+              }
             />
 
             {/* ================= ROUTE: STUDENTS WITH REAL SLUGS ================= */}
             <Route
               path="/hoc-sinh"
-              element={<Navigate to="/hoc-sinh/nhiem-vu" replace />}
+              element={
+                <ProtectedRoute currentUser={currentUser} onOpenLogin={() => setIsLoginModalOpen(true)}>
+                  <Navigate to="/hoc-sinh/nhiem-vu" replace />
+                </ProtectedRoute>
+              }
             />
             <Route
               path="/hoc-sinh/:tab"
-              element={<StudentsView currentUser={currentUser} authToken={authToken} topics={topics} />}
+              element={
+                <ProtectedRoute currentUser={currentUser} onOpenLogin={() => setIsLoginModalOpen(true)}>
+                  <StudentsView currentUser={currentUser} authToken={authToken} topics={topics} />
+                </ProtectedRoute>
+              }
             />
 
             {/* ================= ROUTE: ABOUT ================= */}
@@ -766,12 +872,14 @@ export default function App() {
             <Route
               path="/khong-gian-chung"
               element={
-                <CollaborativeStudySpace
-                  currentUser={currentUser}
-                  authToken={authToken}
-                  onOpenLogin={() => setIsLoginModalOpen(true)}
-                  topics={topics}
-                />
+                <ProtectedRoute currentUser={currentUser} onOpenLogin={() => setIsLoginModalOpen(true)}>
+                  <CollaborativeStudySpace
+                    currentUser={currentUser}
+                    authToken={authToken}
+                    onOpenLogin={() => setIsLoginModalOpen(true)}
+                    topics={topics}
+                  />
+                </ProtectedRoute>
               }
             />
 
@@ -879,6 +987,20 @@ export default function App() {
         onSave={handleSaveTopic}
         authToken={authToken}
       />
+
+      {/* Tile Puzzle Game Modal for /chu-de */}
+      {activeGameTopic && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in !m-0">
+          <div className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-3xl">
+            <TilePuzzleGame
+              topicId={activeGameTopic.id}
+              topicTitle={activeGameTopic.title}
+              topicImg={activeGameTopic.img}
+              onClose={() => setActiveGameTopic(null)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

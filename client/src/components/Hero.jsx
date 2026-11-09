@@ -1,261 +1,127 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Search, BookOpen, Sliders, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
+import React from 'react';
 
-export default function Hero({
-  searchQuery,
-  setSearchQuery,
-  onSearchSubmit,
-  onOpenStudio3D,
-  bannerSlides = [],
-  onOpenBannerConfig,
-  isAdmin = false
-}) {
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-
-  // Active slides only
-  const activeSlides = bannerSlides.filter((s) => s.is_active);
-  const hasSlides = activeSlides.length > 0;
-
-  // Auto rotate carousel every 5.5s (pauses on hover or when focusing in search bar)
-  useEffect(() => {
-    if (!hasSlides || activeSlides.length <= 1 || isHovered || isFocused) return;
-
-    const timer = setInterval(() => {
-      setCurrentSlideIndex((prev) => (prev + 1) % activeSlides.length);
-    }, 5500);
-
-    return () => clearInterval(timer);
-  }, [hasSlides, activeSlides.length, isHovered, isFocused]);
-
-  // Keep index within bounds if slides change
-  useEffect(() => {
-    if (currentSlideIndex >= activeSlides.length) {
-      setCurrentSlideIndex(0);
+export default function Hero() {
+  const handleStartExperience = () => {
+    const target = document.getElementById('chuc-nang-chinh');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [activeSlides.length, currentSlideIndex]);
-
-  const handlePrev = (e) => {
-    e?.stopPropagation();
-    if (!hasSlides) return;
-    setCurrentSlideIndex((prev) => (prev - 1 + activeSlides.length) % activeSlides.length);
   };
-
-  const handleNext = (e) => {
-    e?.stopPropagation();
-    if (!hasSlides) return;
-    setCurrentSlideIndex((prev) => (prev + 1) % activeSlides.length);
-  };
-
-  const activeSlide = hasSlides ? activeSlides[currentSlideIndex] : null;
 
   return (
-    <div
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="relative rounded-3xl overflow-hidden bg-[#162238] text-white p-6 sm:p-9 shadow-sm border border-slate-700/60 min-h-[380px] sm:min-h-[420px] flex flex-col justify-between transition-all"
+    <section
+      className="relative w-full h-[calc(100vh-4rem)] sm:h-[calc(100vh-5rem)] min-h-[560px] sm:min-h-[640px] bg-[#8B0B10] bg-cover bg-center text-white flex flex-col justify-center items-center overflow-hidden select-none"
+      style={{ backgroundImage: "url('/home-assets/bg-banner.jpeg')" }}
     >
-      {/* ============================================================== */}
-      {/* 1. BACKGROUND CAROUSEL (IF ACTIVE SLIDES EXIST)                 */}
-      {/* ============================================================== */}
-      {hasSlides ? (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {activeSlides.map((slide, idx) => {
-            const isActive = idx === currentSlideIndex;
-            return (
-              <div
-                key={slide.id || idx}
-                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                  isActive ? 'opacity-100' : 'opacity-0'
-                }`}
-              >
-                <img
-                  src={slide.image_url}
-                  alt={slide.title || 'Banner Slide'}
-                  className={`w-full h-full object-cover brightness-[0.38] contrast-[1.08] transition-transform duration-[7000ms] ease-out ${
-                    isActive ? 'scale-105' : 'scale-100'
-                  }`}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = 'https://images.unsplash.com/photo-1599707367072-cd6ada2bc375?q=80&w=1200';
-                  }}
-                />
-              </div>
-            );
-          })}
-
-          {/* Double Layer Readability Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0c1424]/95 via-[#0c1424]/85 to-[#0c1424]/50 pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0c1424]/95 via-transparent to-transparent pointer-events-none" />
-        </div>
-      ) : null}
-
-      {/* Admin Banner Management Quick Action Trigger */}
-      {isAdmin && onOpenBannerConfig && (
-        <button
-          type="button"
-          onClick={onOpenBannerConfig}
-          title="Cấu hình hình ảnh trình chiếu Banner (Carousel)"
-          className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/60 hover:bg-black/85 backdrop-blur-md text-white text-xs font-semibold border border-white/20 transition cursor-pointer shadow-sm active:scale-95"
-        >
-          <Sliders className="w-3.5 h-3.5 text-amber-300" />
-          <span className="hidden sm:inline">Cấu hình Banner ({activeSlides.length})</span>
-        </button>
-      )}
+      {/* Subtle depth vignette */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-black/25 pointer-events-none z-0" />
 
       {/* ============================================================== */}
-      {/* 2. FOREGROUND CONTENT (PERFECT CONTRAST & LEGIBILITY)          */}
+      {/* 1. BACKGROUND LAYERS: MISTY CLOUDS                             */}
       {/* ============================================================== */}
-      <div className="relative z-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-slate-200 border border-white/15 mb-4 backdrop-blur-xs">
-          <BookOpen className="w-3.5 h-3.5 text-slate-300" /> Hệ Thống Học Liệu Số & Mô Phỏng 3D
-        </div>
+      {/* Floating traditional clouds top-left & bottom-right (design/image.png) */}
+      <div className="absolute -top-4 sm:-top-8 md:-top-12 lg:-top-16 -left-6 sm:-left-10 md:-left-16 w-[380px] sm:w-[540px] md:w-[700px] lg:w-[850px] xl:w-[980px] max-w-none opacity-[0.085] pointer-events-none select-none z-0">
+        <img src="/home-assets/cloud_1.png" alt="" className="w-full h-auto object-contain" />
+      </div>
+      <div className="absolute -bottom-6 sm:-bottom-10 md:-bottom-14 lg:-bottom-18 -right-6 sm:-right-10 md:-right-16 w-[400px] sm:w-[560px] md:w-[740px] lg:w-[890px] xl:w-[1020px] max-w-none opacity-[0.085] pointer-events-none select-none z-0">
+        <img src="/home-assets/cloud_2.png" alt="" className="w-full h-auto object-contain" />
+      </div>
 
-        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight drop-shadow-sm">
-          {activeSlide?.title ? (
-            activeSlide.title
-          ) : (
-            <>
-              Khám Phá Di Sản & <span className="text-amber-200">Dòng Chảy Lịch Sử 10</span>
-            </>
-          )}
-        </h1>
-
-        <p className="mt-3 text-slate-200 text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl font-normal drop-shadow-xs">
-          Kho tư liệu lịch sử chuẩn hóa theo Chương trình GDPT 2018, tích hợp dữ liệu Nghiệp vụ Sư phạm chi tiết, hình ảnh khảo cổ học độ phân giải cao và Studio mô hình 3D tương tác.
-        </p>
-
-        {/* Search Bar */}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            onSearchSubmit(searchQuery);
+      {/* ============================================================== */}
+      {/* 2. SIDE ANCIENT_HOUSE & LACQUER PILLARS (media & animation)   */}
+      {/* Cột trụ sơn son tròn 3D chạy dọc mép + Mái nhà rồng vươn ra     */}
+      {/* ============================================================== */}
+      {/* Left side motif: Lacquer pillar + Left ancient_house */}
+      <div className="absolute top-0 bottom-0 left-0 pointer-events-none z-10 animate-slide-left-motif flex items-center">
+        {/* Left red lacquer pillar (Cột đỏ bóng sáng trắng 3D, không viền đen) */}
+        <div
+          className="absolute top-0 bottom-0 left-0 w-10 sm:w-12 md:w-14 lg:w-16 xl:w-20 h-full z-0"
+          style={{
+            background: 'linear-gradient(90deg, #78080C 0%, #9E0D14 15%, #C91A23 32%, #E83642 42%, #FFA8B0 48%, #FFFFFF 53%, #FFCCD2 58%, #D8222C 72%, #8F0C12 88%, #70070B 100%)',
+            boxShadow: '0 0 15px rgba(255, 255, 255, 0.15)'
           }}
-          className="mt-6 flex items-center gap-2 bg-white p-1.5 rounded-2xl shadow-lg max-w-2xl border border-slate-200/90"
-        >
-          <div className="pl-3 text-slate-400">
-            <Search className="w-5 h-5" />
-          </div>
-          <input
-            type="text"
-            value={searchQuery}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Tìm theo tên hiện vật (Trống đồng, Angkor, Óc Eo, Bia Võ Cạnh...)"
-            className="w-full bg-transparent px-2 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none font-medium"
-          />
-          <button
-            type="submit"
-            className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition active:scale-95 shrink-0 cursor-pointer shadow-xs"
-          >
-            Tìm kiếm
-          </button>
-        </form>
+        />
 
-        {/* Quick Highlights / Shortcuts */}
-        <div className="mt-5 flex flex-wrap items-center gap-2.5 text-xs text-slate-200">
-          <span className="font-medium text-slate-300">Khám phá nhanh:</span>
-          <button
-            type="button"
-            onClick={() => {
-              const q = 'Văn minh Đông Nam Á';
-              setSearchQuery(q);
-              onSearchSubmit(q);
-            }}
-            className="px-3 py-1 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-xs text-slate-200 transition border border-white/15 text-xs font-medium cursor-pointer"
-          >
-            Đông Nam Á Cổ – Trung Đại
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              const q = 'Trống đồng';
-              setSearchQuery(q);
-              onSearchSubmit(q);
-            }}
-            className="px-3 py-1 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-xs text-slate-200 transition border border-white/15 text-xs font-medium cursor-pointer"
-          >
-            Văn hóa Đông Sơn
-          </button>
-          <button
-            type="button"
-            onClick={onOpenStudio3D}
-            className="px-3 py-1 rounded-full bg-white/15 hover:bg-white/25 text-amber-200 font-semibold transition border border-white/20 flex items-center gap-1.5 text-xs cursor-pointer backdrop-blur-xs"
-          >
-            <Box className="w-3.5 h-3.5" /> Studio Cổ Vật 3D
-          </button>
+        {/* Left ancient_house (Mái ngói rồng uốn lượn vươn từ sau cột vào) */}
+        <img
+          src="/home-assets/ancient_house.png"
+          alt="ancient_house"
+          className="relative z-10 h-[75vh] sm:h-[84vh] md:h-[90vh] lg:h-[94vh] w-auto max-w-none object-contain -translate-x-[86%] sm:-translate-x-[84%] md:-translate-x-[83%] lg:-translate-x-[82%]"
+        />
+      </div>
+
+      {/* Right side motif: Lacquer pillar + Right ancient_house (flipped horizontally) */}
+      <div className="absolute top-0 bottom-0 right-0 pointer-events-none z-10 animate-slide-right-motif flex items-center">
+        {/* Right red lacquer pillar (Cột đỏ bóng sáng trắng 3D, không viền đen) */}
+        <div
+          className="absolute top-0 bottom-0 right-0 w-10 sm:w-12 md:w-14 lg:w-16 xl:w-20 h-full z-0"
+          style={{
+            background: 'linear-gradient(270deg, #78080C 0%, #9E0D14 15%, #C91A23 32%, #E83642 42%, #FFA8B0 48%, #FFFFFF 53%, #FFCCD2 58%, #D8222C 72%, #8F0C12 88%, #70070B 100%)',
+            boxShadow: '0 0 15px rgba(255, 255, 255, 0.15)'
+          }}
+        />
+
+        {/* Right ancient_house (Nhô ra nhiều hơn bên trái 1 chút theo đúng thiết kế) */}
+        <img
+          src="/home-assets/ancient_house.png"
+          alt="ancient_house"
+          className="relative z-10 h-[75vh] sm:h-[84vh] md:h-[90vh] lg:h-[94vh] w-auto max-w-none object-contain translate-x-[78%] sm:translate-x-[76%] md:translate-x-[75%] lg:translate-x-[74%] scale-x-[-1]"
+        />
+      </div>
+
+      {/* ============================================================== */}
+      {/* 3. CHIM LẠC FLYING ACROSS HORIZONTALLY (Slide 6 & animation.mp4)*/}
+      {/* Con chim xuất hiện và bay ngang qua màn hình                    */}
+      {/* ============================================================== */}
+      <div className="absolute inset-0 pointer-events-none z-30 overflow-hidden flex items-center justify-center">
+        <div className="w-64 sm:w-80 md:w-[420px] lg:w-[500px] animate-bird-flight filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.85)]">
+          <img
+            src="/home-assets/bird.png"
+            alt="Chim Lạc Đông Sơn"
+            className="w-full h-auto object-contain"
+          />
         </div>
       </div>
 
       {/* ============================================================== */}
-      {/* 3. CAROUSEL CONTROLS & CAPTION (AT BOTTOM)                    */}
+      {/* 4. CENTER CONTENT REVEALED BEHIND THE BIRD (animation.mp4)     */}
+      {/* Đằng sau con chim là phần chữ được kéo cùng - Căn giữa thoáng  */}
       {/* ============================================================== */}
-      {hasSlides && (
-        <div className="relative z-10 mt-6 pt-3 flex items-center justify-between gap-3 text-xs border-t border-white/10">
-          {/* Slide Caption Pill */}
-          <div className="min-w-0 flex items-center gap-2">
-            {activeSlide?.title ? (
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-300 bg-black/40 backdrop-blur-xs px-2.5 py-1 rounded-lg border border-white/10 truncate max-w-[280px] sm:max-w-md">
-                <ImageIcon className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-                <span className="truncate">{activeSlide.title}</span>
-                {activeSlide.subtitle && (
-                  <span className="text-slate-400 hidden sm:inline">• {activeSlide.subtitle}</span>
-                )}
-              </span>
-            ) : (
-              <span className="text-[11px] text-slate-400">Trình chiếu di sản số</span>
-            )}
-          </div>
-
-          {/* Carousel Navigation: Dots + Arrows */}
-          <div className="flex items-center gap-2 shrink-0">
-            {/* Prev Arrow */}
-            {activeSlides.length > 1 && (
-              <button
-                type="button"
-                onClick={handlePrev}
-                title="Slide trước"
-                className="w-7 h-7 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-xs border border-white/15 flex items-center justify-center text-white transition cursor-pointer"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-            )}
-
-            {/* Dots */}
-            {activeSlides.length > 1 && (
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/30 backdrop-blur-xs border border-white/10">
-                {activeSlides.map((_, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setCurrentSlideIndex(idx)}
-                    title={`Chuyển đến slide ${idx + 1}`}
-                    className={`transition-all duration-300 rounded-full cursor-pointer ${
-                      idx === currentSlideIndex
-                        ? 'w-5 h-1.5 bg-amber-300'
-                        : 'w-1.5 h-1.5 bg-white/40 hover:bg-white/70'
-                    }`}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Next Arrow */}
-            {activeSlides.length > 1 && (
-              <button
-                type="button"
-                onClick={handleNext}
-                title="Slide tiếp theo"
-                className="w-7 h-7 rounded-full bg-black/40 hover:bg-black/70 backdrop-blur-xs border border-white/15 flex items-center justify-center text-white transition cursor-pointer"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+      <div className="relative z-20 w-full max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-8 text-center flex flex-col items-center justify-center animate-text-reveal">
+        {/* Top Subtitle */}
+        <div className="w-full flex justify-center mb-6 sm:mb-8 md:mb-10 lg:mb-12">
+          <h2 className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-black uppercase tracking-[0.14em] text-[#FDE2A7] hero-subtitle select-text">
+            HỆ THỐNG HỌC LIỆU SỐ & MÔ PHỎNG 3D
+          </h2>
         </div>
-      )}
-    </div>
+
+        {/* Main Calligraphic Title "Sử Học Số" */}
+        <div className="w-full flex justify-center py-3 sm:py-4 md:py-6">
+          <h1 className="hero-main-title title text-4xl sm:text-5xl md:text-6xl lg:text-[4.75rem] xl:text-[5.5rem] 2xl:text-[6.25rem] text-[#FFFDF5] tracking-tight leading-[1.25] sm:leading-[1.3] select-text whitespace-nowrap">
+            Sử Học Số
+          </h1>
+        </div>
+
+        {/* Bottom Subtitle */}
+        <div className="w-full flex justify-center mt-5 sm:mt-7 md:mt-9 lg:mt-11 mb-8 sm:mb-10 md:mb-12 lg:mb-16">
+          <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl font-black uppercase tracking-[0.12em] text-[#FDE2A7] hero-subtitle select-text">
+            ĐƯA LỊCH SỬ ĐẾN GẦN HƠN BẰNG CÔNG NGHỆ SỐ
+          </p>
+        </div>
+
+        {/* Call-to-action Button: BẮT ĐẦU TRẢI NGHIỆM ▶ */}
+        <div className="mt-1 sm:mt-2">
+          <button
+            type="button"
+            onClick={handleStartExperience}
+            className="px-8 sm:px-12 py-3.5 sm:py-4 bg-white hover:bg-[#FFFDF5] text-[#850B10] font-black text-xs sm:text-sm md:text-base uppercase tracking-wider shadow-[0_4px_25px_rgba(0,0,0,0.55)] hover:shadow-[0_6px_30px_rgba(0,0,0,0.75)] hover:scale-[1.03] active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer"
+            style={{ borderRadius: '2px' }}
+          >
+            <span className="font-extrabold tracking-[0.06em]">BẮT ĐẦU TRẢI NGHIỆM</span>
+            <span className="text-[#850B10] text-sm sm:text-base leading-none">▶</span>
+          </button>
+        </div>
+      </div>
+    </section>
   );
 }

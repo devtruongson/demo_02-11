@@ -201,16 +201,17 @@ export default function ExamTakingModal({
         className="w-full max-w-4xl h-[94vh] bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl flex flex-col overflow-hidden"
       >
         {/* ================= EXAM TOPBAR ================= */}
-        <div className="px-5 py-3.5 sm:px-6 sm:py-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-gold/15 text-gold border border-gold/30 flex items-center justify-center font-black text-sm shrink-0">
+        <div className="px-5 py-3.5 sm:px-6 sm:py-4 bg-gradient-to-r from-[#70070B] via-[#850B10] to-[#9E0D14] border-b border-amber-300/30 flex items-center justify-between gap-3 shrink-0 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="relative z-10 flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-white/15 text-[#FDE2A7] border border-amber-300/40 flex items-center justify-center font-bold text-sm shrink-0">
               📝
             </div>
             <div className="min-w-0">
-              <h3 className="font-extrabold text-sm sm:text-base text-white truncate max-w-sm sm:max-w-md">
+              <h3 className="font-bold text-sm sm:text-base text-white truncate max-w-sm sm:max-w-md font-serif-royal">
                 {assignment?.title || 'Phòng Thi Trắc Nghiệm'}
               </h3>
-              <div className="flex items-center gap-2 text-[11px] text-slate-400">
+              <div className="flex items-center gap-2 text-[11px] text-[#FFF7E8]/90">
                 <span>{assignment?.created_by_name || 'Hội đồng Sư phạm'}</span>
                 <span>•</span>
                 <span>Tổng {questions.length || resultData?.review?.length || 0} câu hỏi</span>
@@ -218,14 +219,14 @@ export default function ExamTakingModal({
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="relative z-10 flex items-center gap-2.5">
             {/* Real-time Countdown Timer (Only in Take mode) */}
             {!resultData && (
               <div
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-mono font-black ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-mono font-bold ${
                   isTimeCritical
                     ? 'bg-rose-950 text-rose-300 border-rose-700 animate-pulse'
-                    : 'bg-slate-900 text-gold border-slate-700'
+                    : 'bg-black/25 text-[#FDE2A7] border-white/20'
                 }`}
               >
                 <Clock className="w-3.5 h-3.5" />
@@ -238,7 +239,7 @@ export default function ExamTakingModal({
                 type="button"
                 onClick={() => setShowConfirmModal(true)}
                 disabled={submitting}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 text-xs font-black transition shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer"
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-[#FFFDF5] hover:bg-[#FAF5EB] text-[#850B10] text-xs font-bold transition shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Nộp bài</span>
@@ -247,7 +248,7 @@ export default function ExamTakingModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition"
+                className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-[#FFF7E8] text-xs font-bold transition cursor-pointer"
               >
                 Đóng
               </button>
@@ -285,13 +286,14 @@ export default function ExamTakingModal({
             /* ================= MODE: RESULT & REVIEW ================= */
             <div className="flex-1 overflow-y-auto p-5 sm:p-8 space-y-6">
               {/* Score Highlight Banner */}
-              <div className="p-6 rounded-3xl bg-gradient-to-r from-navy via-slate-900 to-navy-dark border border-gold/40 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
-                <div className="space-y-1.5">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/20 text-gold text-xs font-black uppercase tracking-wider border border-gold/30">
+              <div className="p-6 rounded-3xl bg-gradient-to-r from-[#70070B] via-[#850B10] to-[#9E0D14] border border-amber-300/30 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-80 h-80 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+                <div className="relative z-10 space-y-1.5">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-[#FDE2A7] text-xs font-bold uppercase tracking-wider border border-amber-300/40">
                     <Award className="w-3.5 h-3.5" />
                     <span>Kết Quả Bài Kiểm Tra</span>
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-black text-white">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white font-serif-royal">
                     {resultData.submission?.student_name ? `Học sinh: ${resultData.submission.student_name}` : 'Hoàn Thành Bài Thi'}
                   </h2>
                   <p className="text-xs text-slate-300">

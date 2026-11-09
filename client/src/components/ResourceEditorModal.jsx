@@ -4,7 +4,13 @@ import {
     Save,
     Trash2,
     Upload,
-    Box
+    Box,
+    Sparkles,
+    Award,
+    HelpCircle,
+    CheckCircle2,
+    RotateCcw,
+    Link2
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -30,7 +36,6 @@ export default function ResourceEditorModal({ resource, topics, onClose, onSave 
   const [uploadingSingle, setUploadingSingle] = useState(false);
   const [uploadingMultiple, setUploadingMultiple] = useState(false);
   const [showUrlGalleryInput, setShowUrlGalleryInput] = useState(false);
-
   const singleFileInputRef = useRef(null);
   const multiFileInputRef = useRef(null);
 

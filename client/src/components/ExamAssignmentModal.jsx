@@ -205,16 +205,17 @@ export default function ExamAssignmentModal({
         className="w-full max-w-4xl max-h-[92vh] bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl flex flex-col overflow-hidden"
       >
         {/* Header */}
-        <div className="p-5 sm:p-6 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-4 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gold/15 text-gold border border-gold/30 flex items-center justify-center font-bold">
+        <div className="p-5 sm:p-6 bg-gradient-to-r from-[#70070B] via-[#850B10] to-[#9E0D14] border-b border-amber-300/30 flex items-center justify-between gap-4 shrink-0 relative overflow-hidden text-white">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="relative z-10 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-white/15 text-[#FDE2A7] border border-amber-300/40 flex items-center justify-center font-bold">
               <Award className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-extrabold text-base sm:text-lg text-white">
+              <h3 className="font-bold text-base sm:text-lg text-white font-serif-royal">
                 {assignment ? 'Chỉnh Sửa Đề Thi & Bài Tập' : 'Tạo Đề Thi & Giao Bài Cho Học Sinh'}
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#FFF7E8]/90">
                 Lựa chọn câu hỏi trắc nghiệm từ ngân hàng chuẩn GDPT 2018 và phân công học sinh làm bài
               </p>
             </div>
@@ -222,7 +223,7 @@ export default function ExamAssignmentModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+            className="relative z-10 p-2 rounded-xl text-[#FFF7E8]/80 hover:text-white hover:bg-white/10 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -463,7 +464,7 @@ export default function ExamAssignmentModal({
                               onClick={() => handleToggleStudent(st.id)}
                               className={`p-3 rounded-2xl border cursor-pointer transition flex items-center justify-between gap-3 ${
                                 isSelected
-                                  ? 'bg-navy/80 border-gold/70 text-white shadow-sm'
+                                  ? 'bg-[#850B10]/80 border-amber-300/70 text-white shadow-sm'
                                   : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:bg-slate-800/40 hover:text-slate-200'
                               }`}
                             >
@@ -588,7 +589,7 @@ export default function ExamAssignmentModal({
                           onClick={() => handleToggleQuiz(q.id)}
                           className={`p-4 rounded-2xl border cursor-pointer transition space-y-2.5 ${
                             isSelected
-                              ? 'bg-navy/70 border-gold/70 text-white shadow-md'
+                              ? 'bg-[#850B10]/70 border-amber-300/70 text-white shadow-md'
                               : 'bg-slate-950/60 border-slate-800/80 text-slate-300 hover:border-slate-700'
                           }`}
                         >
@@ -671,7 +672,7 @@ export default function ExamAssignmentModal({
               <button
                 type="submit"
                 disabled={saving}
-                className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 text-xs font-black transition shadow-md active:scale-95 disabled:opacity-50"
+                className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white text-xs font-bold transition shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
               >
                 {saving ? (
                   <>

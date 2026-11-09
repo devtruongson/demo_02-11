@@ -1,206 +1,130 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import {
-  ShieldCheck, GraduationCap, Users, Box, BookOpen, CheckCircle,
-  Sparkles, ArrowRight, Award, Flame, CheckCircle2, ChevronRight
-} from 'lucide-react';
+
+/**
+ * Traditional Imperial Tally / Lacquer Tablet Tag (Thẻ bài sơn son thếp vàng)
+ * Shape and design matching /design/image copy.png
+ */
+function TraditionalTabletTag({ num }) {
+  return (
+    <div className="relative w-11 sm:w-12 h-16 sm:h-18 shrink-0 flex items-center justify-center select-none filter drop-shadow-[0_2px_6px_rgba(0,0,0,0.2)]">
+      <svg
+        viewBox="0 0 46 80"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-full h-full"
+      >
+        {/* Outer Red Lacquer Body with bracketed notches */}
+        <path
+          d="M4 0 H42 C44.2 0 46 1.8 46 4 V12 C46 14.2 44.2 16 42 16 H39 V64 H42 C44.2 64 46 65.8 46 68 V76 C46 78.2 44.2 80 42 80 H4 C1.8 80 0 78.2 0 76 V68 C0 65.8 1.8 64 4 64 H7 V16 H4 C1.8 16 0 14.2 0 12 V4 C0 1.8 1.8 0 4 0 Z"
+          fill="#850B10"
+        />
+        {/* Inner Fine Gold/Cream Border */}
+        <path
+          d="M6 3 H40 C41.1 3 42 3.9 42 5 V11 C42 12.1 41.1 13 40 13 H36 V67 H40 C41.1 67 42 67.9 42 69 V75 C42 76.1 41.1 77 40 77 H6 C4.9 77 4 76.1 4 75 V69 C4 67.9 4.9 67 6 67 H10 V13 H6 C4.9 13 4 12.1 4 11 V5 C4 3.9 4.9 3 6 3 Z"
+          stroke="#FFF7E8"
+          strokeWidth="1.2"
+          strokeOpacity="0.9"
+        />
+      </svg>
+      {/* Number centered in cream with serif font */}
+      <span
+        className="absolute inset-0 flex items-center justify-center font-bold text-lg sm:text-xl text-[#FFF7E8] tracking-tight"
+        style={{ fontFamily: "'Cinzel', 'Playfair Display', Georgia, serif" }}
+      >
+        {num}
+      </span>
+    </div>
+  );
+}
 
 export default function WhyChooseUsSection({ onOpenLogin, currentUser }) {
-  const advantages = [
+  const points = [
     {
+      num: '01',
       title: 'Phân quyền theo vai trò rõ ràng',
-      desc: 'Tách biệt không gian làm việc giữa Giáo viên (quản lý lớp, giao đề thi, chấm điểm) và Học sinh (làm bài tập, nhận nhiệm vụ, tính chuỗi Streak).',
-      icon: Users,
-      color: 'bg-blue-50 text-blue-700 border-blue-200'
+      desc: 'Tách biệt không gian làm việc giữa Giáo viên (quản lý lớp, giao đề thi, chấm điểm) và Học sinh (làm bài tập, nhận nhiệm vụ, tính chuỗi Streak).'
     },
     {
-      title: 'Đồng bộ Kế hoạch bài dạy 5512',
-      desc: 'Hỗ trợ giáo viên soạn bài giảng chuẩn Công văn 5512 chỉ trong vài phút, tích hợp sẵn chuỗi hoạt động học và gợi ý tổ chức sư phạm.',
-      icon: GraduationCap,
-      color: 'bg-amber-50 text-amber-800 border-amber-200'
+      num: '02',
+      title: 'Học liệu số hóa chuẩn mực & 3D 360°',
+      desc: 'Dữ liệu khảo cổ, bản đồ lịch sử và bảo vật quốc gia được số hóa 3D 360° tương tác chuẩn Chương trình GDPT 2018.'
     },
     {
-      title: 'Hiện vật 3D 360° tương tác sống động',
-      desc: 'Bóc tách hoa văn, khảo sát kích thước thực tế của bảo vật quốc gia ngay trên trình duyệt mà không cần cài đặt phần mềm phức tạp.',
-      icon: Box,
-      color: 'bg-emerald-50 text-emerald-800 border-emerald-200'
-    },
-    {
-      title: 'Kiểm tra trắc nghiệm & Bảng vàng thi đua',
-      desc: 'Hệ thống ngân hàng câu hỏi bám sát chuẩn kiến thức kỹ năng GDPT 2018, tự động chấm điểm và vinh danh học sinh chăm chỉ.',
-      icon: Award,
-      color: 'bg-purple-50 text-purple-800 border-purple-200'
+      num: '03',
+      title: 'Không gian cộng tác & Thi đua chăm chỉ',
+      desc: 'Môi trường học tập cởi mở, diễn đàn hỏi đáp trực tiếp và thi đua bảng vàng Streak tạo động lực học tập mỗi ngày.'
     }
   ];
 
   return (
-    <section className="bg-gradient-to-b from-slate-50 to-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 lg:p-10 shadow-xs relative overflow-hidden">
-      {/* Background ambient lighting */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+    <section className="relative w-full py-8 sm:py-12 lg:py-16 overflow-hidden select-none">
+      {/* Decorative Traditional Clouds at bottom-left and bottom-right (matching design/image copy.png) */}
+      <div className="absolute -bottom-10 -left-12 w-64 sm:w-80 opacity-40 pointer-events-none select-none z-0">
+        <img
+          src="/home-assets/cloud_1.png"
+          alt=""
+          className="w-full h-auto object-contain filter sepia(0.8) saturate(2.5) hue-rotate(5deg) brightness(1.15)"
+        />
+      </div>
+      <div className="absolute -bottom-12 -right-12 w-72 sm:w-96 opacity-40 pointer-events-none select-none z-0">
+        <img
+          src="/home-assets/cloud_2.png"
+          alt=""
+          className="w-full h-auto object-contain filter sepia(0.8) saturate(2.5) hue-rotate(5deg) brightness(1.15)"
+        />
+      </div>
 
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-        {/* Left Column: Advantages & Description */}
-        <div className="lg:col-span-7 space-y-6">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-navy/10 text-navy border border-navy/20 mb-3">
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-              <span>TẠI SAO CHỌN SỬ KÝ SỐ</span>
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-center">
+          {/* ================= LEFT COLUMN (matching design/image copy.png) ================= */}
+          <div className="lg:col-span-6 xl:col-span-5 space-y-3.5 sm:space-y-4">
+            {/* Red Cartouche Badge */}
+            <div className="inline-block">
+              <span className="inline-flex items-center px-4 sm:px-5 py-1 sm:py-1.5 rounded-full bg-[#850B10] text-[#FFFDF5] text-xs sm:text-sm font-bold tracking-wide shadow-md">
+                Tại sao chọn Sử Học Số?
+              </span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-snug">
-              Được xây dựng cho công việc thật của giáo viên & học sinh.
+
+            {/* Main 3-line Headline: Black lines 1-2, Crimson Red line 3 */}
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-[1.85rem] xl:text-[2.15rem] font-black font-serif-royal leading-[1.3] tracking-tight uppercase space-y-1">
+              <span className="text-[#1A120B] block whitespace-nowrap">ĐƯỢC XÂY DỰNG CHO</span>
+              <span className="text-[#1A120B] block whitespace-nowrap">CÔNG VIỆC THẬT CỦA</span>
+              <span className="text-[#850B10] block whitespace-nowrap">GIÁO VIÊN & HỌC SINH</span>
             </h2>
-            <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-              Không chỉ là kho lưu trữ số, Sử Ký Số mang đến hệ sinh thái học tập đa phương tiện tương tác, giúp việc dạy và học Lịch sử 10 trở nên trực quan, sinh động và tràn đầy cảm hứng.
+
+            {/* Red Underline Divider */}
+            <div className="w-24 sm:w-32 h-[2.5px] bg-[#850B10] rounded-full" />
+
+            {/* Description Text */}
+            <p className="text-xs sm:text-sm lg:text-[0.95rem] text-[#3A2A1A] leading-relaxed font-normal max-w-md lg:max-w-lg">
+              Không chỉ là kho lưu trữ số, <strong className="font-bold text-[#1A120B]">Sử Ký Số</strong> mang đến hệ sinh thái học tập đa phương tiện tương tác, giúp việc dạy và học Lịch sử 10 trở nên trực quan, sinh động và tràn đầy cảm hứng.
             </p>
           </div>
 
-          {/* List of 4 Advantages */}
-          <div className="space-y-3.5">
-            {advantages.map((item, idx) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={idx}
-                  className="flex items-start gap-3.5 p-3 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-slate-300 transition"
-                >
-                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${item.color}`}>
-                    <Icon className="w-4 h-4" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 leading-tight">
-                      {item.title}
-                    </h4>
-                    <p className="text-[11px] sm:text-xs text-slate-500 mt-1 leading-relaxed">
-                      {item.desc}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="pt-2 flex flex-wrap items-center gap-3">
-            {!currentUser ? (
-              <button
-                onClick={onOpenLogin}
-                className="px-5 py-2.5 rounded-xl bg-navy hover:bg-navy-light text-white text-xs font-bold transition shadow-sm flex items-center gap-2 active:scale-95"
+          {/* ================= RIGHT COLUMN (matching design/image copy.png) ================= */}
+          <div className="lg:col-span-6 xl:col-span-7 space-y-6 sm:space-y-8">
+            {points.map((p, idx) => (
+              <div
+                key={idx}
+                className="flex items-start gap-4 sm:gap-6 group transition-transform duration-200 hover:translate-x-1"
               >
-                <span>Đăng ký trải nghiệm miễn phí</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            ) : (
-              <Link
-                to={currentUser.role === 'teacher' ? '/giao-vien' : '/hoc-sinh'}
-                className="px-5 py-2.5 rounded-xl bg-navy hover:bg-navy-light text-white text-xs font-bold transition shadow-sm flex items-center gap-2 active:scale-95"
-              >
-                <span>Vào không gian {currentUser.role === 'teacher' ? 'Giáo viên' : 'Học sinh'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            )}
+                {/* Traditional Vietnamese Tally Tag (Thẻ bài đỏ) */}
+                <TraditionalTabletTag num={p.num} />
 
-            <Link
-              to="/gioi-thieu"
-              className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold transition border border-slate-200"
-            >
-              Tìm hiểu triết lý sư phạm
-            </Link>
-          </div>
-        </div>
-
-        {/* Right Column: Visual UI Card Preview (Matching User Feedback Screenshot) */}
-        <div className="lg:col-span-5">
-          <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-xl space-y-4 relative">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                  Mô hình phân quyền
-                </span>
-                <h4 className="font-extrabold text-sm sm:text-base text-slate-900 leading-tight">
-                  Phân Quyền Theo Vai Trò
-                </h4>
-              </div>
-              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-                Hoạt động
-              </span>
-            </div>
-
-            {/* Role Card Item 1: Teacher */}
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3 hover:bg-slate-100/60 transition">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
-                  <GraduationCap className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-extrabold text-xs text-slate-900 truncate">Thầy Hoàng Thu Hà</span>
-                    <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-100 text-blue-800">
-                      Giáo viên
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-500 truncate">THPT Chuyên • 2 lớp học phụ trách</p>
+                {/* Feature Text */}
+                <div className="flex-1 pt-1 min-w-0">
+                  <h3 className="text-base sm:text-lg lg:text-xl font-bold text-[#1A120B] leading-snug group-hover:text-[#850B10] transition-colors">
+                    {p.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[#4A4A4A] mt-1.5 leading-relaxed font-normal">
+                    {p.desc}
+                  </p>
                 </div>
               </div>
-              <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-1 rounded-lg shrink-0">
-                Giao bài ✓
-              </span>
-            </div>
-
-            {/* Role Card Item 2: Student */}
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3 hover:bg-slate-100/60 transition">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
-                  <Users className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-extrabold text-xs text-slate-900 truncate">Nguyễn Minh Tuấn</span>
-                    <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-100 text-amber-900">
-                      Học sinh
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-500 truncate">Lớp 10A1 • Đã nộp 5/5 bài tập</p>
-                </div>
-              </div>
-              <span className="text-[11px] font-black text-orange-600 bg-orange-50 px-2 py-1 rounded-lg shrink-0 flex items-center gap-1">
-                <Flame className="w-3.5 h-3.5 text-orange-500 fill-orange-500" />
-                <span>Streak 8d</span>
-              </span>
-            </div>
-
-            {/* Role Card Item 3: Admin */}
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3 hover:bg-slate-100/60 transition">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-slate-900 text-gold flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
-                  <ShieldCheck className="w-5 h-5 text-gold" />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-extrabold text-xs text-slate-900 truncate">Quản Trị Viên</span>
-                    <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-slate-200 text-slate-800">
-                      Admin
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-500 truncate">Toàn quyền hệ thống & phân quyền</p>
-                </div>
-              </div>
-              <span className="text-[11px] font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded-lg shrink-0">
-                Kiểm duyệt
-              </span>
-            </div>
-
-            {/* Card Footer Feature Highlights */}
-            <div className="pt-2 text-[11px] text-slate-500 flex items-center justify-between border-t border-slate-100">
-              <span className="flex items-center gap-1 text-emerald-700 font-semibold">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                Bảo mật dữ liệu học đường
-              </span>
-              <span className="text-slate-400 font-mono">Phiên bản 2.5</span>
-            </div>
+            ))}
           </div>
         </div>
       </div>
     </section>
   );
 }
-

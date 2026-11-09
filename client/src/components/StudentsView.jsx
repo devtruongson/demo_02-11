@@ -391,16 +391,18 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in max-w-5xl mx-auto">
-      {/* Student Banner - Clean, dignified academic styling */}
-      <div className="bg-[#182338] text-white p-6 sm:p-8 rounded-3xl border border-slate-700/60 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-slate-200 border border-white/15 mb-3">
-            <Users className="w-3.5 h-3.5" /> Góc Tự Học & Khám Phá Của Học Sinh
+      {/* Student Banner - Warm royal lacquer red & golden accents */}
+      <div className="bg-gradient-to-r from-[#70070B] via-[#850B10] to-[#9E0D14] text-white p-6 sm:p-8 rounded-3xl border border-amber-300/30 shadow-lg relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white/15 text-[#FDE2A7] border border-amber-300/40 mb-3">
+            <Users className="w-3.5 h-3.5 text-[#FDE2A7]" />
+            <span>Góc Tự Học & Khám Phá Của Học Sinh</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight leading-snug">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-serif-royal leading-snug">
             Khám Phá Lịch Sử 10 Trực Quan & Sâu Sắc
           </h2>
-          <p className="mt-2 text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl font-normal">
+          <p className="mt-2 text-[#FFF7E8]/90 text-xs sm:text-sm leading-relaxed max-w-xl font-normal">
             Tự mình tương tác với các cổ vật 3D, hoàn thành nhiệm vụ thu hoạch và thử thách kiến thức qua hệ thống câu hỏi chuẩn GDPT 2018.
           </p>
 
@@ -415,8 +417,8 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                   to={t.to}
                   className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold transition ${
                     isActive
-                      ? 'bg-white text-slate-900 shadow-xs font-bold'
-                      : 'bg-white/10 hover:bg-white/15 text-slate-200 border border-white/10'
+                      ? 'bg-[#FFFDF5] text-[#850B10] shadow-md font-bold'
+                      : 'bg-black/25 hover:bg-black/40 text-white/90 border border-white/15'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -427,19 +429,19 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row md:flex-col gap-2.5 w-full md:w-auto shrink-0">
+        <div className="relative z-10 flex flex-col sm:flex-row md:flex-col gap-2.5 w-full md:w-auto shrink-0">
           <Link
             to="/studio-3d"
-            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white text-slate-900 hover:bg-slate-100 font-semibold text-xs transition shadow-xs text-center"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#FFFDF5] text-[#850B10] hover:bg-[#FAF5EB] font-bold text-xs transition shadow-md text-center"
           >
-            <Box className="w-4 h-4" />
+            <Box className="w-4 h-4 text-[#850B10]" />
             <span>Mở Studio 3D</span>
           </Link>
           <Link
             to="/kho-tu-lieu"
-            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-medium text-xs transition border border-white/15 text-center"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-black/25 hover:bg-black/40 text-white font-medium text-xs transition border border-white/20 text-center"
           >
-            <BookOpen className="w-4 h-4" />
+            <BookOpen className="w-4 h-4 text-[#FDE2A7]" />
             <span>Tra Cứu Tư Liệu</span>
           </Link>
         </div>
@@ -451,17 +453,17 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
       {tab === 'nhiem-vu' && (
         <div className="space-y-6 sm:space-y-8">
           {/* SECTION 1: INTERACTIVE 3-STEP METHOD */}
-          <div className="bg-white p-5 sm:p-7 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
+          <div className="bg-[#FFFDF5] p-5 sm:p-7 rounded-3xl border border-[#EBDBC5] shadow-xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#EBDBC5]/60">
               <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                <span className="text-xs font-semibold uppercase tracking-wider text-[#850B10]">
                   Quy trình rèn luyện năng lực
                 </span>
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mt-0.5">
+                <h3 className="text-lg sm:text-xl font-bold text-[#2D1B08] mt-0.5 font-serif-royal">
                   Phương Pháp Khai Thác Tư Liệu Số
                 </h3>
               </div>
-              <span className="text-xs text-slate-500 font-normal">
+              <span className="text-xs text-stone-500 font-normal">
                 Bấm vào từng bước để xem hướng dẫn chi tiết
               </span>
             </div>
@@ -475,10 +477,10 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                     key={s.step}
                     type="button"
                     onClick={() => setActiveMethodStep(idx)}
-                    className={`p-4 rounded-xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between ${
+                    className={`p-4 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between ${
                       isSelected
-                        ? 'bg-slate-50 border-slate-900 ring-1 ring-slate-900 shadow-xs'
-                        : 'bg-white hover:bg-slate-50/80 border-slate-200 text-slate-800'
+                        ? 'bg-[#FFFDF5] border-[#850B10] ring-1 ring-[#850B10] shadow-sm'
+                        : 'bg-[#FAF5EB] hover:bg-[#FFFDF5] border-[#EBDBC5] text-[#2D1B08]'
                     }`}
                   >
                     <div>
@@ -486,32 +488,32 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                         <span
                           className={`w-7 h-7 rounded-lg font-bold flex items-center justify-center text-xs transition ${
                             isSelected
-                              ? 'bg-slate-900 text-white'
-                              : 'bg-slate-100 text-slate-700'
+                              ? 'bg-[#850B10] text-white shadow-xs'
+                              : 'bg-[#EBDBC5]/70 text-[#850B10]'
                           }`}
                         >
                           {s.step}
                         </span>
                         {isSelected && (
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-200 text-slate-800 uppercase tracking-wider">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#850B10]/10 text-[#850B10] uppercase tracking-wider border border-[#850B10]/20">
                             Đang xem
                           </span>
                         )}
                       </div>
 
-                      <h4 className="font-bold text-sm text-slate-900">
+                      <h4 className="font-bold text-sm text-[#2D1B08]">
                         {s.title}
                       </h4>
-                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                      <p className="text-xs text-stone-600 mt-1 leading-relaxed">
                         {s.subtitle}
                       </p>
                     </div>
 
-                    <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-medium">
-                      <span className={isSelected ? 'text-slate-900 font-semibold' : 'text-slate-400'}>
+                    <div className="mt-3 pt-2.5 border-t border-[#EBDBC5]/50 flex items-center justify-between text-xs font-medium">
+                      <span className={isSelected ? 'text-[#850B10] font-bold' : 'text-stone-400'}>
                         {isSelected ? 'Đang kích hoạt' : 'Xem chi tiết'}
                       </span>
-                      <ArrowRight className={`w-3.5 h-3.5 ${isSelected ? 'text-slate-900' : 'text-slate-400'}`} />
+                      <ArrowRight className={`w-3.5 h-3.5 ${isSelected ? 'text-[#850B10]' : 'text-stone-400'}`} />
                     </div>
                   </button>
                 );
@@ -519,17 +521,17 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
             </div>
 
             {/* Expanded Active Step Detail Panel */}
-            <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+            <div className="p-5 rounded-2xl bg-[#FAF5EB] border border-[#EBDBC5] space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#EBDBC5]/80">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                  <div className="w-8 h-8 rounded-lg bg-[#850B10] text-white flex items-center justify-center font-bold text-xs shadow-xs">
                     {methodSteps[activeMethodStep].step}
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-slate-900">
+                    <h4 className="text-sm font-bold text-[#2D1B08]">
                       Hướng Dẫn Thao Tác: {methodSteps[activeMethodStep].title}
                     </h4>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-stone-600">
                       {methodSteps[activeMethodStep].subtitle}
                     </p>
                   </div>
@@ -541,9 +543,9 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                     return (
                       <Link
                         to={methodSteps[activeMethodStep].sampleUrl}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition shadow-xs"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white text-xs font-bold transition shadow-xs"
                       >
-                        <SampleIcon className="w-3.5 h-3.5 text-slate-300" />
+                        <SampleIcon className="w-3.5 h-3.5 text-[#FDE2A7]" />
                         <span>{methodSteps[activeMethodStep].sampleTitle}</span>
                       </Link>
                     );
@@ -554,11 +556,11 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
               {/* Step Checklist/Guidance Points */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {methodSteps[activeMethodStep].guide.map((g, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 p-3 rounded-lg bg-white border border-slate-200">
-                    <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-700 font-semibold text-[11px] flex items-center justify-center shrink-0 mt-0.5">
+                  <div key={idx} className="flex items-start gap-2.5 p-3 rounded-xl bg-[#FFFDF5] border border-[#EBDBC5]">
+                    <span className="w-5 h-5 rounded-full bg-amber-100 text-[#850B10] font-bold text-[11px] flex items-center justify-center shrink-0 mt-0.5 border border-amber-300/40">
                       {idx + 1}
                     </span>
-                    <p className="text-xs text-slate-700 leading-relaxed font-normal">
+                    <p className="text-xs text-stone-700 leading-relaxed font-normal">
                       {g}
                     </p>
                   </div>
@@ -567,13 +569,13 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
 
               {/* Next Step Button */}
               <div className="pt-1 flex items-center justify-between text-xs">
-                <span className="text-slate-400 font-normal">
+                <span className="text-stone-400 font-normal">
                   Bước {activeMethodStep + 1} / 3 phương pháp
                 </span>
                 <button
                   type="button"
                   onClick={() => setActiveMethodStep((prev) => (prev + 1) % 3)}
-                  className="font-semibold text-slate-700 hover:text-slate-900 transition flex items-center gap-1"
+                  className="font-bold text-[#850B10] hover:text-[#68070B] transition flex items-center gap-1"
                 >
                   <span>Chuyển sang Bước {((activeMethodStep + 1) % 3) + 1}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -585,19 +587,20 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
           {/* SECTION 2: STUDENT QUEST ARENA */}
           <div className="space-y-5">
             {/* Quest Header & Progress Dashboard */}
-            <div className="bg-[#182338] text-white p-5 sm:p-7 rounded-2xl border border-slate-800 shadow-xs space-y-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="bg-gradient-to-r from-[#70070B] via-[#850B10] to-[#9E0D14] text-white p-5 sm:p-7 rounded-3xl border border-amber-300/30 shadow-lg relative overflow-hidden space-y-5">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    <Target className="w-3.5 h-3.5 text-slate-300" />
-                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    <Target className="w-3.5 h-3.5 text-[#FDE2A7]" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#FDE2A7]">
                       Hệ Thống Nhiệm Vụ Khám Phá Lịch Sử 10
                     </span>
                   </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-white mt-1">
+                  <h3 className="text-lg sm:text-xl font-bold text-white mt-1 font-serif-royal">
                     Bảng Nhiệm Vụ & Nhật Ký Thu Hoạch Của Học Sinh
                   </h3>
-                  <p className="text-xs text-slate-300 mt-1 max-w-xl leading-relaxed font-normal">
+                  <p className="text-xs text-[#FFF7E8]/90 mt-1 max-w-xl leading-relaxed font-normal">
                     Hoàn thành các tiêu chí khám phá hiện vật, thu thập điểm kinh nghiệm (XP) và ghi lại những phát hiện lịch sử của riêng em.
                   </p>
                 </div>
@@ -605,7 +608,7 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                 {isAdmin && (
                   <button
                     onClick={handleOpenAddTask}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white hover:bg-slate-100 text-slate-900 font-semibold text-xs transition shadow-xs shrink-0"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#FFFDF5] hover:bg-[#FAF5EB] text-[#850B10] font-bold text-xs transition shadow-md shrink-0 cursor-pointer"
                   >
                     <PlusCircle className="w-3.5 h-3.5" />
                     <span>Thêm nhiệm vụ</span>
@@ -614,60 +617,60 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
               </div>
 
               {/* Progress & Ranking Metrics */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {/* Metric 1 */}
-                <div className="p-3.5 rounded-xl bg-white/5 border border-white/10">
+                <div className="p-3.5 rounded-2xl bg-black/25 border border-white/15">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-slate-300 font-medium">Tiến độ nhiệm vụ</span>
-                    <CheckCircle2 className="w-3.5 h-3.5 text-slate-400" />
+                    <span className="text-xs text-[#FFF7E8]/80 font-medium">Tiến độ nhiệm vụ</span>
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#FDE2A7]" />
                   </div>
                   <div className="mt-2 flex items-baseline gap-2">
                     <strong className="text-2xl font-bold text-white">
                       {completedTasksCount} / {totalTasksCount}
                     </strong>
-                    <span className="text-xs text-slate-300 font-medium">
+                    <span className="text-xs text-[#FDE2A7] font-medium">
                       ({totalTasksCount > 0 ? Math.round((completedTasksCount / totalTasksCount) * 100) : 0}%)
                     </span>
                   </div>
                   <div className="w-full bg-white/20 h-1.5 rounded-full mt-2 overflow-hidden">
                     <div
-                      className="bg-white h-full rounded-full transition-all duration-300"
+                      className="bg-[#FDE2A7] h-full rounded-full transition-all duration-300"
                       style={{ width: `${totalTasksCount > 0 ? (completedTasksCount / totalTasksCount) * 100 : 0}%` }}
                     />
                   </div>
                 </div>
 
                 {/* Metric 2 */}
-                <div className="p-3.5 rounded-xl bg-white/5 border border-white/10">
+                <div className="p-3.5 rounded-2xl bg-black/25 border border-white/15">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-slate-300 font-medium">Điểm tích lũy</span>
-                    <Zap className="w-3.5 h-3.5 text-slate-400" />
+                    <span className="text-xs text-[#FFF7E8]/80 font-medium">Điểm tích lũy</span>
+                    <Zap className="w-3.5 h-3.5 text-[#FDE2A7]" />
                   </div>
                   <div className="mt-2 flex items-baseline gap-1.5">
                     <strong className="text-2xl font-bold text-white">
                       {totalXPEarned}
                     </strong>
-                    <span className="text-xs text-slate-400">/ {totalPossibleXP} XP</span>
+                    <span className="text-xs text-[#FFF7E8]/70">/ {totalPossibleXP} XP</span>
                   </div>
-                  <span className="text-[11px] text-slate-400 mt-1 block">
+                  <span className="text-[11px] text-[#FDE2A7]/90 mt-1 block">
                     Điểm đánh giá năng lực
                   </span>
                 </div>
 
                 {/* Metric 3 */}
-                <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+                <div className="p-3.5 rounded-2xl bg-black/25 border border-white/15 flex items-center justify-between">
                   <div>
-                    <span className="text-xs text-slate-300 font-medium block">Cấp bậc học tập</span>
-                    <h5 className="text-base font-bold mt-1 text-white">
+                    <span className="text-xs text-[#FFF7E8]/80 font-medium block">Cấp bậc học tập</span>
+                    <h5 className="text-base font-bold mt-1 text-[#FDE2A7]">
                       {studentRank.title}
                     </h5>
-                    <span className="text-[11px] text-slate-400 mt-0.5 block">
+                    <span className="text-[11px] text-white/80 mt-0.5 block">
                       {studentRank.badge}
                     </span>
                   </div>
                   <button
                     onClick={handleResetProgress}
-                    className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 transition"
+                    className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-[#FFF7E8] transition cursor-pointer"
                     title="Đặt lại tiến độ làm bài"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
@@ -677,19 +680,19 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
             </div>
 
             {/* Filter by Lesson */}
-            <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="bg-[#FFFDF5] p-3.5 sm:p-4 rounded-2xl border border-[#EBDBC5] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <Filter className="w-3.5 h-3.5 text-slate-400" />
-                <span className="text-xs font-semibold text-slate-700">Lọc theo bài học:</span>
+                <Filter className="w-3.5 h-3.5 text-[#850B10]" />
+                <span className="text-xs font-bold text-[#2D1B08]">Lọc theo bài học:</span>
               </div>
 
               <div className="flex flex-wrap items-center gap-1.5">
                 <button
                   onClick={() => setTaskLessonFilter('all')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                     taskLessonFilter === 'all'
-                      ? 'bg-slate-900 text-white font-semibold'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-[#850B10] text-white shadow-xs'
+                      : 'bg-[#FAF5EB] text-[#2D1B08] border border-[#EBDBC5] hover:bg-[#FFFDF5]'
                   }`}
                 >
                   Tất cả bài học ({tasks.length})
@@ -698,10 +701,10 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                   <button
                     key={les}
                     onClick={() => setTaskLessonFilter(les)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-medium transition cursor-pointer ${
                       taskLessonFilter === les
-                        ? 'bg-slate-900 text-white font-semibold'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-[#850B10] text-white font-bold shadow-xs'
+                        : 'bg-[#FAF5EB] text-[#2D1B08] border border-[#EBDBC5] hover:bg-[#FFFDF5]'
                     }`}
                   >
                     {les.split(':')[0]}
@@ -712,14 +715,14 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
 
             {/* Task Cards List */}
             {loadingTasks ? (
-              <div className="bg-white p-12 rounded-2xl border border-slate-200 text-center space-y-2">
-                <RefreshCw className="w-5 h-5 text-slate-400 animate-spin mx-auto" />
-                <p className="text-xs text-slate-500">Đang tải danh sách nhiệm vụ...</p>
+              <div className="bg-[#FFFDF5] p-12 rounded-3xl border border-[#EBDBC5] text-center space-y-2">
+                <RefreshCw className="w-5 h-5 text-[#850B10] animate-spin mx-auto" />
+                <p className="text-xs text-stone-500">Đang tải danh sách nhiệm vụ...</p>
               </div>
             ) : tasks.length === 0 ? (
-              <div className="bg-white p-12 rounded-2xl border border-slate-200 text-center space-y-2">
-                <Target className="w-7 h-7 text-slate-300 mx-auto" />
-                <p className="text-sm font-semibold text-slate-700">Chưa có nhiệm vụ học tập nào phù hợp.</p>
+              <div className="bg-[#FFFDF5] p-12 rounded-3xl border border-[#EBDBC5] text-center space-y-2">
+                <Target className="w-7 h-7 text-stone-400 mx-auto" />
+                <p className="text-sm font-semibold text-[#2D1B08]">Chưa có nhiệm vụ học tập nào phù hợp.</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -733,44 +736,44 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                   return (
                     <div
                       key={task.id}
-                      className={`bg-white rounded-2xl border transition-all duration-150 shadow-xs overflow-hidden ${
+                      className={`bg-[#FFFDF5] rounded-3xl border transition-all duration-150 shadow-xs overflow-hidden ${
                         isFullyCompleted
-                          ? 'border-slate-300 bg-slate-50/50'
-                          : 'border-slate-200 hover:border-slate-300'
+                          ? 'border-emerald-300/80 bg-[#FAF5EB]/80'
+                          : 'border-[#EBDBC5] hover:border-amber-300'
                       }`}
                     >
                       {/* Task Header */}
                       <div className="p-5 sm:p-6 space-y-3">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-[#850B10] border border-amber-300/50">
                               {task.badge || 'Khám Phá Di Sản'}
                             </span>
-                            <span className="text-xs text-slate-500 font-medium">
+                            <span className="text-xs text-stone-600 font-medium">
                               • {task.lesson}
                             </span>
-                            <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-600">
+                            <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-[#FAF5EB] text-stone-700 border border-[#EBDBC5]">
                               {task.difficulty === 'co_ban' ? 'Cơ bản' : task.difficulty === 'van_dung' ? 'Vận dụng' : 'Thông hiểu'}
                             </span>
                           </div>
 
                           <div className="flex items-center gap-2 self-end sm:self-auto">
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#850B10]/10 text-[#850B10] border border-[#850B10]/20 font-bold text-xs">
                               +{task.reward_xp || 100} XP
                             </span>
 
                             {isAdmin && (
-                              <div className="flex items-center gap-1 pl-2 border-l border-slate-200">
+                              <div className="flex items-center gap-1 pl-2 border-l border-[#EBDBC5]">
                                 <button
                                   onClick={() => handleOpenEditTask(task)}
-                                  className="p-1.5 rounded-md text-slate-400 hover:text-slate-900 hover:bg-slate-100"
+                                  className="p-1.5 rounded-md text-stone-400 hover:text-[#850B10] hover:bg-[#FAF5EB] transition cursor-pointer"
                                   title="Sửa nhiệm vụ"
                                 >
                                   <Edit3 className="w-3.5 h-3.5" />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteTask(task.id, task.title)}
-                                  className="p-1.5 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50"
+                                  className="p-1.5 rounded-md text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
                                   title="Xóa nhiệm vụ"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -782,10 +785,10 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
 
                         {/* Task Title & Description */}
                         <div>
-                          <h4 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
+                          <h4 className="text-base sm:text-lg font-bold text-[#2D1B08] leading-snug">
                             {task.title}
                           </h4>
-                          <p className="mt-1 text-xs text-slate-600 leading-relaxed font-normal">
+                          <p className="mt-1 text-xs text-stone-600 leading-relaxed font-normal">
                             {task.description}
                           </p>
                         </div>
@@ -793,17 +796,17 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                         {/* Interactive Checklist Header & Progress Bar */}
                         <div className="pt-2">
                           <div className="flex items-center justify-between text-xs mb-1.5">
-                            <span className="font-semibold text-slate-700 flex items-center gap-1.5">
-                              <CheckSquare className="w-3.5 h-3.5 text-slate-600" />
+                            <span className="font-bold text-[#2D1B08] flex items-center gap-1.5">
+                              <CheckSquare className="w-3.5 h-3.5 text-[#850B10]" />
                               Tiêu chí hoàn thành ({completedChecks.length}/{checklist.length}):
                             </span>
-                            <span className={`font-semibold text-xs ${isFullyCompleted ? 'text-slate-900 font-bold' : 'text-slate-500'}`}>
+                            <span className={`font-bold text-xs ${isFullyCompleted ? 'text-emerald-700' : 'text-[#850B10]'}`}>
                               {isFullyCompleted ? 'Đã hoàn thành' : `${completionPercent}%`}
                             </span>
                           </div>
-                          <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                          <div className="w-full bg-[#FAF5EB] border border-[#EBDBC5] h-2 rounded-full overflow-hidden">
                             <div
-                              className="h-full rounded-full transition-all duration-300 bg-slate-900"
+                              className="h-full rounded-full transition-all duration-300 bg-[#850B10]"
                               style={{ width: `${completionPercent}%` }}
                             />
                           </div>
@@ -820,20 +823,20 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                                 onClick={() => toggleTaskCheck(task.id, idx)}
                                 className={`w-full text-left p-3 rounded-xl border transition flex items-start gap-3 cursor-pointer ${
                                   isChecked
-                                    ? 'bg-slate-50 border-slate-200 text-slate-500'
-                                    : 'bg-white hover:bg-slate-50/80 border-slate-200 text-slate-800'
+                                    ? 'bg-[#FAF5EB] border-[#EBDBC5] text-stone-500'
+                                    : 'bg-[#FFFDF5] hover:bg-[#FAF5EB]/60 border-[#EBDBC5] text-[#2D1B08]'
                                 }`}
                               >
                                 <div
                                   className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 mt-0.5 border transition ${
                                     isChecked
-                                      ? 'bg-slate-900 border-slate-900 text-white shadow-2xs'
-                                      : 'border-slate-300 bg-white'
+                                      ? 'bg-[#850B10] border-[#850B10] text-white shadow-2xs'
+                                      : 'border-[#EBDBC5] bg-white'
                                   }`}
                                 >
                                   {isChecked && <Check className="w-3.5 h-3.5 stroke-[2.5]" />}
                                 </div>
-                                <span className={`text-xs leading-relaxed ${isChecked ? 'line-through text-slate-400' : ''}`}>
+                                <span className={`text-xs leading-relaxed ${isChecked ? 'line-through text-stone-400' : ''}`}>
                                   {step}
                                 </span>
                               </button>
@@ -842,21 +845,21 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                         </div>
 
                         {/* Student Field Notebook (Nhật ký thu hoạch) */}
-                        <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5 mt-3">
+                        <div className="p-4 rounded-2xl bg-[#FAF5EB] border border-[#EBDBC5] space-y-2.5 mt-3">
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
-                              <BookOpen className="w-3.5 h-3.5 text-slate-500" />
+                            <span className="text-xs font-bold text-[#2D1B08] flex items-center gap-1.5">
+                              <BookOpen className="w-3.5 h-3.5 text-[#850B10]" />
                               Nhật ký thu hoạch của em:
                             </span>
                             {savedNoteTaskId === task.id && (
-                              <span className="text-[11px] font-medium text-slate-600 animate-fade-in flex items-center gap-1">
-                                <Check className="w-3 h-3 text-emerald-600" /> Đã lưu ghi chép
+                              <span className="text-[11px] font-bold text-emerald-700 animate-fade-in flex items-center gap-1">
+                                <Check className="w-3 h-3 text-emerald-700" /> Đã lưu ghi chép
                               </span>
                             )}
                           </div>
 
                           {task.reflection_prompt && (
-                            <p className="text-xs text-slate-500 italic leading-relaxed">
+                            <p className="text-xs text-stone-600 italic leading-relaxed">
                               Gợi ý: {task.reflection_prompt}
                             </p>
                           )}
@@ -866,14 +869,14 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                             value={progress.note || ''}
                             onChange={(e) => handleNoteChange(task.id, e.target.value)}
                             placeholder="Ghi lại các chi tiết lịch sử, nhận xét hoặc cảm nhận của em..."
-                            className="w-full p-3 rounded-lg border border-slate-300 bg-white text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-900"
+                            className="w-full p-3 rounded-xl border border-[#EBDBC5] bg-[#FFFDF5] text-xs text-[#2D1B08] placeholder-stone-400 focus:outline-none focus:border-[#850B10]"
                           />
 
                           <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
                             <button
                               type="button"
                               onClick={() => handleSaveNote(task.id)}
-                              className="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition shadow-2xs"
+                              className="px-3.5 py-1.5 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white font-bold text-xs transition shadow-2xs cursor-pointer"
                             >
                               Lưu ghi chép
                             </button>
@@ -881,16 +884,16 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                             <button
                               type="button"
                               onClick={() => handleCopySubmission(task)}
-                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-medium transition"
+                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#FFFDF5] hover:bg-[#FAF5EB] text-[#2D1B08] border border-[#EBDBC5] text-xs font-semibold transition cursor-pointer"
                             >
                               {copiedTaskId === task.id ? (
                                 <>
                                   <Check className="w-3.5 h-3.5 text-emerald-600" />
-                                  <span className="text-slate-900 font-semibold">Đã sao chép bài nộp</span>
+                                  <span className="text-emerald-800 font-bold">Đã sao chép bài nộp</span>
                                 </>
                               ) : (
                                 <>
-                                  <Copy className="w-3.5 h-3.5 text-slate-500" />
+                                  <Copy className="w-3.5 h-3.5 text-stone-500" />
                                   <span>Sao chép bài nộp</span>
                                 </>
                               )}
@@ -899,16 +902,16 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-                          <span className="text-xs text-slate-500 font-normal">
-                            Đối tượng: <strong className="text-slate-800 font-semibold">{task.target_title || 'Mô hình 3D'}</strong>
+                        <div className="pt-3 border-t border-[#EBDBC5]/60 flex flex-wrap items-center justify-between gap-3">
+                          <span className="text-xs text-stone-600 font-normal">
+                            Đối tượng: <strong className="text-[#2D1B08] font-bold">{task.target_title || 'Mô hình 3D'}</strong>
                           </span>
 
                           <Link
                             to={task.target_url || '/studio-3d'}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition shadow-2xs ml-auto"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white text-xs font-bold transition shadow-2xs ml-auto"
                           >
-                            <Box className="w-3.5 h-3.5 text-slate-300" />
+                            <Box className="w-3.5 h-3.5 text-[#FDE2A7]" />
                             <span>Bắt đầu nhiệm vụ</span>
                             <ArrowRight className="w-3.5 h-3.5" />
                           </Link>
@@ -928,43 +931,43 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
       {/* ========================================================= */}
       {tab === 'bang-xep-hang-streak' && (
         <div className="space-y-6">
-          <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div className="bg-[#FFFDF5] p-6 sm:p-7 rounded-3xl border border-[#EBDBC5] shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#EBDBC5]/60">
               <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-black bg-orange-100 text-orange-800 mb-1">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-[#850B10] border border-amber-300/50 mb-1">
                   <Flame className="w-3.5 h-3.5 text-orange-600 fill-orange-600" />
                   <span>Thi Đua Tự Học GDPT 2018</span>
                 </div>
-                <h3 className="text-xl font-black text-slate-900">
+                <h3 className="text-xl font-bold text-[#2D1B08] font-serif-royal">
                   Bảng Vàng Chuỗi Ngày Đăng Nhập Học Bài (Streak)
                 </h3>
               </div>
-              <span className="text-xs text-slate-400 font-bold">
+              <span className="text-xs text-stone-500 font-bold">
                 Xếp hạng toàn hệ thống
               </span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-orange-50 via-amber-50 to-orange-100/60 border border-orange-200/80 text-xs text-orange-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="p-4 rounded-2xl bg-[#FAF5EB] border border-amber-300/60 text-xs text-[#2D1B08] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
                 <Flame className="w-5 h-5 text-orange-500 fill-orange-500 animate-pulse shrink-0" />
                 <div>
-                  <strong className="block text-slate-900 font-bold">Quy tắc duy trì chuỗi Streak:</strong>
+                  <strong className="block text-[#850B10] font-bold">Quy tắc duy trì chuỗi Streak:</strong>
                   <span>Mỗi ngày đăng nhập học bài, làm trắc nghiệm sẽ cộng thêm +1 ngày. Giữ lửa học tập để nhận danh hiệu "Học Giả Lịch Sử"!</span>
                 </div>
               </div>
               {currentUser && (
-                <div className="px-3.5 py-2 rounded-xl bg-white border border-orange-200 font-black text-orange-600 shrink-0 shadow-2xs">
+                <div className="px-3.5 py-2 rounded-xl bg-[#FFFDF5] border border-amber-300/80 font-bold text-[#850B10] shrink-0 shadow-2xs">
                   Chuỗi của bạn: {currentUser.streak_count || 1} ngày 🔥
                 </div>
               )}
             </div>
 
             {loadingLeaderboard ? (
-              <div className="py-12 text-center text-xs text-slate-400">Đang nạp dữ liệu Bảng Vàng...</div>
+              <div className="py-12 text-center text-xs text-stone-400">Đang nạp dữ liệu Bảng Vàng...</div>
             ) : leaderboard.length === 0 ? (
-              <div className="py-12 text-center text-xs text-slate-400">Chưa có dữ liệu xếp hạng</div>
+              <div className="py-12 text-center text-xs text-stone-400">Chưa có dữ liệu xếp hạng</div>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-[#EBDBC5]/50">
                 {leaderboard.map((student, idx) => {
                   const isTop1 = idx === 0;
                   const isTop2 = idx === 1;
@@ -975,24 +978,24 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                       key={student.id}
                       className={`p-3.5 sm:p-4 flex items-center justify-between gap-3 transition rounded-2xl my-1 ${
                         isTop1
-                          ? 'bg-amber-50/70 border border-amber-200'
+                          ? 'bg-amber-50/90 border border-amber-300 shadow-xs'
                           : isTop2
-                          ? 'bg-slate-50/80 border border-slate-200'
+                          ? 'bg-[#FAF5EB] border border-[#EBDBC5]'
                           : isTop3
-                          ? 'bg-orange-50/50 border border-orange-200'
-                          : 'hover:bg-slate-50'
+                          ? 'bg-orange-50/60 border border-amber-200'
+                          : 'hover:bg-[#FAF5EB]'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         {/* Rank Badge */}
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs shrink-0 ${
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
                           isTop1
-                            ? 'bg-amber-500 text-slate-950 shadow-md ring-2 ring-amber-300'
+                            ? 'bg-[#850B10] text-[#FDE2A7] shadow-md ring-2 ring-amber-300'
                             : isTop2
-                            ? 'bg-slate-300 text-slate-800'
+                            ? 'bg-[#EBDBC5] text-[#850B10]'
                             : isTop3
                             ? 'bg-amber-700 text-white'
-                            : 'bg-slate-100 text-slate-600'
+                            : 'bg-[#FAF5EB] text-stone-600 border border-[#EBDBC5]'
                         }`}>
                           {idx + 1}
                         </div>
@@ -1000,27 +1003,27 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                         {/* Name & Account */}
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="font-extrabold text-xs sm:text-sm text-slate-900 truncate">
+                            <span className="font-bold text-xs sm:text-sm text-[#2D1B08] truncate">
                               {student.full_name || student.username}
                             </span>
                             {isTop1 && (
-                              <span className="text-[10px] font-black px-2 py-0.2 rounded-full bg-amber-400 text-slate-950 shadow-2xs">
+                              <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-amber-400 text-[#2D1B08] shadow-2xs">
                                 👑 Quán Quân
                               </span>
                             )}
                           </div>
-                          <span className="text-[11px] text-slate-400 font-mono">
+                          <span className="text-[11px] text-stone-500 font-mono">
                             @{student.username} • {student.exams_completed || 0} bài kiểm tra hoàn thành
                           </span>
                         </div>
                       </div>
 
                       {/* Streak Display */}
-                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 shadow-2xs shrink-0">
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FFFDF5] border border-[#EBDBC5] shadow-2xs shrink-0">
                         <Flame className={`w-4 h-4 ${
                           isTop1 ? 'text-orange-500 fill-orange-500 animate-pulse' : 'text-amber-500 fill-amber-500'
                         }`} />
-                        <span className="font-black text-sm text-slate-900">
+                        <span className="font-bold text-sm text-[#2D1B08]">
                           {student.streak_count || 1} ngày
                         </span>
                       </div>
@@ -1050,13 +1053,13 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
       {tab === 'luyen-tap-trac-nghiem' && (
         <div className="space-y-6">
           {/* Lesson Filter & Header */}
-          <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-100">
+          <div className="bg-[#FFFDF5] p-5 sm:p-6 rounded-3xl border border-[#EBDBC5] shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-[#EBDBC5]/60">
               <div>
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <span className="text-xs font-semibold text-[#850B10] uppercase tracking-wider">
                   Đấu Trường Trắc Nghiệm GDPT 2018
                 </span>
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mt-0.5">
+                <h3 className="text-lg sm:text-xl font-bold text-[#2D1B08] mt-0.5 font-serif-royal">
                   Luyện Tập & Củng Cố Kiến Thức Từng Bài Học
                 </h3>
               </div>
@@ -1064,7 +1067,7 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
               {isAdmin && (
                 <button
                   onClick={handleOpenAddQuiz}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition shadow-xs shrink-0"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white font-bold text-xs transition shadow-xs shrink-0 cursor-pointer"
                 >
                   <PlusCircle className="w-3.5 h-3.5" />
                   <span>Thêm câu hỏi mới</span>
@@ -1074,16 +1077,16 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
 
             {/* Lesson Selector Pills */}
             <div className="space-y-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#850B10] block">
                 Chọn Bài Học / Chuyên Đề:
               </span>
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={() => setSelectedLesson('all')}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition ${
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                     selectedLesson === 'all'
-                      ? 'bg-slate-900 text-white font-semibold shadow-xs'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'
+                      ? 'bg-[#850B10] text-white shadow-xs'
+                      : 'bg-[#FAF5EB] hover:bg-[#FFFDF5] text-[#2D1B08] border border-[#EBDBC5]'
                   }`}
                 >
                   Tất cả các bài ({quizzes.length})
@@ -1093,14 +1096,14 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
                   <button
                     key={les.lesson}
                     onClick={() => setSelectedLesson(les.lesson)}
-                    className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 ${
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 cursor-pointer ${
                       selectedLesson === les.lesson
-                        ? 'bg-slate-900 text-white font-semibold shadow-xs'
-                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'
+                        ? 'bg-[#850B10] text-white font-bold shadow-xs'
+                        : 'bg-[#FAF5EB] hover:bg-[#FFFDF5] text-[#2D1B08] border border-[#EBDBC5]'
                     }`}
                   >
                     <span>{les.lesson}</span>
-                    <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-200 text-slate-800 font-semibold">
+                    <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 text-[#850B10] font-bold border border-amber-300/40">
                       {les.question_count}
                     </span>
                   </button>
@@ -1111,9 +1114,9 @@ export default function StudentsView({ currentUser, authToken, topics = [] }) {
 
           {/* Interactive Quiz Player */}
           {loadingQuizzes ? (
-            <div className="bg-white p-12 rounded-2xl border border-slate-200 text-center space-y-2">
-              <RefreshCw className="w-5 h-5 text-slate-400 animate-spin mx-auto" />
-              <p className="text-xs font-medium text-slate-500">Đang tải bộ câu hỏi...</p>
+            <div className="bg-[#FFFDF5] p-12 rounded-3xl border border-[#EBDBC5] text-center space-y-2">
+              <RefreshCw className="w-5 h-5 text-[#850B10] animate-spin mx-auto" />
+              <p className="text-xs font-medium text-stone-500">Đang tải bộ câu hỏi...</p>
             </div>
           ) : (
             <QuizInteractiveComponent

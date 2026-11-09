@@ -125,26 +125,27 @@ export default function StudentTaskEditorModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200/90 w-full max-w-2xl my-8 overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-fade-in overflow-y-auto">
+      <div className="bg-[#FFFDF5] rounded-3xl shadow-2xl border border-[#EBDBC5] w-full max-w-2xl my-8 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gold/20 text-gold-dark flex items-center justify-center font-bold">
-              <CheckSquare className="w-5 h-5" />
+        <div className="px-6 py-4 bg-gradient-to-r from-[#70070B] via-[#850B10] to-[#9E0D14] text-white flex items-center justify-between border-b border-amber-300/30 relative overflow-hidden shrink-0">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="relative z-10 flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-white/15 text-[#FDE2A7] border border-amber-300/40 flex items-center justify-center font-bold">
+              <CheckSquare className="w-5 h-5 text-[#FDE2A7]" />
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-black text-slate-900">
+              <h3 className="text-base sm:text-lg font-bold text-white font-serif-royal">
                 {isEditing ? 'Chỉnh Sửa Nhiệm Vụ Học Tập' : 'Thêm Nhiệm Vụ Học Tập Mới'}
               </h3>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-[#FFF7E8]/90">
                 Thiết kế nhiệm vụ rèn luyện năng lực tự học cho học sinh Lớp 10
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+            className="relative z-10 p-1.5 rounded-xl text-[#FFF7E8]/80 hover:text-white hover:bg-white/10 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -168,7 +169,7 @@ export default function StudentTaskEditorModal({
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="Ví dụ: Giải Mã Biểu Tượng Sùng Bái Mặt Trời Trên Trống Đồng Ngọc Lũ"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-navy"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#850B10]"
             />
           </div>
 
@@ -183,7 +184,7 @@ export default function StudentTaskEditorModal({
                 value={formData.lesson}
                 onChange={(e) => setFormData({ ...formData, lesson: e.target.value })}
                 placeholder="Ví dụ: Bài 11: Một số nền văn minh cổ trên đất nước Việt Nam"
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:border-navy"
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:border-[#850B10]"
               />
             </div>
             <div>
@@ -195,7 +196,7 @@ export default function StudentTaskEditorModal({
                 value={formData.badge}
                 onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
                 placeholder="Ví dụ: Bảo Vật Quốc Gia, Di Sản UNESCO, Hải Trình Số"
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:border-navy"
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:border-[#850B10]"
               />
             </div>
           </div>
@@ -209,7 +210,7 @@ export default function StudentTaskEditorModal({
               <select
                 value={formData.difficulty}
                 onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 bg-white focus:outline-none focus:border-navy"
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 bg-white focus:outline-none focus:border-[#850B10]"
               >
                 <option value="co_ban">Cơ bản (Khám phá & nhận biết)</option>
                 <option value="thong_hieu">Thông hiểu (Giải mã hoa văn & bối cảnh)</option>
@@ -224,7 +225,7 @@ export default function StudentTaskEditorModal({
                 type="number"
                 value={formData.reward_xp}
                 onChange={(e) => setFormData({ ...formData, reward_xp: e.target.value })}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-navy"
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#850B10]"
               />
             </div>
           </div>
@@ -238,7 +239,7 @@ export default function StudentTaskEditorModal({
               <select
                 value={formData.target_type}
                 onChange={(e) => setFormData({ ...formData, target_type: e.target.value })}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 bg-white focus:outline-none focus:border-navy"
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 bg-white focus:outline-none focus:border-[#850B10]"
               >
                 <option value="3d">Mô hình 3D xoay 360°</option>
                 <option value="resource">Bài tư liệu số</option>
@@ -254,7 +255,7 @@ export default function StudentTaskEditorModal({
                 value={formData.target_title}
                 onChange={(e) => setFormData({ ...formData, target_title: e.target.value })}
                 placeholder="Ví dụ: Trống đồng Ngọc Lũ"
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:border-navy"
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:border-[#850B10]"
               />
             </div>
             <div>
@@ -266,7 +267,7 @@ export default function StudentTaskEditorModal({
                 value={formData.target_url}
                 onChange={(e) => setFormData({ ...formData, target_url: e.target.value })}
                 placeholder="/studio-3d/co-vat/dong_son_drum"
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono text-slate-800 focus:outline-none focus:border-navy"
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-mono text-slate-800 focus:outline-none focus:border-[#850B10]"
               />
             </div>
           </div>
@@ -281,7 +282,7 @@ export default function StudentTaskEditorModal({
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Mô tả tóm tắt những gì học sinh sẽ được học và khám phá trong nhiệm vụ này..."
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-normal text-slate-800 focus:outline-none focus:border-navy"
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-normal text-slate-800 focus:outline-none focus:border-[#850B10]"
             />
           </div>
 
@@ -294,7 +295,7 @@ export default function StudentTaskEditorModal({
               <button
                 type="button"
                 onClick={handleAddChecklist}
-                className="inline-flex items-center gap-1 text-[11px] font-bold text-navy hover:text-gold-dark"
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-[#850B10] hover:text-gold-dark"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Thêm bước</span>
@@ -312,7 +313,7 @@ export default function StudentTaskEditorModal({
                     value={step}
                     onChange={(e) => handleChecklistChange(idx, e.target.value)}
                     placeholder={`Bước ${idx + 1}: Thao tác hoặc việc cần làm...`}
-                    className="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-navy"
+                    className="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#850B10]"
                   />
                   <button
                     type="button"
@@ -337,24 +338,24 @@ export default function StudentTaskEditorModal({
               value={formData.reflection_prompt}
               onChange={(e) => setFormData({ ...formData, reflection_prompt: e.target.value })}
               placeholder="Ví dụ: Theo em, việc khắc họa hình ảnh chim Lạc và mặt trời ở tâm trống thể hiện điều gì...?"
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-normal text-slate-800 focus:outline-none focus:border-navy"
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-normal text-slate-800 focus:outline-none focus:border-[#850B10]"
             />
           </div>
         </form>
 
         {/* Modal Footer */}
-        <div className="px-6 py-3.5 border-t border-slate-100 flex items-center justify-end gap-3 bg-slate-50/70">
+        <div className="px-6 py-3.5 border-t border-[#EBDBC5] flex items-center justify-end gap-3 bg-[#FAF5EB]">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition"
+            className="px-4 py-2 rounded-xl text-xs font-bold text-stone-600 hover:bg-stone-200/60 transition cursor-pointer"
           >
             Hủy bỏ
           </button>
           <button
             onClick={handleSubmit}
             disabled={saving}
-            className="px-5 py-2 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 font-black text-xs transition shadow-sm active:scale-95 disabled:opacity-50"
+            className="px-5 py-2 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white font-bold text-xs transition shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             {saving ? 'Đang lưu...' : isEditing ? 'Cập Nhật Nhiệm Vụ' : 'Tạo Nhiệm Vụ'}
           </button>
