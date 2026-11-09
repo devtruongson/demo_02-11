@@ -46,7 +46,7 @@ export default function Hero() {
         <img
           src="/home-assets/ancient_house.png"
           alt="ancient_house"
-          className="relative z-10 h-[75vh] sm:h-[84vh] md:h-[90vh] lg:h-[94vh] w-auto max-w-none object-contain -translate-x-[86%] sm:-translate-x-[84%] md:-translate-x-[83%] lg:-translate-x-[82%]"
+          className="relative z-10 h-[75vh] sm:h-[84vh] md:h-[90vh] lg:h-[94vh] w-auto max-w-none object-contain -translate-x-[88%] sm:-translate-x-[84%] md:-translate-x-[83%] lg:-translate-x-[82%]"
         />
       </div>
 
@@ -61,11 +61,11 @@ export default function Hero() {
           }}
         />
 
-        {/* Right ancient_house (Trên mobile nhô ra cân đối bằng bên trái: 86%) */}
+        {/* Right ancient_house (Trên mobile thụt vào cân đối 88% giống bên trái) */}
         <img
           src="/home-assets/ancient_house.png"
           alt="ancient_house"
-          className="relative z-10 h-[75vh] sm:h-[84vh] md:h-[90vh] lg:h-[94vh] w-auto max-w-none object-contain translate-x-[86%] sm:translate-x-[76%] md:translate-x-[75%] lg:translate-x-[74%] scale-x-[-1]"
+          className="relative z-10 h-[75vh] sm:h-[84vh] md:h-[90vh] lg:h-[94vh] w-auto max-w-none object-contain translate-x-[88%] sm:translate-x-[76%] md:translate-x-[75%] lg:translate-x-[74%] scale-x-[-1]"
         />
       </div>
 
