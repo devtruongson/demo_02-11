@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, Box, Video, FileText, Image, MapPin, Calendar, ExternalLink, Lightbulb } from 'lucide-react';
 import { createResourceSlug } from '../utils/slugify.js';
+import { formatActivitiesForPreview } from '../utils/activityHelper.js';
 
 export default function ResourceCard({ resource, onSelect, onOpen3D }) {
   const getTypeBadge = (type) => {
@@ -104,11 +105,11 @@ export default function ResourceCard({ resource, onSelect, onOpen3D }) {
           </p>
 
           {/* Pedagogical Tip preview */}
-          {resource.tip && (
+          {Boolean(formatActivitiesForPreview(resource.tip)) && (
             <div className="mt-3 p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-[11px] text-slate-700 leading-normal flex items-start gap-1.5">
               <Lightbulb className="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5" />
               <span className="line-clamp-2">
-                <strong className="text-slate-900 font-semibold">Gợi ý sư phạm:</strong> {resource.tip}
+                <strong className="text-slate-900 font-semibold">Gợi ý sư phạm:</strong> {formatActivitiesForPreview(resource.tip)}
               </span>
             </div>
           )}

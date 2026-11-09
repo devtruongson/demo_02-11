@@ -10,6 +10,7 @@ import ThreeArtifactViewer from './ThreeArtifactViewer.jsx';
 import QuizInteractiveComponent from './QuizInteractiveComponent.jsx';
 import QuizEditorModal from './QuizEditorModal.jsx';
 import { parseIdFromSlug, createResourceSlug, formatYouTubeEmbedUrl } from '../utils/slugify.js';
+import { parseLearningActivities } from '../utils/activityHelper.js';
 
 export default function ResourceDetailView({
   resource: initialResource,
@@ -35,6 +36,10 @@ export default function ResourceDetailView({
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
   const [copied, setCopied] = useState(false);
   const [copiedCitation, setCopiedCitation] = useState(false);
+
+  const learningActivities = React.useMemo(() => {
+    return parseLearningActivities(resource?.tip);
+  }, [resource?.tip]);
 
   const isAdmin = currentUser?.role === 'admin';
 
@@ -552,7 +557,7 @@ export default function ResourceDetailView({
             </div>
           )}
 
-          {/* Section: GỢI Ý TỔ CHỨC HỌC TẬP (Matching Feedback Diagram) */}
+          {/* Section: GỢI Ý TỔ CHỨC HỌC TẬP (Chuẩn 5512 - Tùy biến linh hoạt theo từng tư liệu) */}
           <div className="bg-gradient-to-br from-amber-50/70 to-orange-50/50 p-6 rounded-3xl border border-amber-200/80 shadow-xs space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-amber-200/60">
               <h3 className="font-black text-sm sm:text-base text-amber-950 flex items-center gap-2">
@@ -565,32 +570,16 @@ export default function ResourceDetailView({
             </div>
 
             <div className="space-y-3 text-xs sm:text-sm text-amber-950 leading-relaxed">
-              <div className="p-3.5 bg-white/90 rounded-2xl border border-amber-200/70 space-y-1">
-                <strong className="text-slate-900 block font-bold text-xs uppercase tracking-wider text-amber-800">
-                  1. Hoạt động Khởi động (5 phút):
-                </strong>
-                <p className="text-xs text-slate-700">
-                  Cho học sinh quan sát ảnh hiện vật trên màn hình thông minh. Đặt câu hỏi: <em>"Dựa vào hình dáng và hoa văn, em có suy nghĩ gì về đời sống tinh thần của cư dân thời kỳ này?"</em>
-                </p>
-              </div>
-
-              <div className="p-3.5 bg-white/90 rounded-2xl border border-amber-200/70 space-y-1">
-                <strong className="text-slate-900 block font-bold text-xs uppercase tracking-wider text-amber-800">
-                  2. Hoạt động Khám phá & Bóc tách kiến thức:
-                </strong>
-                <p className="text-xs text-slate-700">
-                  Học sinh làm việc theo nhóm 4 người, truy cập mô hình 3D tương tác để đo đạc và phát hiện các chi tiết khảo cổ học tiêu biểu.
-                </p>
-              </div>
-
-              <div className="p-3.5 bg-white/90 rounded-2xl border border-amber-200/70 space-y-1">
-                <strong className="text-slate-900 block font-bold text-xs uppercase tracking-wider text-amber-800">
-                  3. Luyện tập & Vận dụng:
-                </strong>
-                <p className="text-xs text-slate-700">
-                  Hoàn thành 3 câu trắc nghiệm nhanh bên dưới để kiểm tra mức độ ghi nhớ và hiểu sâu về tư liệu.
-                </p>
-              </div>
+              {learningActivities.map((act, idx) => (
+                <div key={act.id || idx} className="p-3.5 bg-white/90 rounded-2xl border border-amber-200/70 space-y-1">
+                  <strong className="text-slate-900 block font-bold text-xs uppercase tracking-wider text-amber-800">
+                    {act.title}
+                  </strong>
+                  <p className="text-xs text-slate-700 whitespace-pre-line leading-relaxed">
+                    {act.content}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
 

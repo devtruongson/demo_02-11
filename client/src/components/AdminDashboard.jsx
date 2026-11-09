@@ -44,6 +44,7 @@ import {
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatYouTubeEmbedUrl } from '../utils/slugify.js';
+import { formatActivitiesForPreview } from '../utils/activityHelper.js';
 import Artifact3DEditorModal from './Artifact3DEditorModal.jsx';
 import ExamAssignmentModal from './ExamAssignmentModal.jsx';
 import ExamSubmissionsViewerModal from './ExamSubmissionsViewerModal.jsx';
@@ -3339,10 +3340,10 @@ export default function AdminDashboard({
               </div>
 
               {/* Pedagogical tip */}
-              {previewResource.tip && (
+              {Boolean(formatActivitiesForPreview(previewResource.tip)) && (
                 <div className="bg-amber-950/40 p-4 rounded-2xl border border-amber-900/50 space-y-1 text-xs">
                   <strong className="text-amber-400 block font-bold">💡 Gợi ý khai thác sư phạm:</strong>
-                  <p className="text-amber-200/90 leading-relaxed">{previewResource.tip}</p>
+                  <p className="text-amber-200/90 leading-relaxed whitespace-pre-line">{formatActivitiesForPreview(previewResource.tip)}</p>
                 </div>
               )}
             </div>

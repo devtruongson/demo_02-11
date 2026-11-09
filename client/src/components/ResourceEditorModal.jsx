@@ -10,9 +10,14 @@ import {
     HelpCircle,
     CheckCircle2,
     RotateCcw,
-    Link2
+    Link2,
+    Plus,
+    ArrowUp,
+    ArrowDown,
+    Lightbulb
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { DEFAULT_5512_ACTIVITIES } from '../utils/activityHelper.js';
 
 export default function ResourceEditorModal({ resource, topics, onClose, onSave }) {
   const [formData, setFormData] = useState({
@@ -36,6 +41,7 @@ export default function ResourceEditorModal({ resource, topics, onClose, onSave 
   const [uploadingSingle, setUploadingSingle] = useState(false);
   const [uploadingMultiple, setUploadingMultiple] = useState(false);
   const [showUrlGalleryInput, setShowUrlGalleryInput] = useState(false);
+  const [activities, setActivities] = useState([]);
   const singleFileInputRef = useRef(null);
   const multiFileInputRef = useRef(null);
 
@@ -55,6 +61,43 @@ export default function ResourceEditorModal({ resource, topics, onClose, onSave 
         }
       }
 
+      let initActs = [];
+      if (resource.tip) {
+        if (Array.isArray(resource.tip)) {
+          initActs = resource.tip.map((item, idx) => ({
+            id: item.id || `act-${Date.now()}-${idx}`,
+            title: item.title || `Hoạt động ${idx + 1}:`,
+            content: item.content || item.desc || (typeof item === 'string' ? item : '')
+          }));
+        } else if (typeof resource.tip === 'string') {
+          try {
+            const parsed = JSON.parse(resource.tip);
+            if (Array.isArray(parsed)) {
+              initActs = parsed.map((item, idx) => ({
+                id: item.id || `act-${Date.now()}-${idx}`,
+                title: item.title || `Hoạt động ${idx + 1}:`,
+                content: item.content || item.desc || (typeof item === 'string' ? item : '')
+              }));
+            } else if (typeof parsed === 'string' && parsed.trim()) {
+              initActs = [{
+                id: `act-${Date.now()}-0`,
+                title: 'Gợi ý sư phạm:',
+                content: parsed.trim()
+              }];
+            }
+          } catch {
+            if (resource.tip.trim()) {
+              initActs = [{
+                id: `act-${Date.now()}-0`,
+                title: 'Gợi ý sư phạm:',
+                content: resource.tip.trim()
+              }];
+            }
+          }
+        }
+      }
+      setActivities(initActs);
+
       setFormData({
         topic_id: resource.topic_id || 4,
         lesson: resource.lesson || '',
@@ -71,8 +114,59 @@ export default function ResourceEditorModal({ resource, topics, onClose, onSave 
         tip: resource.tip || '',
         model_3d: resource.model_3d || ''
       });
+    } else {
+      setActivities([]);
     }
   }, [resource]);
+
+  // Dynamic Activities Handlers
+  const handleAddActivity = () => {
+    setActivities((prev) => [
+      ...prev,
+      {
+        id: `act-${Date.now()}-${prev.length}`,
+        title: `${prev.length + 1}. Hoạt động:`,
+        content: ''
+      }
+    ]);
+  };
+
+  const handleUpdateActivity = (index, field, value) => {
+    setActivities((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  };
+
+  const handleRemoveActivity = (index) => {
+    setActivities((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleMoveActivity = (index, direction) => {
+    setActivities((prev) => {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= prev.length) return prev;
+      const next = [...prev];
+      const temp = next[index];
+      next[index] = next[targetIndex];
+      next[targetIndex] = temp;
+      return next;
+    });
+  };
+
+  const handleLoadDefaultTemplates = () => {
+    setActivities(
+      DEFAULT_5512_ACTIVITIES.map((act, idx) => ({
+        ...act,
+        id: `act-${Date.now()}-${idx}`
+      }))
+    );
+  };
+
+  const handleClearActivities = () => {
+    setActivities([]);
+  };
 
   // Handle Single Image Upload (Ảnh đại diện chính)
   const handleSingleFileUpload = async (e) => {
@@ -170,9 +264,17 @@ export default function ResourceEditorModal({ resource, topics, onClose, onSave 
 
     setSaving(true);
     try {
+      const validActs = activities
+        .map((a) => ({
+          title: a.title?.trim() || '',
+          content: a.content?.trim() || ''
+        }))
+        .filter((a) => a.title || a.content);
+
       const payload = {
         ...formData,
-        gallery: formData.gallery.length > 0 ? formData.gallery : [formData.img]
+        gallery: formData.gallery.length > 0 ? formData.gallery : [formData.img],
+        tip: validActs.length > 0 ? JSON.stringify(validActs) : ''
       };
 
       await onSave(payload, resource?.id);
@@ -485,20 +587,130 @@ export default function ResourceEditorModal({ resource, topics, onClose, onSave 
                 />
               </div>
 
-              {/* Pedagogical Tip & Source */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Gợi ý khai thác sư phạm (Dành cho GV & HS)
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={formData.tip}
-                    onChange={(e) => setFormData({ ...formData, tip: e.target.value })}
-                    placeholder="Câu hỏi định hướng phân tích, liên hệ thực tế hoặc bài tập nhóm..."
-                    className="w-full px-4 py-2.5 rounded-2xl border border-slate-300 text-xs font-medium text-slate-900 placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-navy focus:border-navy bg-white shadow-2xs"
-                  />
+              {/* Pedagogical Activities Section (Chuẩn 5512 - Tùy biến động cho từng tư liệu) */}
+              <div className="bg-amber-50/70 p-5 rounded-3xl border border-amber-200/80 space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-amber-200/70">
+                  <div className="flex items-center gap-2">
+                    <Lightbulb className="w-4 h-4 text-amber-700" />
+                    <span className="text-xs font-black uppercase tracking-wider text-amber-950">
+                      Gợi ý tổ chức hoạt động học tập (Chuẩn 5512)
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={handleLoadDefaultTemplates}
+                      className="px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-[11px] font-bold border border-amber-300 transition flex items-center gap-1"
+                      title="Nạp nhanh 3 hoạt động mẫu theo chuẩn công văn 5512"
+                    >
+                      <Sparkles className="w-3 h-3 text-amber-700" />
+                      <span>Nạp mẫu 5512</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleAddActivity}
+                      className="px-2.5 py-1 rounded-lg bg-navy hover:bg-navy-light text-white text-[11px] font-black transition flex items-center gap-1 shadow-xs"
+                    >
+                      <Plus className="w-3 h-3" />
+                      <span>Thêm hoạt động</span>
+                    </button>
+                  </div>
                 </div>
+
+                <p className="text-[11px] text-amber-900/80 leading-relaxed">
+                  {activities.length === 0
+                    ? 'Chưa thiết lập hoạt động tùy chỉnh. Hệ thống sẽ tự động hiển thị 3 hoạt động chuẩn 5512 mặc định khi xem bài. Nhấn "Nạp mẫu 5512" để tùy biến hoặc "Thêm hoạt động" để tạo mới.'
+                    : `Đang có ${activities.length} hoạt động tùy chỉnh cho tư liệu này. Bạn có thể thêm, bớt hoặc đổi thứ tự tùy ý.`}
+                </p>
+
+                {activities.length > 0 && (
+                  <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+                    {activities.map((act, index) => (
+                      <div
+                        key={act.id || index}
+                        className="p-3.5 bg-white rounded-2xl border border-amber-200/90 shadow-2xs space-y-2 group"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-black uppercase text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-md">
+                            Mục #{index + 1}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              disabled={index === 0}
+                              onClick={() => handleMoveActivity(index, -1)}
+                              className="p-1 rounded text-slate-400 hover:text-slate-700 disabled:opacity-20 transition"
+                              title="Di chuyển lên"
+                            >
+                              <ArrowUp className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={index === activities.length - 1}
+                              onClick={() => handleMoveActivity(index, 1)}
+                              className="p-1 rounded text-slate-400 hover:text-slate-700 disabled:opacity-20 transition"
+                              title="Di chuyển xuống"
+                            >
+                              <ArrowDown className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveActivity(index)}
+                              className="p-1 rounded text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition ml-1"
+                              title="Xóa mục này"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <input
+                            type="text"
+                            value={act.title}
+                            onChange={(e) => handleUpdateActivity(index, 'title', e.target.value)}
+                            placeholder={`Tiêu đề (VD: ${index + 1}. Hoạt động Khởi động (5 phút):)`}
+                            className="w-full px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-900 placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:ring-1 focus:ring-amber-500 bg-slate-50/50"
+                          />
+                        </div>
+
+                        <div>
+                          <textarea
+                            rows={2}
+                            value={act.content}
+                            onChange={(e) => handleUpdateActivity(index, 'content', e.target.value)}
+                            placeholder="Nội dung chi tiết, câu hỏi định hướng, gợi ý giao nhiệm vụ cho học sinh..."
+                            className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-800 placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:ring-1 focus:ring-amber-500 bg-slate-50/50 leading-relaxed"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {activities.length > 0 && (
+                  <div className="flex items-center justify-between pt-1">
+                    <button
+                      type="button"
+                      onClick={handleAddActivity}
+                      className="text-xs font-bold text-amber-900 hover:text-amber-950 flex items-center gap-1.5 underline underline-offset-2"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Thêm mục hoạt động khác</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleClearActivities}
+                      className="text-[11px] text-slate-500 hover:text-rose-600 transition"
+                    >
+                      Xóa tất cả (Dùng 3 mục mặc định)
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Source & URL */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
