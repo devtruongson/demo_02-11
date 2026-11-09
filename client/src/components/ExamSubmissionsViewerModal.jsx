@@ -84,19 +84,20 @@ export default function ExamSubmissionsViewerModal({
         className="w-full max-w-4xl max-h-[90vh] bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl flex flex-col overflow-hidden"
       >
         {/* Header */}
-        <div className="p-5 sm:p-6 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-4 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gold/15 text-gold border border-gold/30 flex items-center justify-center font-bold">
+        <div className="p-5 sm:p-6 bg-gradient-to-r from-[#70070B] via-[#850B10] to-[#9E0D14] border-b border-amber-300/30 flex items-center justify-between gap-4 shrink-0 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="relative z-10 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-white/15 text-[#FDE2A7] border border-amber-300/40 flex items-center justify-center font-bold">
               <Award className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded-md bg-gold text-slate-950 text-[10px] font-black uppercase">
+                <span className="px-2 py-0.5 rounded-full bg-white/20 text-[#FDE2A7] border border-amber-300/40 text-[10px] font-bold uppercase">
                   Bảng điểm đề thi
                 </span>
-                <span className="text-xs text-slate-400 font-mono">#{assignment.id}</span>
+                <span className="text-xs text-[#FFF7E8]/80 font-mono">#{assignment.id}</span>
               </div>
-              <h3 className="font-extrabold text-base sm:text-lg text-white mt-0.5">
+              <h3 className="font-bold text-base sm:text-lg text-white mt-0.5 font-serif-royal">
                 {assignment.title}
               </h3>
             </div>
@@ -104,7 +105,7 @@ export default function ExamSubmissionsViewerModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="relative z-10 p-2 rounded-xl text-[#FFF7E8]/80 hover:text-white hover:bg-white/10 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -145,7 +146,7 @@ export default function ExamSubmissionsViewerModal({
               onClick={() => setActiveTab('submitted')}
               className={`px-3.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 ${
                 activeTab === 'submitted'
-                  ? 'bg-navy text-white shadow-sm'
+                  ? 'bg-[#850B10] text-white shadow-sm'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -156,7 +157,7 @@ export default function ExamSubmissionsViewerModal({
               onClick={() => setActiveTab('unsubmitted')}
               className={`px-3.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 ${
                 activeTab === 'unsubmitted'
-                  ? 'bg-navy text-white shadow-sm'
+                  ? 'bg-[#850B10] text-white shadow-sm'
                   : 'text-slate-400 hover:text-white'
               }`}
             >

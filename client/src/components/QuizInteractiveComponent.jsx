@@ -128,47 +128,48 @@ export default function QuizInteractiveComponent({
     }
 
     return (
-      <div className="bg-gradient-to-br from-slate-900 via-navy-dark to-slate-900 text-white rounded-3xl p-6 sm:p-10 border border-white/10 shadow-xl space-y-6 animate-fade-in text-center">
-        <div className="w-16 h-16 rounded-3xl bg-gold/20 border border-gold/40 text-gold mx-auto flex items-center justify-center font-black">
+      <div className="bg-gradient-to-r from-[#70070B] via-[#850B10] to-[#9E0D14] text-white rounded-3xl p-6 sm:p-10 border border-amber-300/30 shadow-xl space-y-6 animate-fade-in text-center relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10 w-16 h-16 rounded-3xl bg-white/15 border border-amber-300/40 text-[#FDE2A7] mx-auto flex items-center justify-center font-bold">
           <Award className="w-8 h-8" />
         </div>
 
-        <div>
-          <span className="text-xs font-black uppercase tracking-wider text-gold-light">
+        <div className="relative z-10">
+          <span className="text-xs font-bold uppercase tracking-wider text-[#FDE2A7]">
             Hoàn Thành Bài Trắc Nghiệm Năng Lực
           </span>
-          <h3 className="text-2xl sm:text-3xl font-black mt-1 text-white">
+          <h3 className="text-2xl sm:text-3xl font-bold mt-1 text-white font-serif-royal">
             {title}
           </h3>
-          <p className="mt-2 text-xs sm:text-sm text-slate-300 max-w-lg mx-auto leading-relaxed">
+          <p className="mt-2 text-xs sm:text-sm text-[#FFF7E8]/90 max-w-lg mx-auto leading-relaxed">
             {subtitle}
           </p>
         </div>
 
         {/* Score Card */}
-        <div className="inline-flex items-center gap-6 p-4 px-8 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
+        <div className="relative z-10 inline-flex items-center gap-6 p-4 px-8 rounded-2xl bg-black/25 backdrop-blur-md border border-white/20">
           <div>
-            <span className="text-[10px] text-slate-400 block font-bold uppercase">Số câu chính xác</span>
-            <strong className="text-3xl font-black text-gold">
-              {score} <span className="text-base text-slate-300 font-normal">/ {total}</span>
+            <span className="text-[10px] text-[#FFF7E8]/80 block font-bold uppercase">Số câu chính xác</span>
+            <strong className="text-3xl font-bold text-[#FDE2A7]">
+              {score} <span className="text-base text-[#FFF7E8]/70 font-normal">/ {total}</span>
             </strong>
           </div>
-          <div className="w-px h-10 bg-white/15" />
+          <div className="w-px h-10 bg-white/20" />
           <div>
-            <span className="text-[10px] text-slate-400 block font-bold uppercase">Tỷ lệ hoàn thành</span>
-            <strong className="text-3xl font-black text-emerald-400">
+            <span className="text-[10px] text-[#FFF7E8]/80 block font-bold uppercase">Tỷ lệ hoàn thành</span>
+            <strong className="text-3xl font-bold text-emerald-400">
               {percent}%
             </strong>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
+        <div className="relative z-10 flex flex-wrap items-center justify-center gap-3 pt-4">
           <button
             onClick={handleRestart}
-            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 font-black text-xs transition shadow-md active:scale-95"
+            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#FFFDF5] hover:bg-[#FAF5EB] text-[#850B10] font-bold text-xs transition shadow-md active:scale-95 cursor-pointer"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-4 h-4 text-[#850B10]" />
             <span>Làm Lại Bài Này</span>
           </button>
         </div>
@@ -177,13 +178,13 @@ export default function QuizInteractiveComponent({
   }
 
   return (
-    <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-6 relative overflow-hidden animate-fade-in">
+    <div className="bg-[#FFFDF5] rounded-3xl p-6 sm:p-8 border border-[#EBDBC5] shadow-xs space-y-6 relative overflow-hidden animate-fade-in">
       {/* Top Banner & Progress */}
-      <div className="space-y-3 pb-4 border-b border-slate-100">
+      <div className="space-y-3 pb-4 border-b border-[#EBDBC5]/60">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-gold/15 text-navy border border-gold/30">
-              <Sparkles className="w-3.5 h-3.5 text-gold-dark" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-amber-100 text-[#850B10] border border-amber-300/50">
+              <Sparkles className="w-3.5 h-3.5 text-[#850B10]" />
               <span>Thử Thách Trắc Nghiệm GDPT 2018</span>
             </span>
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${diffBadge.color}`}>
@@ -192,18 +193,18 @@ export default function QuizInteractiveComponent({
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs font-black text-slate-700">
-              Câu <strong className="text-gold-dark">{currentIndex + 1}</strong> / {total}
+            <span className="text-xs font-bold text-[#2D1B08]">
+              Câu <strong className="text-[#850B10]">{currentIndex + 1}</strong> / {total}
             </span>
 
             {/* Admin Quick Edit Tools */}
             {isAdmin && (
-              <div className="flex items-center gap-1 pl-2 border-l border-slate-200">
+              <div className="flex items-center gap-1 pl-2 border-l border-[#EBDBC5]">
                 {onEditQuiz && (
                   <button
                     onClick={() => onEditQuiz(currentQuiz)}
                     title="Chỉnh sửa câu hỏi này (Admin)"
-                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-gold/30 text-slate-700 hover:text-slate-950 transition border border-slate-200"
+                    className="p-1.5 rounded-lg bg-[#FAF5EB] hover:bg-amber-100 text-stone-700 hover:text-[#850B10] transition border border-[#EBDBC5]"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
                   </button>
@@ -212,7 +213,7 @@ export default function QuizInteractiveComponent({
                   <button
                     onClick={() => onDeleteQuiz(currentQuiz.id, currentQuiz.question)}
                     title="Xóa câu hỏi này (Admin)"
-                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-rose-600 transition border border-slate-200"
+                    className="p-1.5 rounded-lg bg-[#FAF5EB] hover:bg-rose-100 text-stone-700 hover:text-rose-600 transition border border-[#EBDBC5]"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -221,7 +222,7 @@ export default function QuizInteractiveComponent({
                   <button
                     onClick={onAddQuiz}
                     title="Thêm câu hỏi mới cho bài này (Admin)"
-                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-emerald-100 text-slate-700 hover:text-emerald-700 transition border border-slate-200"
+                    className="p-1.5 rounded-lg bg-[#FAF5EB] hover:bg-emerald-100 text-stone-700 hover:text-emerald-700 transition border border-[#EBDBC5]"
                   >
                     <PlusCircle className="w-3.5 h-3.5" />
                   </button>
@@ -232,9 +233,9 @@ export default function QuizInteractiveComponent({
         </div>
 
         {/* Progress Bar */}
-        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+        <div className="w-full bg-[#FAF5EB] border border-[#EBDBC5] h-2 rounded-full overflow-hidden">
           <div
-            className="bg-gradient-to-r from-gold to-amber-500 h-full rounded-full transition-all duration-300"
+            className="bg-gradient-to-r from-amber-500 to-[#850B10] h-full rounded-full transition-all duration-300"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -242,11 +243,11 @@ export default function QuizInteractiveComponent({
 
       {/* Question Prompt */}
       <div>
-        <h3 className="text-base sm:text-lg font-black text-slate-900 leading-snug">
+        <h3 className="text-base sm:text-lg font-bold text-[#2D1B08] leading-snug">
           {currentQuiz.question}
         </h3>
         {currentQuiz.lesson && (
-          <span className="text-[11px] font-bold text-slate-400 mt-1 block">
+          <span className="text-[11px] font-medium text-stone-500 mt-1 block">
             Thuộc bài: {currentQuiz.lesson}
           </span>
         )}
@@ -260,19 +261,19 @@ export default function QuizInteractiveComponent({
           const isCorrect = idx === currentQuiz.correct_index;
           const hasAnswered = selectedOption !== null;
 
-          let btnClass = 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200';
-          let letterClass = 'bg-slate-200 text-slate-700';
+          let btnClass = 'bg-[#FAF5EB] hover:bg-[#FFFDF5] text-[#2D1B08] border-[#EBDBC5]';
+          let letterClass = 'bg-[#EBDBC5] text-[#850B10] font-bold';
 
           if (hasAnswered) {
             if (isCorrect) {
               btnClass = 'bg-emerald-50 text-emerald-950 border-emerald-400 shadow-sm ring-1 ring-emerald-300';
-              letterClass = 'bg-emerald-500 text-white font-black';
+              letterClass = 'bg-emerald-600 text-white font-bold';
             } else if (isSelected && !isCorrect) {
               btnClass = 'bg-rose-50 text-rose-950 border-rose-300 ring-1 ring-rose-200';
-              letterClass = 'bg-rose-500 text-white font-black';
+              letterClass = 'bg-rose-600 text-white font-bold';
             } else {
-              btnClass = 'bg-slate-50 text-slate-400 border-slate-200 opacity-60';
-              letterClass = 'bg-slate-200 text-slate-400';
+              btnClass = 'bg-[#FAF5EB] text-stone-400 border-[#EBDBC5] opacity-60';
+              letterClass = 'bg-[#EBDBC5] text-stone-400';
             }
           }
 
@@ -285,7 +286,7 @@ export default function QuizInteractiveComponent({
                 !hasAnswered ? 'cursor-pointer active:scale-[0.99]' : 'cursor-default'
               }`}
             >
-              <span className={`w-7 h-7 rounded-xl flex items-center justify-center font-black text-xs shrink-0 transition ${letterClass}`}>
+              <span className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 transition ${letterClass}`}>
                 {letter}
               </span>
               <span className="flex-1 pt-1 leading-relaxed">
@@ -304,19 +305,19 @@ export default function QuizInteractiveComponent({
 
       {/* Explanation Box (Shown once answered) */}
       {selectedOption !== null && (
-        <div className="p-5 rounded-2xl bg-amber-50/80 border border-amber-200/80 space-y-2 animate-fade-in text-xs">
-          <div className="flex items-center gap-2 font-black text-amber-900 text-xs">
-            <Lightbulb className="w-4 h-4 text-amber-600" />
+        <div className="p-5 rounded-2xl bg-[#FAF5EB] border border-amber-300/70 space-y-2 animate-fade-in text-xs">
+          <div className="flex items-center gap-2 font-bold text-[#850B10] text-xs">
+            <Lightbulb className="w-4 h-4 text-[#850B10]" />
             <span>Giải Mã Kiến Thức Lịch Sử:</span>
           </div>
-          <p className="text-slate-700 leading-relaxed font-normal pl-6 whitespace-pre-line">
+          <p className="text-stone-700 leading-relaxed font-normal pl-6 whitespace-pre-line">
             {currentQuiz.explanation || 'Đáp án chính xác được xây dựng trên cơ sở các nguồn tư liệu khảo cổ và giáo trình Lịch sử 10 GDPT 2018.'}
           </p>
 
           <div className="pt-3 flex items-center justify-end">
             <button
               onClick={handleNext}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-navy hover:bg-navy-light text-white font-black text-xs transition shadow-md active:scale-95"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white font-bold text-xs transition shadow-md active:scale-95 cursor-pointer"
             >
               <span>{currentIndex < total - 1 ? 'Câu tiếp theo' : 'Xem kết quả tổng kết'}</span>
               <ArrowRight className="w-4 h-4" />

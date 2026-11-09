@@ -104,18 +104,15 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialRol
         {/* ======================================================== */}
         {/* DEDICATED HEADER: STUDENT VS TEACHER BRANDING            */}
         {/* ======================================================== */}
-        <div className={`px-6 py-6 text-white flex items-center justify-between transition-colors duration-300 ${
+        <div className={`px-6 py-6 text-white flex items-center justify-between transition-colors duration-300 relative overflow-hidden ${
           isTeacher
-            ? 'bg-gradient-to-r from-slate-900 via-stone-900 to-amber-950 border-b border-amber-900/30'
-            : 'bg-gradient-to-r from-navy via-navy-light to-navy border-b border-navy-light/30'
+            ? 'bg-gradient-to-r from-[#590408] via-[#70070B] to-[#850B10] border-b border-amber-300/30'
+            : 'bg-gradient-to-r from-[#70070B] via-[#850B10] to-[#9E0D14] border-b border-amber-300/30'
         }`}>
-          <div>
+          <div className="absolute top-0 right-0 w-80 h-80 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="relative z-10">
             <div className="flex items-center gap-2 mb-1.5">
-              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 ${
-                isTeacher
-                  ? 'bg-amber-400 text-slate-950'
-                  : 'bg-gold text-slate-950'
-              }`}>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 bg-white/20 text-[#FDE2A7] border border-amber-300/40">
                 {isTeacher ? (
                   <>
                     <GraduationCap className="w-3 h-3" />
@@ -129,18 +126,18 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialRol
                 )}
               </span>
 
-              <span className="text-[11px] text-amber-200/90 font-medium">
+              <span className="text-[11px] text-[#FFF7E8]/90 font-medium">
                 {isTeacher ? 'Kế hoạch 5512 & Lớp học' : 'Lịch Sử 10 • GDPT 2018'}
               </span>
             </div>
 
-            <h3 className="font-extrabold text-xl leading-tight">
+            <h3 className="font-bold text-xl leading-tight text-white font-serif-royal">
               {tab === 'login'
                 ? (isTeacher ? 'Đăng Nhập Cổng Giáo Viên' : 'Đăng Nhập Góc Học Tập')
                 : (isTeacher ? 'Đăng Ký Tài Khoản Giáo Viên' : 'Đăng Ký Tài Khoản Học Sinh')}
             </h3>
 
-            <p className="text-xs text-slate-300 mt-1">
+            <p className="text-xs text-[#FFF7E8]/80 mt-1">
               {isTeacher
                 ? 'Tổ chức lớp học, giao bài tập, chấm điểm & khai thác bài giảng'
                 : 'Làm nhiệm vụ học tập, luyện thi trắc nghiệm & tích lũy Streak 🔥'}
@@ -149,7 +146,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialRol
 
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer shrink-0 self-start mt-1"
+            className="relative z-10 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer shrink-0 self-start mt-1"
           >
             <X className="w-4 h-4" />
           </button>
@@ -166,7 +163,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialRol
               tab === 'login'
                 ? isTeacher
                   ? 'border-amber-700 text-amber-900 bg-white shadow-xs font-black'
-                  : 'border-navy text-navy bg-white shadow-xs font-black'
+                  : 'border-[#850B10] text-[#850B10] bg-white shadow-xs font-black'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -181,7 +178,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialRol
               tab === 'register'
                 ? isTeacher
                   ? 'border-amber-700 text-amber-900 bg-white shadow-xs font-black'
-                  : 'border-navy text-navy bg-white shadow-xs font-black'
+                  : 'border-[#850B10] text-[#850B10] bg-white shadow-xs font-black'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -221,7 +218,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialRol
                     onChange={(e) => setLoginIdentifier(e.target.value)}
                     placeholder={isTeacher ? 'giaovien hoặc email trường...' : 'Tên tài khoản hoặc email học sinh...'}
                     className={`w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 ${
-                      isTeacher ? 'focus:ring-amber-600' : 'focus:ring-navy'
+                      isTeacher ? 'focus:ring-amber-600' : 'focus:ring-[#850B10]'
                     }`}
                   />
                 </div>
@@ -240,7 +237,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialRol
                     onChange={(e) => setLoginPassword(e.target.value)}
                     placeholder="••••••••"
                     className={`w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 ${
-                      isTeacher ? 'focus:ring-amber-600' : 'focus:ring-navy'
+                      isTeacher ? 'focus:ring-amber-600' : 'focus:ring-[#850B10]'
                     }`}
                   />
                 </div>
@@ -252,7 +249,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialRol
                 className={`w-full py-3 rounded-xl text-white text-xs font-bold transition shadow-md active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 mt-2 cursor-pointer ${
                   isTeacher
                     ? 'bg-amber-700 hover:bg-amber-800'
-                    : 'bg-navy hover:bg-navy-light'
+                    : 'bg-[#850B10] hover:bg-[#68070B]'
                 }`}
               >
                 <span>{loading ? 'Đang xác thực bảo mật...' : `Đăng Nhập Cổng ${isTeacher ? 'Giáo Viên' : 'Học Sinh'}`}</span>
@@ -273,7 +270,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialRol
                   onChange={(e) => setRegFullName(e.target.value)}
                   placeholder={isTeacher ? 'Ví dụ: Thầy Trần Quang Khải' : 'Ví dụ: Nguyễn Văn Nam'}
                   className={`w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 ${
-                    isTeacher ? 'focus:ring-amber-600' : 'focus:ring-navy'
+                    isTeacher ? 'focus:ring-amber-600' : 'focus:ring-[#850B10]'
                   }`}
                 />
               </div>
@@ -289,7 +286,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialRol
                   onChange={(e) => setRegUsername(e.target.value)}
                   placeholder={isTeacher ? 'Ví dụ: thaykhai_su hoặc gv_lichsu' : 'Ví dụ: nam_lop10a1'}
                   className={`w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 ${
-                    isTeacher ? 'focus:ring-amber-600' : 'focus:ring-navy'
+                    isTeacher ? 'focus:ring-amber-600' : 'focus:ring-[#850B10]'
                   }`}
                 />
               </div>
@@ -305,7 +302,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialRol
                   onChange={(e) => setRegEmail(e.target.value)}
                   placeholder={isTeacher ? 'thaykhai@thpt.edu.vn' : 'hocsinh@gmail.com'}
                   className={`w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 ${
-                    isTeacher ? 'focus:ring-amber-600' : 'focus:ring-navy'
+                    isTeacher ? 'focus:ring-amber-600' : 'focus:ring-[#850B10]'
                   }`}
                 />
               </div>
@@ -321,7 +318,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialRol
                   onChange={(e) => setRegPassword(e.target.value)}
                   placeholder="••••••••"
                   className={`w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 ${
-                    isTeacher ? 'focus:ring-amber-600' : 'focus:ring-navy'
+                    isTeacher ? 'focus:ring-amber-600' : 'focus:ring-[#850B10]'
                   }`}
                 />
               </div>
@@ -355,7 +352,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, initialRol
                     setError('');
                     setSuccessMsg('');
                   }}
-                  className="font-extrabold text-navy hover:text-gold-dark flex items-center gap-1 cursor-pointer transition hover:underline"
+                  className="font-extrabold text-[#850B10] hover:text-[#68070B] flex items-center gap-1 cursor-pointer transition hover:underline"
                 >
                   <span>Tiếp tục với vai trò Học sinh</span>
                   <ArrowRight className="w-3.5 h-3.5" />

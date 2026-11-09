@@ -758,26 +758,17 @@ export default function TeachersView({ currentUser, authToken }) {
           )}
         </div>
       )}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
 
       {/* ================= TAB 5: MY CLASSES & ADD STUDENTS ================= */}
       {tab === 'lop-hoc' && (
         <div className="space-y-6">
           {/* Header Action Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FFFDF5] p-5 rounded-3xl border border-[#EBDBC5] shadow-xs">
             <div>
-              <h2 className="text-lg font-black text-slate-900 tracking-tight">
+              <h2 className="text-lg font-black text-[#1A120B] font-serif-royal tracking-tight">
                 Quản Lý Lớp Học & Học Sinh Của Riêng Tôi
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-[#5C4A3A] mt-0.5">
                 Tạo lớp học, thêm học sinh vào lớp và theo dõi tiến độ hoàn thành bài kiểm tra, điểm trung bình.
               </p>
             </div>
@@ -785,9 +776,9 @@ export default function TeachersView({ currentUser, authToken }) {
             {isTeacherOrAdmin && (
               <button
                 onClick={() => setIsNewClassModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 text-xs font-bold transition shadow-xs active:scale-95 shrink-0"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white text-xs font-bold transition shadow-md active:scale-95 shrink-0 cursor-pointer"
               >
-                <PlusCircle className="w-4 h-4" />
+                <PlusCircle className="w-4 h-4 text-[#FDE2A7]" />
                 <span>Tạo Lớp Học Mới</span>
               </button>
             )}
@@ -806,35 +797,35 @@ export default function TeachersView({ currentUser, authToken }) {
                   }}
                   className={`p-4 rounded-2xl border transition cursor-pointer flex flex-col justify-between ${
                     isCurrent
-                      ? 'bg-navy text-white border-navy shadow-md ring-2 ring-navy/30'
-                      : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200'
+                      ? 'bg-[#850B10] text-white border-[#850B10] shadow-md ring-2 ring-[#850B10]/30'
+                      : 'bg-[#FFFDF5] hover:bg-[#FAF5EB] text-[#2D1B08] border-[#EBDBC5]'
                   }`}
                 >
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
-                        isCurrent ? 'bg-gold text-slate-950' : 'bg-slate-100 text-slate-600'
+                        isCurrent ? 'bg-amber-100 text-[#850B10]' : 'bg-[#FAF5EB] text-[#850B10] border border-[#EBDBC5]'
                       }`}>
                         Mã lớp: {cls.code}
                       </span>
-                      <span className={`text-xs font-bold ${isCurrent ? 'text-amber-200' : 'text-slate-500'}`}>
+                      <span className={`text-xs font-bold ${isCurrent ? 'text-amber-200' : 'text-[#8C7A6B]'}`}>
                         {cls.student_count || 0} học sinh
                       </span>
                     </div>
 
-                    <h3 className={`font-black text-sm leading-tight ${isCurrent ? 'text-white' : 'text-slate-900'}`}>
+                    <h3 className={`font-black text-sm leading-tight ${isCurrent ? 'text-white' : 'text-[#1A120B]'}`}>
                       {cls.name}
                     </h3>
 
                     {cls.description && (
-                      <p className={`text-xs mt-1 line-clamp-2 ${isCurrent ? 'text-slate-200' : 'text-slate-500'}`}>
+                      <p className={`text-xs mt-1 line-clamp-2 ${isCurrent ? 'text-white/80' : 'text-[#5C4A3A]'}`}>
                         {cls.description}
                       </p>
                     )}
                   </div>
 
                   <div className={`mt-3 pt-2 text-[11px] font-bold border-t flex items-center justify-between ${
-                    isCurrent ? 'border-white/20 text-gold' : 'border-slate-100 text-navy'
+                    isCurrent ? 'border-white/20 text-[#FDE2A7]' : 'border-[#EBDBC5] text-[#850B10]'
                   }`}>
                     <span>{isCurrent ? '✓ Đang xem danh sách' : 'Bấm để quản lý'}</span>
                     <span>{cls.grade || 'Lớp 10'} →</span>
@@ -846,41 +837,41 @@ export default function TeachersView({ currentUser, authToken }) {
 
           {/* Class Students Management Panel */}
           {selectedClass && (
-            <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+            <div className="bg-[#FFFDF5] rounded-3xl p-5 sm:p-6 border border-[#EBDBC5] shadow-xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#EBDBC5]">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-black text-base text-slate-900">
+                    <h3 className="font-black text-base text-[#1A120B]">
                       Danh Sách Học Sinh: {selectedClass.name}
                     </h3>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-navy text-white">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#850B10] text-white">
                       {classStudents.length} em
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Mã mời tham gia: <strong className="font-mono text-navy">{selectedClass.code}</strong>
+                  <p className="text-xs text-[#5C4A3A] mt-0.5">
+                    Mã mời tham gia: <strong className="font-mono text-[#850B10]">{selectedClass.code}</strong>
                   </p>
                 </div>
 
                 <button
                   onClick={() => setIsAddStudentModalOpen(true)}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-navy hover:bg-navy-light text-white text-xs font-bold transition shadow-xs active:scale-95 shrink-0"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white text-xs font-bold transition shadow-xs active:scale-95 shrink-0 cursor-pointer"
                 >
-                  <UserPlus className="w-4 h-4 text-gold" />
+                  <UserPlus className="w-4 h-4 text-[#FDE2A7]" />
                   <span>+ Thêm Học Sinh Vào Lớp</span>
                 </button>
               </div>
 
               {/* Students List Table */}
               {loadingClassStudents ? (
-                <div className="py-8 text-center text-xs text-slate-400">Đang tải danh sách học sinh...</div>
+                <div className="py-8 text-center text-xs text-[#8C7A6B]">Đang tải danh sách học sinh...</div>
               ) : classStudents.length === 0 ? (
-                <div className="py-12 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                  <Users className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p className="text-xs text-slate-600 font-semibold">Lớp này chưa có học sinh nào.</p>
+                <div className="py-12 text-center bg-[#FAF5EB] rounded-2xl border border-dashed border-[#EBDBC5]">
+                  <Users className="w-8 h-8 text-[#8C7A6B] mx-auto mb-2" />
+                  <p className="text-xs text-[#5C4A3A] font-semibold">Lớp này chưa có học sinh nào.</p>
                   <button
                     onClick={() => setIsAddStudentModalOpen(true)}
-                    className="mt-2 text-xs font-bold text-navy hover:underline"
+                    className="mt-2 text-xs font-bold text-[#850B10] hover:underline cursor-pointer"
                   >
                     Bấm vào đây để thêm học sinh đầu tiên
                   </button>
@@ -889,7 +880,7 @@ export default function TeachersView({ currentUser, authToken }) {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
                     <thead>
-                      <tr className="border-b border-slate-200 text-slate-400 uppercase text-[10px] font-black">
+                      <tr className="border-b border-[#EBDBC5] text-[#8C7A6B] uppercase text-[10px] font-black">
                         <th className="py-2.5 px-3">Học sinh</th>
                         <th className="py-2.5 px-3">Tài khoản & Email</th>
                         <th className="py-2.5 px-3 text-center">Chuỗi Streak</th>
@@ -898,33 +889,33 @@ export default function TeachersView({ currentUser, authToken }) {
                         <th className="py-2.5 px-3 text-right">Thao tác</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-[#EBDBC5]/60">
                       {classStudents.map((st) => (
-                        <tr key={st.id} className="hover:bg-slate-50 transition">
-                          <td className="py-3 px-3 font-bold text-slate-900">
+                        <tr key={st.id} className="hover:bg-[#FAF5EB] transition">
+                          <td className="py-3 px-3 font-bold text-[#1A120B]">
                             {st.full_name}
                           </td>
-                          <td className="py-3 px-3 text-slate-500 font-mono text-[11px]">
+                          <td className="py-3 px-3 text-[#5C4A3A] font-mono text-[11px]">
                             @{st.username} • {st.email}
                           </td>
                           <td className="py-3 px-3 text-center">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-50 text-orange-700 font-black text-[11px] border border-orange-200">
-                              <Flame className="w-3 h-3 fill-orange-500 text-orange-500" />
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 font-black text-[11px] border border-amber-200">
+                              <Flame className="w-3 h-3 fill-amber-600 text-amber-600" />
                               <span>{st.streak_count || 1}d</span>
                             </span>
                           </td>
-                          <td className="py-3 px-3 text-center font-bold text-slate-700">
+                          <td className="py-3 px-3 text-center font-bold text-[#2D1B08]">
                             {st.exams_completed || 0} bài
                           </td>
                           <td className="py-3 px-3 text-center">
-                            <span className="font-extrabold text-navy">
+                            <span className="font-extrabold text-[#850B10]">
                               {st.avg_score !== null ? `${st.avg_score} đ` : 'Chưa có'}
                             </span>
                           </td>
                           <td className="py-3 px-3 text-right">
                             <button
                               onClick={() => handleRemoveStudentFromClass(st.id, st.full_name)}
-                              className="p-1 rounded-lg hover:bg-rose-50 text-rose-500 hover:text-rose-700 transition"
+                              className="p-1 rounded-lg hover:bg-rose-50 text-rose-500 hover:text-rose-700 transition cursor-pointer"
                               title="Xóa học sinh khỏi lớp"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -943,35 +934,35 @@ export default function TeachersView({ currentUser, authToken }) {
 
       {/* MODAL: ADD STUDENT TO CLASS */}
       {isAddStudentModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[85vh]">
-            <div className="p-4 bg-slate-900 text-white flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-[#FFFDF5] rounded-3xl w-full max-w-lg shadow-2xl border border-[#EBDBC5] overflow-hidden flex flex-col max-h-[85vh]">
+            <div className="p-4 bg-gradient-to-r from-[#70070B] to-[#850B10] text-white flex items-center justify-between">
               <div>
                 <h4 className="font-bold text-sm">Thêm Học Sinh Vào Lớp: {selectedClass?.name}</h4>
-                <p className="text-[11px] text-slate-400">Chọn từ danh sách học sinh đã đăng ký hệ thống</p>
+                <p className="text-[11px] text-[#FDE2A7]">Chọn từ danh sách học sinh đã đăng ký hệ thống</p>
               </div>
               <button
                 onClick={() => setIsAddStudentModalOpen(false)}
-                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"
+                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="p-4 border-b border-slate-100">
+            <div className="p-4 border-b border-[#EBDBC5]">
               <div className="relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-[#8C7A6B] absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={studentSearch}
                   onChange={(e) => setStudentSearch(e.target.value)}
                   placeholder="Tìm học sinh theo tên, tài khoản hoặc email..."
-                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-navy"
+                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#FAF5EB] border border-[#EBDBC5] text-xs focus:outline-none focus:ring-2 focus:ring-[#850B10]"
                 />
               </div>
             </div>
 
-            <div className="p-4 overflow-y-auto divide-y divide-slate-100 flex-1 space-y-2">
+            <div className="p-4 overflow-y-auto divide-y divide-[#EBDBC5]/60 flex-1 space-y-2">
               {studentsPool
                 .filter((st) => {
                   if (!studentSearch.trim()) return true;
@@ -987,18 +978,18 @@ export default function TeachersView({ currentUser, authToken }) {
                   return (
                     <div key={st.id} className="pt-2 flex items-center justify-between gap-3">
                       <div>
-                        <p className="font-bold text-xs text-slate-900">{st.full_name}</p>
-                        <p className="text-[10px] text-slate-400 font-mono">@{st.username} • {st.email}</p>
+                        <p className="font-bold text-xs text-[#1A120B]">{st.full_name}</p>
+                        <p className="text-[10px] text-[#5C4A3A] font-mono">@{st.username} • {st.email}</p>
                       </div>
 
                       {isAlreadyIn ? (
-                        <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">
+                        <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
                           ✓ Đã trong lớp
                         </span>
                       ) : (
                         <button
                           onClick={() => handleAddStudentToClass(st.id)}
-                          className="px-3 py-1 rounded-lg bg-navy hover:bg-navy-light text-white text-xs font-bold transition shadow-2xs cursor-pointer active:scale-95"
+                          className="px-3.5 py-1.5 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white text-xs font-bold transition shadow-xs cursor-pointer active:scale-95"
                         >
                           + Thêm
                         </button>
@@ -1013,13 +1004,13 @@ export default function TeachersView({ currentUser, authToken }) {
 
       {/* MODAL: CREATE NEW CLASS */}
       {isNewClassModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-slate-200 overflow-hidden">
-            <div className="p-4 bg-navy text-white flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-[#FFFDF5] rounded-3xl w-full max-w-md shadow-2xl border border-[#EBDBC5] overflow-hidden">
+            <div className="p-4 bg-gradient-to-r from-[#70070B] to-[#850B10] text-white flex items-center justify-between">
               <h4 className="font-bold text-sm">Tạo Lớp Học Mới</h4>
               <button
                 onClick={() => setIsNewClassModalOpen(false)}
-                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"
+                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1027,7 +1018,7 @@ export default function TeachersView({ currentUser, authToken }) {
 
             <form onSubmit={handleCreateClass} className="p-5 space-y-3.5">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-[#1A120B] mb-1">
                   Tên lớp học *
                 </label>
                 <input
@@ -1036,36 +1027,36 @@ export default function TeachersView({ currentUser, authToken }) {
                   value={newClassName}
                   onChange={(e) => setNewClassName(e.target.value)}
                   placeholder="Ví dụ: Lớp 10A2 - Lịch Sử Chuyên Sâu"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-navy"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FAF5EB] border border-[#EBDBC5] text-xs focus:outline-none focus:ring-2 focus:ring-[#850B10]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-[#1A120B] mb-1">
                   Mô tả / Ghi chú lớp học
                 </label>
                 <textarea
                   rows={3}
                   value={newClassDesc}
                   onChange={(e) => setNewClassDesc(e.target.value)}
-                  placeholder="Ghi chú về mục tiêu học tập của lớp..."
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-navy"
+                  placeholder="Nhập thông tin mục tiêu, giáo viên chủ nhiệm..."
+                  className="w-full px-3 py-2 rounded-xl bg-[#FAF5EB] border border-[#EBDBC5] text-xs focus:outline-none focus:ring-2 focus:ring-[#850B10]"
                 />
               </div>
 
-              <div className="pt-2 flex justify-end gap-2">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#EBDBC5]">
                 <button
                   type="button"
                   onClick={() => setIsNewClassModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-[#5C4A3A] hover:bg-[#FAF5EB] transition cursor-pointer"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-gold hover:bg-gold-dark text-slate-950 text-xs font-black transition shadow-xs active:scale-95"
+                  className="px-4 py-2 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white text-xs font-bold transition shadow-md cursor-pointer"
                 >
-                  Tạo lớp ngay
+                  Tạo Lớp Ngay
                 </button>
               </div>
             </form>

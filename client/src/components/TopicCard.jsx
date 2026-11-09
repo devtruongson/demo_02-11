@@ -72,8 +72,8 @@ export default function TopicCard({ topic, onSelect, isAdmin = false, onEdit = n
 
       {/* Content */}
       <div className="p-4 flex-1 flex flex-col justify-between">
-        <Link to={url} className="block group-hover:text-navy">
-          <h3 className="font-extrabold text-sm text-slate-800 group-hover:text-navy transition line-clamp-1">
+        <Link to={url} className="block group-hover:text-[#850B10]">
+          <h3 className="font-extrabold text-sm text-slate-800 group-hover:text-[#850B10] transition line-clamp-1">
             {topic.title}
           </h3>
           <p className="mt-1 text-slate-500 text-xs line-clamp-2 leading-relaxed">
@@ -81,7 +81,7 @@ export default function TopicCard({ topic, onSelect, isAdmin = false, onEdit = n
           </p>
         </Link>
 
-        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-navy group-hover:text-gold-dark transition">
+        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#850B10] group-hover:text-[#68070B] transition">
           <Link to={url} className="flex-1 flex items-center justify-between">
             <span>Xem bài học & tư liệu</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
