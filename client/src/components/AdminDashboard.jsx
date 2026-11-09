@@ -2490,10 +2490,10 @@ export default function AdminDashboard({
                         <button
                           onClick={() => handleOpenEditTopic(topic)}
                           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gold/15 hover:bg-gold text-amber-300 hover:text-slate-950 text-xs font-bold transition cursor-pointer"
-                          title="Đổi tên & chỉnh sửa chủ đề"
+                          title="Đổi tên & cấu hình trò chơi lật ô cho chủ đề này"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
-                          <span>Đổi tên / Sửa</span>
+                          <span>Cấu hình Game & Sửa</span>
                         </button>
                         <button
                           onClick={() => handleDeleteTopic(topic)}
@@ -2609,10 +2609,10 @@ export default function AdminDashboard({
                           <button
                             onClick={() => handleOpenEditTopic(topic)}
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gold/15 hover:bg-gold text-amber-300 hover:text-slate-950 text-xs font-bold transition cursor-pointer"
-                            title="Đổi tên & chỉnh sửa chủ đề"
+                            title="Đổi tên & cấu hình trò chơi lật ô cho chủ đề này"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
-                            <span>Đổi tên / Sửa</span>
+                            <span>Cấu hình Game & Sửa</span>
                           </button>
                           <button
                             onClick={() => handleDeleteTopic(topic)}

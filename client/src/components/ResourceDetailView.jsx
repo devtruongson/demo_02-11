@@ -9,7 +9,6 @@ import {
 import ThreeArtifactViewer from './ThreeArtifactViewer.jsx';
 import QuizInteractiveComponent from './QuizInteractiveComponent.jsx';
 import QuizEditorModal from './QuizEditorModal.jsx';
-import TilePuzzleGame from './TilePuzzleGame.jsx';
 import { parseIdFromSlug, createResourceSlug, formatYouTubeEmbedUrl } from '../utils/slugify.js';
 
 export default function ResourceDetailView({
@@ -598,16 +597,6 @@ export default function ResourceDetailView({
               )}
             </div>
           </div>
-
-          {/* ========================================================= */}
-          {/* TRÒ CHƠI LẬT Ô CHỮ MỞ BỨC TRANH BÍ ẨN (Trắc nghiệm tương tác) */}
-          {/* ========================================================= */}
-          <TilePuzzleGame
-            resourceId={resource.id}
-            resourceImg={resource.game_image || resource.img}
-            resourceTitle={resource.title}
-            initialQuizzes={resourceQuizzes}
-          />
 
           {/* Quizzes Component */}
           {resourceQuizzes.length > 0 && (

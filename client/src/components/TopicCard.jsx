@@ -1,8 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, BookOpen, Edit3, Trash2 } from 'lucide-react';
+import { ArrowRight, BookOpen, Edit3, Trash2, Sparkles } from 'lucide-react';
 
-export default function TopicCard({ topic, onSelect, isAdmin = false, onEdit = null, onDelete = null }) {
+export default function TopicCard({
+  topic,
+  onSelect,
+  isAdmin = false,
+  onEdit = null,
+  onDelete = null,
+  onPlayGame = null
+}) {
   const url = `/kho-tu-lieu?topic=${topic.id}`;
   const fallbackImg = 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=600&q=80';
 
@@ -21,7 +28,7 @@ export default function TopicCard({ topic, onSelect, isAdmin = false, onEdit = n
           loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#590408]/70 via-transparent to-transparent opacity-80" />
-        
+
         {/* Number Badge */}
         <div className="absolute top-3 left-3 bg-[#850b10] text-[#fff8ee] text-xs font-black px-2.5 py-1 rounded-lg shadow-sm border border-amber-300/40">
           Chủ đề {topic.order_index || topic.id}
@@ -34,6 +41,12 @@ export default function TopicCard({ topic, onSelect, isAdmin = false, onEdit = n
             <span>{topic.resource_count} tư liệu</span>
           </div>
         )}
+
+        {/* Game Badge */}
+        {/* <div className="absolute bottom-2.5 left-3 bg-[#850B10]/85 backdrop-blur-md text-[#FFF7E8] text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 border border-amber-300/30">
+          <Sparkles className="w-2.5 h-2.5 text-amber-300" />
+          <span>Game Lật Ô</span>
+        </div> */}
       </Link>
 
       {/* Admin Quick Action Controls */}
@@ -48,7 +61,7 @@ export default function TopicCard({ topic, onSelect, isAdmin = false, onEdit = n
                 onEdit(topic);
               }}
               className="p-1.5 rounded-lg bg-gold/20 hover:bg-gold text-amber-300 hover:text-slate-950 transition cursor-pointer"
-              title="Đổi tên & chỉnh sửa chủ đề"
+              title="Đổi tên & cấu hình trò chơi chủ đề"
             >
               <Edit3 className="w-3.5 h-3.5" />
             </button>
@@ -81,11 +94,30 @@ export default function TopicCard({ topic, onSelect, isAdmin = false, onEdit = n
           </p>
         </Link>
 
-        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#850B10] group-hover:text-[#68070B] transition">
-          <Link to={url} className="flex-1 flex items-center justify-between">
-            <span>Xem bài học & tư liệu</span>
+        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between gap-2 text-xs font-bold">
+          <Link
+            to={url}
+            className="flex items-center gap-1 text-[#850B10] hover:text-[#68070B] transition"
+          >
+            <span>Xem tư liệu</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
           </Link>
+
+          {/* {onPlayGame && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onPlayGame(topic);
+              }}
+              className="px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300/70 text-[11px] font-bold flex items-center gap-1 transition shadow-2xs active:scale-95 cursor-pointer"
+              title="Chơi trò chơi lật ô tranh bí ẩn của chủ đề này"
+            >
+              <Sparkles className="w-3 h-3 text-amber-700" />
+              <span>Lật ô tranh</span>
+            </button>
+          )} */}
         </div>
       </div>
     </div>
