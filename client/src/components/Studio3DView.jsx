@@ -310,7 +310,7 @@ export default function Studio3DView({
   if (isGlobeMode) {
     return (
       <div
-        className="min-h-screen bg-[#FAF5EB] bg-repeat py-8 px-4 sm:px-6 lg:px-8 space-y-6"
+        className="w-full min-h-screen bg-[#FAF5EB] bg-repeat py-8 px-4 sm:px-6 lg:px-8 space-y-6"
         style={{ backgroundImage: "url('/home-assets/bg.png')" }}
       >
         <div className="max-w-7xl mx-auto space-y-6">
@@ -333,7 +333,7 @@ export default function Studio3DView({
   if (artifactCode && currentArtifact) {
     return (
       <div
-        className="min-h-screen bg-[#FAF5EB] bg-repeat py-8 sm:py-12 px-4 sm:px-6 lg:px-12 select-none"
+        className="w-full min-h-screen bg-[#FAF5EB] bg-repeat py-8 sm:py-12 px-4 sm:px-6 lg:px-12 select-none"
         style={{ backgroundImage: "url('/home-assets/bg.png')" }}
       >
         <div className="max-w-7xl mx-auto space-y-8">
@@ -476,7 +476,7 @@ export default function Studio3DView({
   // ================= VIEWPORT MODE 3: 3D GALLERY GRID (design/image copy 15.png) =================
   return (
     <div
-      className="min-h-screen bg-[#FAF5EB] bg-repeat py-8 sm:py-12 px-4 sm:px-6 lg:px-10 relative overflow-hidden select-none"
+      className="w-full min-h-screen bg-[#FAF5EB] bg-repeat py-8 sm:py-12 px-4 sm:px-6 lg:px-10 relative overflow-hidden select-none"
       style={{ backgroundImage: "url('/home-assets/bg.png')" }}
     >
       {/* Decorative Traditional Golden Clouds in Background */}

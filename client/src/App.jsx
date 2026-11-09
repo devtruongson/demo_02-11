@@ -97,6 +97,7 @@ export default function App() {
   const isHomePage = location.pathname === '/';
   const isDetailPage = location.pathname.startsWith('/tu-lieu/');
   const isDashboard = location.pathname.startsWith('/dashboard');
+  const isStudio3D = location.pathname.startsWith('/studio-3d');
 
   // Collapsible Sidebar state (Feedback requirement)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
@@ -386,12 +387,12 @@ export default function App() {
       <div className={
         isDashboard
           ? 'min-h-screen bg-slate-950 flex-1 flex flex-col px-3 sm:px-8 lg:px-12 py-3 sm:py-4'
-          : isHomePage
+          : isHomePage || isStudio3D
             ? 'w-full flex-1 flex flex-col'
             : 'container mx-auto px-3 sm:px-6 lg:px-8 flex-1 flex my-2 sm:my-4 gap-4 sm:gap-6'
       }>
-        {/* Left Sidebar: HIDDEN on home page, detail view, and on dashboard */}
-        {!isHomePage && !isDetailPage && !isDashboard && (
+        {/* Left Sidebar: HIDDEN on home page, detail view, dashboard, and Studio 3D */}
+        {!isHomePage && !isDetailPage && !isDashboard && !isStudio3D && (
           <Sidebar
             stats={stats}
             currentUser={currentUser}
@@ -401,7 +402,7 @@ export default function App() {
         )}
 
         {/* Dynamic Main Workspace Content */}
-        <main className={`flex-1 min-w-0 ${isHomePage || isDetailPage || isDashboard ? 'w-full' : ''} ${!isDashboard ? 'pb-12' : ''}`}>
+        <main className={`flex-1 min-w-0 ${isHomePage || isDetailPage || isDashboard || isStudio3D ? 'w-full' : ''} ${!isDashboard && !isStudio3D ? 'pb-12' : ''}`}>
           <Routes>
             {/* ================= ROUTE: HOME ================= */}
             <Route

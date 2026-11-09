@@ -91,3 +91,4 @@ export function formatActivitiesForPreview(tipValue) {
   }
   return '';
 }
+
