@@ -136,7 +136,92 @@ export default function ResourceDetailView({
     }
   };
 
-  if (loading) {
+  // Extract gallery photos safely
+  const getGalleryPhotos = () => {
+    if (!resource) return [];
+    const raw = resource.gallery;
+    if (Array.isArray(raw) && raw.length > 0) return raw;
+    if (typeof raw === 'string') {
+      try {
+        const norm = raw.replace(/'/g, '"');
+        const parsed = JSON.parse(norm);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch {
+        const lines = raw.split('\n').map((l) => l.trim()).filter(Boolean);
+        if (lines.length > 0) return lines;
+      }
+    }
+    return resource.img ? [resource.img] : ['https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=1200&q=80'];
+  };
+
+  const galleryPhotos = getGalleryPhotos();
+  const youtubeEmbedUrl = formatYouTubeEmbedUrl(resource?.video_url);
+
+  const relatedResources = resource && allResources
+    ? allResources
+        .filter((r) => r.id !== resource.id && (r.topic_id === resource.topic_id || r.place === resource.place || r.lesson === resource.lesson))
+        .slice(0, 4)
+    : [];
+
+  const finalRelated = relatedResources.length >= 3
+    ? relatedResources
+    : resource && allResources
+      ? [
+          ...relatedResources,
+          ...allResources.filter((r) => r.id !== resource.id && !relatedResources.some((item) => item.id === r.id))
+        ].slice(0, 4)
+      : [];
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleNextPhoto = () => {
+    if (galleryPhotos.length === 0) return;
+    setActivePhotoIdx((prev) => (prev + 1) % galleryPhotos.length);
+  };
+
+  const handlePrevPhoto = () => {
+    if (galleryPhotos.length === 0) return;
+    setActivePhotoIdx((prev) => (prev - 1 + galleryPhotos.length) % galleryPhotos.length);
+  };
+
+  const handleLightboxPrev = () => {
+    if (galleryPhotos.length === 0) return;
+    setLightboxPhotoIdx((prev) => (prev - 1 + galleryPhotos.length) % galleryPhotos.length);
+    setLightboxZoom(1);
+  };
+
+  const handleLightboxNext = () => {
+    if (galleryPhotos.length === 0) return;
+    setLightboxPhotoIdx((prev) => (prev + 1) % galleryPhotos.length);
+    setLightboxZoom(1);
+  };
+
+  const handleToggleZoom = () => {
+    setLightboxZoom((prev) => (prev === 1 ? 1.6 : prev === 1.6 ? 2.2 : 1));
+  };
+
+  // Keyboard navigation for Fullscreen Lightbox (Hooks must always be called unconditionally)
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsLightboxOpen(false);
+        setLightboxZoom(1);
+      } else if (e.key === 'ArrowLeft') {
+        handleLightboxPrev();
+      } else if (e.key === 'ArrowRight') {
+        handleLightboxNext();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isLightboxOpen, galleryPhotos.length]);
+
+  if (loading && !resource) {
     return (
       <div className="py-24 text-center space-y-4">
         <div className="w-12 h-12 border-4 border-navy border-t-gold rounded-full animate-spin mx-auto" />
@@ -158,89 +243,13 @@ export default function ResourceDetailView({
         </p>
         <button
           onClick={() => navigate('/kho-tu-lieu')}
-          className="px-6 py-2.5 rounded-xl bg-navy hover:bg-navy-light text-white text-xs font-bold transition shadow"
+          className="px-6 py-2.5 rounded-xl bg-navy hover:bg-navy-light text-white text-xs font-bold transition shadow cursor-pointer"
         >
           Trở lại kho tư liệu Lịch sử 10
         </button>
       </div>
     );
   }
-
-  // Extract gallery photos
-  const getGalleryPhotos = () => {
-    const raw = resource.gallery;
-    if (Array.isArray(raw) && raw.length > 0) return raw;
-    if (typeof raw === 'string') {
-      try {
-        const norm = raw.replace(/'/g, '"');
-        const parsed = JSON.parse(norm);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      } catch {
-        const lines = raw.split('\n').map((l) => l.trim()).filter(Boolean);
-        if (lines.length > 0) return lines;
-      }
-    }
-    return resource.img ? [resource.img] : ['https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=1200&q=80'];
-  };
-
-  const galleryPhotos = getGalleryPhotos();
-  const youtubeEmbedUrl = formatYouTubeEmbedUrl(resource.video_url);
-
-  const relatedResources = allResources
-    .filter((r) => r.id !== resource.id && (r.topic_id === resource.topic_id || r.place === resource.place || r.lesson === resource.lesson))
-    .slice(0, 4);
-
-  const finalRelated = relatedResources.length >= 3
-    ? relatedResources
-    : [
-        ...relatedResources,
-        ...allResources.filter((r) => r.id !== resource.id && !relatedResources.some((item) => item.id === r.id))
-      ].slice(0, 4);
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleNextPhoto = () => {
-    setActivePhotoIdx((prev) => (prev + 1) % galleryPhotos.length);
-  };
-
-  const handlePrevPhoto = () => {
-    setActivePhotoIdx((prev) => (prev - 1 + galleryPhotos.length) % galleryPhotos.length);
-  };
-
-  const handleLightboxPrev = () => {
-    setLightboxPhotoIdx((prev) => (prev - 1 + galleryPhotos.length) % galleryPhotos.length);
-    setLightboxZoom(1);
-  };
-
-  const handleLightboxNext = () => {
-    setLightboxPhotoIdx((prev) => (prev + 1) % galleryPhotos.length);
-    setLightboxZoom(1);
-  };
-
-  const handleToggleZoom = () => {
-    setLightboxZoom((prev) => (prev === 1 ? 1.6 : prev === 1.6 ? 2.2 : 1));
-  };
-
-  // Keyboard navigation for Fullscreen Lightbox
-  useEffect(() => {
-    if (!isLightboxOpen) return;
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        setIsLightboxOpen(false);
-        setLightboxZoom(1);
-      } else if (e.key === 'ArrowLeft') {
-        handleLightboxPrev();
-      } else if (e.key === 'ArrowRight') {
-        handleLightboxNext();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isLightboxOpen, galleryPhotos.length]);
 
   return (
     <div className="space-y-6 animate-fade-in pb-16">
