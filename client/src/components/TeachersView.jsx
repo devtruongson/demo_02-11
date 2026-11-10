@@ -3,12 +3,13 @@ import { useParams, NavLink, Link, Navigate } from 'react-router-dom';
 import {
   GraduationCap, CheckCircle2, FileText, Sparkles, Layers, BookOpen,
   ExternalLink, Lightbulb, HelpCircle, Award, PlusCircle, Edit3, Trash2,
-  ShieldCheck, RefreshCw, AlertCircle, Clock, Calendar, Users, Eye, UserPlus, Search, X, Flame
+  ShieldCheck, RefreshCw, AlertCircle, Clock, Calendar, Users, Eye, UserPlus, Search, X, Flame, Check
 } from 'lucide-react';
 import TeacherGuideEditorModal from './TeacherGuideEditorModal.jsx';
 import ExamAssignmentModal from './ExamAssignmentModal.jsx';
 import ExamSubmissionsViewerModal from './ExamSubmissionsViewerModal.jsx';
 import ExamTakingModal from './ExamTakingModal.jsx';
+import QuizEditorModal from './QuizEditorModal.jsx';
 
 export default function TeachersView({ currentUser, authToken }) {
   const { tab = 'ke-hoach-5512' } = useParams();
@@ -22,6 +23,16 @@ export default function TeachersView({ currentUser, authToken }) {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+
+  // Question Bank (Quizzes from Database) State
+  const [quizzes, setQuizzes] = useState([]);
+  const [loadingQuizzes, setLoadingQuizzes] = useState(false);
+  const [quizLessons, setQuizLessons] = useState([]);
+  const [quizLessonFilter, setQuizLessonFilter] = useState('all');
+  const [quizDifficultyFilter, setQuizDifficultyFilter] = useState('all');
+  const [quizSearch, setQuizSearch] = useState('');
+  const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
+  const [editingQuiz, setEditingQuiz] = useState(null);
 
   // Exam Assignments State
   const [assignments, setAssignments] = useState([]);
@@ -50,7 +61,7 @@ export default function TeachersView({ currentUser, authToken }) {
   const teacherTabs = [
     // { to: '/giao-vien/cam-nang', id: 'cam-nang', category: 'cam_nang', label: 'Cẩm Nang Sư Phạm', icon: BookOpen }, // Tạm ẩn theo yêu cầu
     { to: '/giao-vien/ke-hoach-5512', id: 'ke-hoach-5512', category: 'ke_hoach_5512', label: 'Kế Hoạch Bài Dạy 5512', icon: FileText },
-    { to: '/giao-vien/ngan-hang-cau-hoi', id: 'ngan-hang-cau-hoi', category: 'ngan_hang_cau_hoi', label: 'Ngân Hàng Câu Hỏi & Đề Kiểm Tra', icon: HelpCircle },
+    { to: '/giao-vien/ngan-hang-cau-hoi', id: 'ngan-hang-cau-hoi', category: 'ngan_hang_cau_hoi', label: 'Ngân Hàng Câu Hỏi & Đề Kiểm Tra', icon: HelpCircle, badge: quizzes.length > 0 ? `${quizzes.length}` : null },
     { to: '/giao-vien/giao-bai-tap', id: 'giao-bai-tap', category: 'giao_bai_tap', label: 'Giao Bài Tập & Đề Thi', icon: Award },
     { to: '/giao-vien/lop-hoc', id: 'lop-hoc', category: 'lop_hoc', label: 'Lớp Học Của Tôi & Thêm Học Sinh', icon: Users }
   ];
@@ -90,14 +101,133 @@ export default function TeachersView({ currentUser, authToken }) {
     }
   };
 
+  const fetchQuizLessons = async () => {
+    try {
+      const res = await fetch(`/api/quizzes/lessons?_t=${Date.now()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setQuizLessons(Array.isArray(data) ? data : []);
+      }
+    } catch (err) {
+      console.error('Lỗi khi tải danh sách bài học trắc nghiệm:', err);
+    }
+  };
+
+  const fetchQuizzes = async (lessonName = quizLessonFilter) => {
+    try {
+      setLoadingQuizzes(true);
+      const url = lessonName && lessonName !== 'all'
+        ? `/api/quizzes?lesson=${encodeURIComponent(lessonName)}&_t=${Date.now()}`
+        : `/api/quizzes?_t=${Date.now()}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        setQuizzes(Array.isArray(data) ? data : []);
+      }
+    } catch (err) {
+      console.error('Lỗi khi tải ngân hàng câu hỏi:', err);
+    } finally {
+      setLoadingQuizzes(false);
+    }
+  };
+
+  const handleOpenAddQuiz = () => {
+    setEditingQuiz(null);
+    setIsQuizModalOpen(true);
+  };
+
+  const handleOpenEditQuiz = (q) => {
+    setEditingQuiz(q);
+    setIsQuizModalOpen(true);
+  };
+
+  const handleSaveQuiz = async (payload, id) => {
+    const url = id ? `/api/quizzes/${id}` : '/api/quizzes';
+    const method = id ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Lỗi lưu câu hỏi trắc nghiệm');
+    }
+    await fetchQuizzes(quizLessonFilter);
+    await fetchQuizLessons();
+  };
+
+  const handleDeleteQuiz = async (id, questionTitle) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa câu hỏi này khỏi ngân hàng?\n"${questionTitle}"`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/quizzes/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Lỗi khi xóa câu hỏi');
+      }
+      await fetchQuizzes(quizLessonFilter);
+      await fetchQuizLessons();
+    } catch (err) {
+      alert('Xóa thất bại: ' + err.message);
+    }
+  };
+
+  const getDifficultyMeta = (diff) => {
+    switch (diff) {
+      case 'nhan_biet':
+        return { label: 'Mức 1: Nhận biết', badgeClass: 'bg-blue-50 text-blue-700 border-blue-200' };
+      case 'thong_hieu':
+        return { label: 'Mức 2: Thông hiểu', badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
+      case 'van_dung':
+        return { label: 'Mức 3: Vận dụng', badgeClass: 'bg-amber-50 text-amber-800 border-amber-200' };
+      case 'van_dung_cao':
+        return { label: 'Mức 4: Vận dụng cao', badgeClass: 'bg-purple-50 text-purple-700 border-purple-200' };
+      default:
+        return { label: 'Thông hiểu', badgeClass: 'bg-stone-50 text-stone-700 border-stone-200' };
+    }
+  };
+
+  const filteredQuizzes = quizzes.filter((q) => {
+    if (quizDifficultyFilter !== 'all' && q.difficulty !== quizDifficultyFilter) {
+      return false;
+    }
+    if (quizSearch.trim()) {
+      const term = quizSearch.toLowerCase();
+      const matchQ = q.question && q.question.toLowerCase().includes(term);
+      const matchLesson = q.lesson && q.lesson.toLowerCase().includes(term);
+      const opts = Array.isArray(q.options)
+        ? q.options
+        : (typeof q.options === 'string' ? JSON.parse(q.options || '[]') : []);
+      const matchOpts = opts.some((opt) => opt && opt.toLowerCase().includes(term));
+      return matchQ || matchLesson || matchOpts;
+    }
+    return true;
+  });
+
   useEffect(() => {
     fetchMaterials();
     fetchAssignments();
+    fetchQuizzes(quizLessonFilter);
+    fetchQuizLessons();
     if (authToken) {
       fetchClasses();
       fetchStudentsPool();
     }
   }, [authToken]);
+
+  useEffect(() => {
+    fetchQuizzes(quizLessonFilter);
+  }, [quizLessonFilter]);
 
   const fetchClasses = async () => {
     try {
@@ -372,8 +502,15 @@ export default function TeachersView({ currentUser, authToken }) {
                     : 'bg-black/25 hover:bg-black/40 text-white/90 border border-white/15'
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-4 h-4 shrink-0" />
                 <span>{t.label}</span>
+                {t.badge && (
+                  <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${
+                    isActive ? 'bg-[#850B10] text-[#FFFDF5]' : 'bg-amber-400 text-slate-950 font-bold'
+                  }`}>
+                    {t.badge}
+                  </span>
+                )}
               </NavLink>
             );
           })}
@@ -402,6 +539,34 @@ export default function TeachersView({ currentUser, authToken }) {
             </button>
           )}
         </div>
+      ) : tab === 'ngan-hang-cau-hoi' ? (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-[#FFFDF5] border border-[#EBDBC5] gap-3 shadow-xs">
+          <div className="flex items-center gap-2 text-xs text-[#2D1B08] font-medium">
+            <HelpCircle className="w-4 h-4 text-[#850B10] shrink-0" />
+            <span>
+              Ngân hàng câu hỏi trắc nghiệm lưu trữ trong cơ sở dữ liệu ({quizzes.length} câu hỏi): Phân loại theo 4 cấp độ nhận thức và bài học SGK GDPT 2018.
+            </span>
+          </div>
+
+          {isTeacherOrAdmin && (
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={handleOpenAddQuiz}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white text-xs font-bold transition shadow-md active:scale-95 cursor-pointer"
+              >
+                <PlusCircle className="w-3.5 h-3.5 text-[#FDE2A7]" />
+                <span>+ Thêm Câu Hỏi Mới</span>
+              </button>
+              <button
+                onClick={handleOpenNewAssignment}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-amber-50 text-[#850B10] border border-[#ECD9BA] text-xs font-bold transition shadow-2xs active:scale-95 cursor-pointer"
+              >
+                <Award className="w-3.5 h-3.5" />
+                <span>Tạo Đề Thi</span>
+              </button>
+            </div>
+          )}
+        </div>
       ) : (
         isAdmin && (
           <div className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-[#FFFDF5] border border-[#EBDBC5] shadow-xs">
@@ -422,7 +587,7 @@ export default function TeachersView({ currentUser, authToken }) {
       )}
 
       {/* Loading state */}
-      {loading && tabMaterials.length === 0 && (
+      {loading && tabMaterials.length === 0 && tab !== 'ngan-hang-cau-hoi' && tab !== 'giao-bai-tap' && tab !== 'lop-hoc' && (
         <div className="p-12 text-center text-slate-400 text-xs font-medium flex items-center justify-center gap-2">
           <RefreshCw className="w-4 h-4 animate-spin text-slate-500" />
           <span>Đang nạp dữ liệu sư phạm...</span>
@@ -579,64 +744,279 @@ export default function TeachersView({ currentUser, authToken }) {
 
       {/* ================= TAB 3: NGÂN HÀNG CÂU HỎI TRẮC NGHIỆM ================= */}
       {tab === 'ngan-hang-cau-hoi' && (
-        <div className="bg-[#FFFDF5] rounded-3xl p-5 sm:p-7 border border-[#EBDBC5] shadow-xs space-y-5">
-          <div>
-            <h3 className="text-lg sm:text-xl font-bold text-[#850B10] font-serif-royal">
-              Ngân Hàng Câu Hỏi Trắc Nghiệm Đánh Giá Theo Mức Độ
-            </h3>
-            <p className="text-xs text-[#5C4A3A] mt-1">
-              Phân theo 4 cấp độ nhận thức: Nhận biết, Thông hiểu, Vận dụng và Vận dụng cao.
-            </p>
-          </div>
+        <div className="space-y-6 animate-fade-in">
+          {/* Header & Stats Cards */}
+          <div className="bg-[#FFFDF5] rounded-3xl p-5 sm:p-7 border border-[#EBDBC5] shadow-xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#EBDBC5]/60">
+              <div>
+                <h3 className="text-lg sm:text-xl font-bold text-[#850B10] font-serif-royal">
+                  Ngân Hàng Câu Hỏi Trắc Nghiệm Đánh Giá Theo Mức Độ
+                </h3>
+                <p className="text-xs text-[#5C4A3A] mt-1">
+                  Đồng bộ trực tiếp từ cơ sở dữ liệu hệ thống ({quizzes.length} câu hỏi). Phân theo 4 cấp độ nhận thức: Nhận biết, Thông hiểu, Vận dụng và Vận dụng cao.
+                </p>
+              </div>
 
-          <div className="space-y-3.5 text-xs">
-            {tabMaterials.map((q, idx) => {
-              const extra = parseExtra(q.extra_data);
-              return (
-                <div
-                  key={q.id}
-                  className="p-4 sm:p-5 rounded-2xl bg-[#FAF5EB] border border-[#EBDBC5] space-y-2 relative group transition hover:border-amber-300"
-                >
-                  {isAdmin && (
-                    <div className="absolute top-3 right-3 flex items-center gap-1 opacity-80 group-hover:opacity-100 transition">
-                      <button
-                        onClick={() => handleOpenEdit(q)}
-                        title="Chỉnh sửa câu hỏi này"
-                        className="p-1.5 rounded-lg bg-white hover:bg-amber-100 text-[#850B10] transition border border-[#EBDBC5] shadow-2xs"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteMaterial(q.id, q.title)}
-                        title="Xóa câu hỏi này"
-                        className="p-1.5 rounded-lg bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 transition border border-[#EBDBC5] shadow-2xs"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  )}
-
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-[#850B10] bg-amber-100/80 border border-amber-300/50 px-2.5 py-0.5 rounded-md text-[11px]">
-                      {q.badge || q.subtitle || `Câu hỏi ${idx + 1}`}
-                    </span>
-                  </div>
-                  <p className="font-bold text-[#1A120B] pr-14 leading-snug">
-                    {q.title}
-                  </p>
-                  <div className="text-[#3A2A1A] pl-2.5 border-l-2 border-[#850B10]/40 leading-relaxed whitespace-pre-line font-normal">
-                    {q.content}
-                  </div>
-                  {extra.answer && (
-                    <div className="mt-2 text-xs font-semibold text-emerald-900 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 flex items-center gap-1.5">
-                      <span className="text-emerald-700 font-bold">✓ Đáp án:</span>
-                      <span>{extra.answer}</span>
-                    </div>
-                  )}
+              {isTeacherOrAdmin && (
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={handleOpenAddQuiz}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white text-xs font-bold transition shadow-md active:scale-95 cursor-pointer"
+                  >
+                    <PlusCircle className="w-3.5 h-3.5 text-[#FDE2A7]" />
+                    <span>Thêm Câu Hỏi</span>
+                  </button>
+                  <button
+                    onClick={handleOpenNewAssignment}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-amber-50 text-[#850B10] border border-[#ECD9BA] text-xs font-bold transition shadow-2xs active:scale-95 cursor-pointer"
+                  >
+                    <Award className="w-3.5 h-3.5" />
+                    <span>Tạo Đề Thi</span>
+                  </button>
                 </div>
-              );
-            })}
+              )}
+            </div>
+
+            {/* Stats Overview */}
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              <div className="p-3 rounded-2xl bg-white border border-[#EBDBC5] text-center shadow-2xs">
+                <span className="text-[10px] font-bold text-slate-500 uppercase block">Tổng câu hỏi</span>
+                <span className="text-xl font-black text-slate-900 mt-0.5 block">{quizzes.length}</span>
+              </div>
+              <div className="p-3 rounded-2xl bg-blue-50/60 border border-blue-200 text-center shadow-2xs">
+                <span className="text-[10px] font-bold text-blue-700 uppercase block">Nhận biết</span>
+                <span className="text-xl font-black text-blue-900 mt-0.5 block">
+                  {quizzes.filter(q => q.difficulty === 'nhan_biet').length}
+                </span>
+              </div>
+              <div className="p-3 rounded-2xl bg-emerald-50/60 border border-emerald-200 text-center shadow-2xs">
+                <span className="text-[10px] font-bold text-emerald-700 uppercase block">Thông hiểu</span>
+                <span className="text-xl font-black text-emerald-900 mt-0.5 block">
+                  {quizzes.filter(q => q.difficulty === 'thong_hieu').length}
+                </span>
+              </div>
+              <div className="p-3 rounded-2xl bg-amber-50/60 border border-amber-200 text-center shadow-2xs">
+                <span className="text-[10px] font-bold text-amber-800 uppercase block">Vận dụng</span>
+                <span className="text-xl font-black text-amber-900 mt-0.5 block">
+                  {quizzes.filter(q => q.difficulty === 'van_dung').length}
+                </span>
+              </div>
+              <div className="p-3 rounded-2xl bg-purple-50/60 border border-purple-200 text-center shadow-2xs col-span-2 sm:col-span-1">
+                <span className="text-[10px] font-bold text-purple-700 uppercase block">Vận dụng cao</span>
+                <span className="text-xl font-black text-purple-900 mt-0.5 block">
+                  {quizzes.filter(q => q.difficulty === 'van_dung_cao').length}
+                </span>
+              </div>
+            </div>
+
+            {/* Filter & Search Bar */}
+            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 pt-2">
+              {/* Lesson Select */}
+              <div className="w-full md:w-64 shrink-0">
+                <select
+                  value={quizLessonFilter}
+                  onChange={(e) => setQuizLessonFilter(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-white border border-[#EBDBC5] text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#850B10]"
+                >
+                  <option value="all">Tất cả bài học ({quizzes.length})</option>
+                  {quizLessons.map((l) => (
+                    <option key={l.lesson} value={l.lesson}>
+                      {l.lesson} ({l.question_count} câu)
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Difficulty Filter Pills */}
+              <div className="flex flex-wrap items-center gap-1.5 flex-1">
+                {[
+                  { id: 'all', label: 'Tất cả' },
+                  { id: 'nhan_biet', label: 'Nhận biết' },
+                  { id: 'thong_hieu', label: 'Thông hiểu' },
+                  { id: 'van_dung', label: 'Vận dụng' },
+                  { id: 'van_dung_cao', label: 'Vận dụng cao' }
+                ].map((diff) => (
+                  <button
+                    key={diff.id}
+                    type="button"
+                    onClick={() => setQuizDifficultyFilter(diff.id)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                      quizDifficultyFilter === diff.id
+                        ? 'bg-[#850B10] text-white shadow-xs'
+                        : 'bg-white hover:bg-stone-100 text-stone-700 border border-[#EBDBC5]'
+                    }`}
+                  >
+                    {diff.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Search Box */}
+              <div className="relative w-full md:w-64 shrink-0">
+                <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={quizSearch}
+                  onChange={(e) => setQuizSearch(e.target.value)}
+                  placeholder="Tìm kiếm nội dung câu hỏi..."
+                  className="w-full pl-9 pr-7 py-2 rounded-xl bg-white border border-[#EBDBC5] text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#850B10]"
+                />
+                {quizSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setQuizSearch('')}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-0.5"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
+
+          {/* Question List */}
+          {loadingQuizzes ? (
+            <div className="p-12 text-center bg-white rounded-3xl border border-slate-200">
+              <RefreshCw className="w-6 h-6 animate-spin text-[#850B10] mx-auto mb-2" />
+              <p className="text-xs font-bold text-slate-500">Đang tải ngân hàng câu hỏi từ cơ sở dữ liệu...</p>
+            </div>
+          ) : filteredQuizzes.length === 0 ? (
+            <div className="p-12 text-center bg-white rounded-3xl border border-dashed border-slate-300 space-y-3">
+              <HelpCircle className="w-10 h-10 text-stone-400 mx-auto" />
+              <h4 className="font-bold text-base text-slate-800">Không tìm thấy câu hỏi phù hợp</h4>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                Không có câu hỏi nào khớp với bài học, mức độ nhận thức hoặc từ khóa tìm kiếm bạn đã chọn.
+              </p>
+              {isTeacherOrAdmin && (
+                <button
+                  type="button"
+                  onClick={handleOpenAddQuiz}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                >
+                  <PlusCircle className="w-3.5 h-3.5" />
+                  <span>Thêm câu hỏi mới</span>
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between text-xs text-slate-500 px-1">
+                <span>
+                  Hiển thị <strong>{filteredQuizzes.length}</strong> / {quizzes.length} câu hỏi trong ngân hàng
+                </span>
+                <button
+                  type="button"
+                  onClick={() => fetchQuizzes(quizLessonFilter)}
+                  className="text-[#850B10] font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  <span>Làm mới</span>
+                </button>
+              </div>
+
+              {filteredQuizzes.map((q, idx) => {
+                const diffMeta = getDifficultyMeta(q.difficulty);
+                const opts = Array.isArray(q.options)
+                  ? q.options
+                  : (typeof q.options === 'string' ? JSON.parse(q.options || '[]') : []);
+                const optionLetters = ['A', 'B', 'C', 'D'];
+
+                return (
+                  <div
+                    key={q.id}
+                    className="p-5 sm:p-6 rounded-3xl bg-[#FAF5EB] border border-[#EBDBC5] space-y-3.5 hover:border-amber-300 transition shadow-2xs relative group"
+                  >
+                    {/* Header meta */}
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-black text-xs text-[#850B10] bg-amber-100/80 border border-amber-300/60 px-2.5 py-0.5 rounded-lg">
+                          Câu {idx + 1}
+                        </span>
+                        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg border ${diffMeta.badgeClass}`}>
+                          {diffMeta.label}
+                        </span>
+                        {q.lesson && (
+                          <span className="text-[11px] text-stone-600 font-medium flex items-center gap-1 bg-white/70 px-2 py-0.5 rounded-lg border border-[#EBDBC5]/60 truncate max-w-md">
+                            <BookOpen className="w-3 h-3 text-[#850B10] shrink-0" />
+                            <span className="truncate">{q.lesson}</span>
+                          </span>
+                        )}
+                      </div>
+
+                      {isTeacherOrAdmin && (
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={() => handleOpenEditQuiz(q)}
+                            title="Chỉnh sửa câu hỏi này"
+                            className="p-1.5 rounded-lg bg-white hover:bg-amber-100 text-[#850B10] transition border border-[#EBDBC5] shadow-2xs cursor-pointer"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteQuiz(q.id, q.question)}
+                            title="Xóa câu hỏi này"
+                            className="p-1.5 rounded-lg bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 transition border border-[#EBDBC5] shadow-2xs cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Question Content */}
+                    <p className="font-bold text-sm sm:text-base text-slate-900 leading-snug">
+                      {q.question}
+                    </p>
+
+                    {/* Options (A, B, C, D) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                      {opts.map((optText, oIdx) => {
+                        const isCorrect = oIdx === q.correct_index;
+                        return (
+                          <div
+                            key={oIdx}
+                            className={`p-3 rounded-2xl border text-xs transition flex items-start gap-2.5 ${
+                              isCorrect
+                                ? 'bg-emerald-50/90 border-emerald-300 text-emerald-950 font-semibold ring-1 ring-emerald-200'
+                                : 'bg-white/85 border-[#EBDBC5]/80 text-slate-700'
+                            }`}
+                          >
+                            <span
+                              className={`w-5 h-5 rounded-md font-bold text-xs flex items-center justify-center shrink-0 ${
+                                isCorrect
+                                  ? 'bg-emerald-600 text-white'
+                                  : 'bg-stone-200 text-stone-700'
+                              }`}
+                            >
+                              {optionLetters[oIdx] || oIdx + 1}
+                            </span>
+                            <span className="flex-1 leading-relaxed">{optText}</span>
+                            {isCorrect && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-black text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shrink-0">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-700" />
+                                <span>Đáp án đúng</span>
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Explanation if any */}
+                    {q.explanation && (
+                      <div className="p-3 rounded-2xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950 flex items-start gap-2 leading-relaxed">
+                        <Lightbulb className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                        <div>
+                          <strong className="text-amber-900">Hướng dẫn giải / Giải thích: </strong>
+                          <span>{q.explanation}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
@@ -1133,6 +1513,18 @@ export default function TeachersView({ currentUser, authToken }) {
         studentId={reviewingStudentExam?.studentId}
         onClose={() => setReviewingStudentExam(null)}
         authToken={authToken}
+      />
+
+      {/* Quiz Editor Modal (Add & Edit Questions in Database Question Bank) */}
+      <QuizEditorModal
+        quiz={editingQuiz}
+        isOpen={isQuizModalOpen}
+        onClose={() => {
+          setIsQuizModalOpen(false);
+          setEditingQuiz(null);
+        }}
+        onSave={handleSaveQuiz}
+        defaultLesson={quizLessonFilter !== 'all' ? quizLessonFilter : ''}
       />
     </div>
   );

@@ -2538,8 +2538,8 @@ app.get('/api/quizzes/by-resource/:resourceId', async (req, res) => {
   }
 });
 
-// POST /api/quizzes (Admin only)
-app.post('/api/quizzes', requireAdmin, async (req, res) => {
+// POST /api/quizzes (Teacher and Admin)
+app.post('/api/quizzes', requireTeacherOrAdmin, async (req, res) => {
   try {
     const { resource_id, topic_id, lesson, question, options, correct_index, explanation, difficulty, order_index } = req.body;
     if (!lesson || !question || !options) {
@@ -2576,8 +2576,8 @@ app.post('/api/quizzes', requireAdmin, async (req, res) => {
   }
 });
 
-// PUT /api/quizzes/:id (Admin only)
-app.put('/api/quizzes/:id', requireAdmin, async (req, res) => {
+// PUT /api/quizzes/:id (Teacher and Admin)
+app.put('/api/quizzes/:id', requireTeacherOrAdmin, async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { resource_id, topic_id, lesson, question, options, correct_index, explanation, difficulty, order_index } = req.body;
@@ -2627,8 +2627,8 @@ app.put('/api/quizzes/:id', requireAdmin, async (req, res) => {
   }
 });
 
-// DELETE /api/quizzes/:id (Admin only)
-app.delete('/api/quizzes/:id', requireAdmin, async (req, res) => {
+// DELETE /api/quizzes/:id (Teacher and Admin)
+app.delete('/api/quizzes/:id', requireTeacherOrAdmin, async (req, res) => {
   try {
     const id = Number(req.params.id);
     const [exists] = await pool.query('SELECT id, lesson FROM quizzes WHERE id = ?', [id]);

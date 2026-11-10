@@ -110,9 +110,9 @@ export default function ContactView() {
         <div className="lg:col-span-5 bg-stone-50/70 p-6 sm:p-8 lg:p-9 border-b lg:border-b-0 lg:border-r border-slate-200/80 flex flex-col justify-between space-y-6">
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
+              {/* <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
                 Trung ương Đoàn TNCS Hồ Chí Minh
-              </h2>
+              </h2> */}
               <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
                 Ban Tổ chức Đề án "Câu chuyện thời hoa lửa" & Ban Biên tập Nền tảng Học liệu Số Lịch sử 10
               </p>
