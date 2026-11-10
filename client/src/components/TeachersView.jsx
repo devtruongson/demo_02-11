@@ -810,13 +810,13 @@ export default function TeachersView({ currentUser, authToken }) {
             </div>
 
             {/* Filter & Search Bar */}
-            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 pt-2">
+            <div className="flex flex-col md:flex-row items-stretch md:items-start gap-3 pt-2">
               {/* Lesson Select */}
-              <div className="w-full md:w-64 shrink-0">
+              <div className="w-full md:w-60 lg:w-64 shrink-0">
                 <select
                   value={quizLessonFilter}
                   onChange={(e) => setQuizLessonFilter(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-white border border-[#EBDBC5] text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#850B10]"
+                  className="w-full h-9 px-3 rounded-xl bg-white border border-[#EBDBC5] text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#850B10]"
                 >
                   <option value="all">Tất cả bài học ({quizzes.length})</option>
                   {quizLessons.map((l) => (
@@ -840,7 +840,7 @@ export default function TeachersView({ currentUser, authToken }) {
                     key={diff.id}
                     type="button"
                     onClick={() => setQuizDifficultyFilter(diff.id)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                    className={`h-9 px-3 rounded-xl text-xs font-bold transition cursor-pointer inline-flex items-center justify-center shrink-0 ${
                       quizDifficultyFilter === diff.id
                         ? 'bg-[#850B10] text-white shadow-xs'
                         : 'bg-white hover:bg-stone-100 text-stone-700 border border-[#EBDBC5]'
@@ -852,14 +852,14 @@ export default function TeachersView({ currentUser, authToken }) {
               </div>
 
               {/* Search Box */}
-              <div className="relative w-full md:w-64 shrink-0">
+              <div className="relative w-full md:w-60 lg:w-64 shrink-0">
                 <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={quizSearch}
                   onChange={(e) => setQuizSearch(e.target.value)}
                   placeholder="Tìm kiếm nội dung câu hỏi..."
-                  className="w-full pl-9 pr-7 py-2 rounded-xl bg-white border border-[#EBDBC5] text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#850B10]"
+                  className="w-full h-9 pl-9 pr-7 rounded-xl bg-white border border-[#EBDBC5] text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#850B10]"
                 />
                 {quizSearch && (
                   <button

@@ -109,11 +109,25 @@ export default function ContactView() {
         {/* Left Column: Organization & Social Info */}
         <div className="lg:col-span-5 bg-stone-50/70 p-6 sm:p-8 lg:p-9 border-b lg:border-b-0 lg:border-r border-slate-200/80 flex flex-col justify-between space-y-6">
           <div className="space-y-6">
-            <div>
-              {/* <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
-                Trung ương Đoàn TNCS Hồ Chí Minh
-              </h2> */}
-              <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">
+            <div className="space-y-3">
+              {/* Brand Logo & Slogan */}
+              <div className="flex items-center gap-3">
+                <img
+                  src="/home-assets/logo.png"
+                  alt="Logo Sử Học Số"
+                  className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-sm shrink-0"
+                />
+                <div className="min-w-0">
+                  <h2 className="text-2xl sm:text-3xl font-black text-[#850B10] uppercase tracking-wide leading-none font-sans">
+                    SỬ HỌC SỐ
+                  </h2>
+                  <p className="text-[11px] sm:text-xs font-semibold text-slate-700 mt-1 leading-snug whitespace-nowrap">
+                    Đưa lịch sử đến gần hơn bằng công nghệ số
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-500 font-medium leading-relaxed pt-2 border-t border-slate-200/80">
                 Ban Tổ chức Đề án "Câu chuyện thời hoa lửa" & Ban Biên tập Nền tảng Học liệu Số Lịch sử 10
               </p>
             </div>
