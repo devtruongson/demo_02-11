@@ -565,6 +565,132 @@ app.delete('/api/teacher/classes/:id/students/:studentId', requireTeacherOrAdmin
 });
 
 // ==========================================
+// STUDENT CLASS MANAGEMENT & PARTICIPATION
+// ==========================================
+
+// GET /api/student/classes (Get all classes current student has joined)
+app.get('/api/student/classes', requireAuth, async (req, res) => {
+  try {
+    const studentId = req.user.id;
+    const [rows] = await pool.query(`
+      SELECT c.id, c.name, c.grade, c.description, c.code, c.created_at, cs.joined_at,
+             u.full_name as teacher_name, u.email as teacher_email,
+             (SELECT COUNT(*) FROM class_students cs2 WHERE cs2.class_id = c.id) as student_count,
+             (SELECT COUNT(*) FROM exam_assignments ea WHERE ea.is_active = 1) as assignments_count
+      FROM class_students cs
+      JOIN classes c ON cs.class_id = c.id
+      LEFT JOIN users u ON c.teacher_id = u.id
+      WHERE cs.student_id = ?
+      ORDER BY cs.joined_at DESC
+    `, [studentId]);
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching student classes:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/student/classes/:id/members (Get classmates in a joined class)
+app.get('/api/student/classes/:id/members', requireAuth, async (req, res) => {
+  try {
+    const classId = Number(req.params.id);
+    const studentId = req.user.id;
+    // Verify membership
+    const [check] = await pool.query(
+      'SELECT id FROM class_students WHERE class_id = ? AND student_id = ?',
+      [classId, studentId]
+    );
+    if (check.length === 0 && req.user.role !== 'admin' && req.user.role !== 'teacher') {
+      return res.status(403).json({ error: 'Bạn chưa tham gia lớp học này.' });
+    }
+
+    const [members] = await pool.query(`
+      SELECT u.id, u.username, u.full_name, u.avatar, u.streak_count, cs.joined_at
+      FROM class_students cs
+      JOIN users u ON cs.student_id = u.id
+      WHERE cs.class_id = ?
+      ORDER BY u.full_name ASC
+    `, [classId]);
+    res.json(members);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/student/classes/join (Join a class using class code)
+app.post('/api/student/classes/join', requireAuth, async (req, res) => {
+  try {
+    const studentId = req.user.id;
+    const { code } = req.body;
+    if (!code || !code.trim()) {
+      return res.status(400).json({ error: 'Vui lòng nhập mã lớp học.' });
+    }
+
+    const cleanCode = code.trim().toUpperCase();
+    const [foundClass] = await pool.query(
+      'SELECT c.*, u.full_name as teacher_name FROM classes c LEFT JOIN users u ON c.teacher_id = u.id WHERE UPPER(c.code) = ?',
+      [cleanCode]
+    );
+
+    if (foundClass.length === 0) {
+      return res.status(404).json({ error: `Không tìm thấy lớp học với mã "${cleanCode}". Vui lòng kiểm tra lại mã từ giáo viên.` });
+    }
+
+    const targetClass = foundClass[0];
+
+    // Check if already in class
+    const [alreadyIn] = await pool.query(
+      'SELECT id FROM class_students WHERE class_id = ? AND student_id = ?',
+      [targetClass.id, studentId]
+    );
+
+    if (alreadyIn.length > 0) {
+      return res.status(400).json({ error: `Bạn đã tham gia lớp "${targetClass.name}" rồi.` });
+    }
+
+    await pool.query(
+      'INSERT INTO class_students (class_id, student_id) VALUES (?, ?)',
+      [targetClass.id, studentId]
+    );
+
+    const [countRes] = await pool.query('SELECT COUNT(*) as cnt FROM class_students WHERE class_id = ?', [targetClass.id]);
+
+    res.status(201).json({
+      success: true,
+      message: `Chúc mừng bạn đã tham gia thành công lớp học "${targetClass.name}"!`,
+      classItem: {
+        ...targetClass,
+        joined_at: new Date(),
+        student_count: countRes[0]?.cnt || 1
+      }
+    });
+  } catch (err) {
+    console.error('Error joining class:', err);
+    res.status(500).json({ error: 'Lỗi khi tham gia lớp học: ' + err.message });
+  }
+});
+
+// POST /api/student/classes/leave (Leave a joined class)
+app.post('/api/student/classes/leave', requireAuth, async (req, res) => {
+  try {
+    const studentId = req.user.id;
+    const { class_id } = req.body;
+    if (!class_id) {
+      return res.status(400).json({ error: 'Vui lòng cung cấp class_id cần rời.' });
+    }
+
+    await pool.query(
+      'DELETE FROM class_students WHERE class_id = ? AND student_id = ?',
+      [class_id, studentId]
+    );
+
+    res.json({ success: true, message: 'Đã rời khỏi lớp học thành công.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ==========================================
 // COLLABORATIVE STUDY SPACE (KHÔNG GIAN HỌC TẬP CHUNG)
 // ==========================================
 
@@ -3336,6 +3462,13 @@ app.get('/api/exam-assignments', requireAuth, async (req, res) => {
       [userId]
     );
 
+    // Get classes that this student is enrolled in
+    const [enrolledRows] = await pool.query(
+      'SELECT class_id FROM class_students WHERE student_id = ?',
+      [userId]
+    );
+    const enrolledClassIds = enrolledRows.map(r => r.class_id);
+
     // Filter assignments assigned to this student
     const studentExams = assignments
       .map((a) => {
@@ -3351,7 +3484,9 @@ app.get('/api/exam-assignments', requireAuth, async (req, res) => {
       .filter((a) => {
         const ids = a.assigned_student_ids;
         if (!Array.isArray(ids)) return false;
-        return ids.includes('all') || ids.includes(userId) || ids.includes(String(userId));
+        const matchesDirect = ids.includes('all') || ids.includes(userId) || ids.includes(String(userId));
+        const matchesClass = enrolledClassIds.some(cid => ids.includes(`class_${cid}`));
+        return matchesDirect || matchesClass;
       });
 
     res.json(studentExams);

@@ -458,6 +458,7 @@ export default function App() {
                         /* Giao diện sau khi đăng nhập: Giáo viên (image copy 3.png) hoặc Học sinh (image copy 4.png) */
                         <AuthenticatedHomeSection
                           currentUser={currentUser}
+                          authToken={authToken}
                           topics={topics}
                           artifacts3d={artifacts3d}
                         />
@@ -863,7 +864,7 @@ export default function App() {
               path="/hoc-sinh"
               element={
                 <ProtectedRoute currentUser={currentUser} onOpenLogin={() => setIsLoginModalOpen(true)}>
-                  <Navigate to="/hoc-sinh/nhiem-vu" replace />
+                  <Navigate to="/hoc-sinh/bai-tap-duoc-giao" replace />
                 </ProtectedRoute>
               }
             />

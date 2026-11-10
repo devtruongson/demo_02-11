@@ -23,7 +23,7 @@ export default function Sidebar({
     { to: '/studio-3d', label: 'Studio Hiện vật 3D', icon: Box, count: stats?.artifacts_3d, badge: '3D' },
     { to: '/khong-gian-chung', label: 'Không gian học tập', icon: MessageSquare, badge: 'Mới' },
     ...(isTeacher || isAdmin ? [{ to: '/giao-vien', label: 'Dành cho giáo viên', icon: GraduationCap, badge: 'Lớp' }] : []),
-    ...(isStudent ? [{ to: '/hoc-sinh', label: 'Góc học tập của em', icon: Users, badge: `🔥 ${currentUser?.streak_count || 1}d` }] : []),
+    ...(isStudent ? [{ to: '/hoc-sinh', label: 'Lớp học & Bài tập của em', icon: Users, badge: `🔥 ${currentUser?.streak_count || 1}d` }] : []),
     { to: '/lien-he', label: 'Liên hệ & Góp ý', icon: Mail },
     { to: '/gioi-thieu', label: 'Giới thiệu dự án', icon: Info },
   ];

@@ -20,6 +20,7 @@ export default function Navbar({
 
   const isAdmin = currentUser?.role === 'admin';
   const isTeacher = currentUser?.role === 'teacher';
+  const isStudent = currentUser?.role === 'student';
 
   // Close mobile drawer on route change
   useEffect(() => {
@@ -44,6 +45,7 @@ export default function Navbar({
     { to: '/studio-3d', label: 'Không gian 3D' },
     { to: '/khong-gian-chung', label: 'Không gian học tập' },
     ...(isTeacher || isAdmin ? [{ to: '/giao-vien', label: 'Lớp học & Giao bài' }] : []),
+    ...(isStudent ? [{ to: '/hoc-sinh/bai-tap-duoc-giao', label: 'Lớp học & Bài tập' }] : []),
     { to: '/lien-he', label: 'Liên hệ' },
   ];
 

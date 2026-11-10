@@ -1,18 +1,68 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Compass, Box, Flame, GraduationCap, ArrowRight,
   Sparkles, Users, Award, BookOpen, Clock, CheckCircle2,
-  FileText, PlusCircle
+  FileText, PlusCircle, Calendar, Play, Eye, AlertCircle, Copy, Check
 } from 'lucide-react';
+import ExamTakingModal from './ExamTakingModal.jsx';
 
 export default function AuthenticatedHomeSection({
   currentUser,
+  authToken,
   topics = [],
   artifacts3d = []
 }) {
   const navigate = useNavigate();
   const isTeacher = currentUser?.role === 'teacher' || currentUser?.role === 'admin';
+
+  // Student specific data
+  const [studentClasses, setStudentClasses] = useState([]);
+  const [assignedExams, setAssignedExams] = useState([]);
+  const [loadingStudentData, setLoadingStudentData] = useState(false);
+  const [activeExamId, setActiveExamId] = useState(null);
+  const [activeExamMode, setActiveExamMode] = useState('take');
+  const [copiedCode, setCopiedCode] = useState(null);
+
+  const fetchStudentData = async () => {
+    if (!authToken || isTeacher) return;
+    try {
+      setLoadingStudentData(true);
+      const [classesRes, examsRes] = await Promise.all([
+        fetch(`/api/student/classes?_t=${Date.now()}`, {
+          headers: { Authorization: `Bearer ${authToken}` }
+        }),
+        fetch(`/api/exam-assignments?_t=${Date.now()}`, {
+          headers: { Authorization: `Bearer ${authToken}` }
+        })
+      ]);
+
+      if (classesRes.ok) {
+        const clsData = await classesRes.json();
+        setStudentClasses(Array.isArray(clsData) ? clsData : []);
+      }
+      if (examsRes.ok) {
+        const examData = await examsRes.json();
+        setAssignedExams(Array.isArray(examData) ? examData : []);
+      }
+    } catch (err) {
+      console.error('Lỗi tải dữ liệu học sinh:', err);
+    } finally {
+      setLoadingStudentData(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isTeacher && currentUser && authToken) {
+      fetchStudentData();
+    }
+  }, [isTeacher, currentUser, authToken]);
+
+  const handleCopyCode = (code) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
 
   // Fallback topics if none passed
   const sampleTopics = topics.length > 0 ? topics : [
@@ -441,6 +491,257 @@ export default function AuthenticatedHomeSection({
           </div>
         </section>
       )}
+
+      {/* ============================================================== */}
+      {/* CARD 4: LỚP HỌC & BÀI TẬP ĐƯỢC GIAO (CHỈ HIỂN THỊ KHI LÀ HỌC SINH) */}
+      {/* ============================================================== */}
+      {!isTeacher && currentUser && (
+        <section className="bg-[#FFF5DC] rounded-3xl border border-[#ECD9BA] p-6 sm:p-8 shadow-sm transition hover:shadow-md relative overflow-hidden">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+            <div>
+              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#850B10] text-[#FFF7E8] font-black text-sm uppercase tracking-wider shadow-sm select-none">
+                <GraduationCap className="w-4 h-4 text-amber-300" />
+                <span>LỚP HỌC & BÀI TẬP CỦA EM</span>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-700 font-medium italic mt-2">
+                Thông tin mô tả: Theo dõi các lớp học em đã tham gia, làm bài kiểm tra và bài tập trắc nghiệm do thầy cô giao, xem điểm và đáp án chi tiết.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+              <Link
+                to="/hoc-sinh/lop-hoc"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#850B10] hover:text-[#590408] bg-white/80 hover:bg-white px-4 py-2 rounded-xl border border-[#ECD9BA] transition shadow-2xs"
+              >
+                <Users className="w-4 h-4" />
+                <span>Lớp học ({studentClasses.length})</span>
+              </Link>
+              <Link
+                to="/hoc-sinh/bai-tap-duoc-giao"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-white bg-[#850B10] hover:bg-[#68070B] px-4 py-2 rounded-xl transition shadow-xs"
+              >
+                <Award className="w-4 h-4 text-amber-300" />
+                <span>Xem tất cả bài tập</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
+          {/* 2 Sections Grid: Lớp học của em & Bài tập thầy cô giao */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 pt-2">
+            {/* Left 5 cols: Lớp học của em */}
+            <div className="lg:col-span-5 bg-white rounded-2xl border border-[#ECD9BA] p-4 sm:p-5 shadow-2xs flex flex-col justify-between space-y-3">
+              <div>
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 mb-3">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-[#850B10]" />
+                    <h4 className="font-black text-xs sm:text-sm text-[#850B10] uppercase tracking-wide">
+                      Lớp học đã tham gia
+                    </h4>
+                  </div>
+                  <span className="text-[10px] font-bold text-amber-900 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+                    {studentClasses.length} lớp
+                  </span>
+                </div>
+
+                {loadingStudentData ? (
+                  <div className="py-8 text-center text-xs text-stone-500">Đang tải danh sách lớp...</div>
+                ) : studentClasses.length === 0 ? (
+                  <div className="py-6 text-center space-y-2">
+                    <Users className="w-8 h-8 text-stone-300 mx-auto" />
+                    <p className="text-xs text-stone-600">Em chưa tham gia lớp học nào.</p>
+                    <Link
+                      to="/hoc-sinh/lop-hoc"
+                      className="inline-block text-xs font-bold text-[#850B10] hover:underline"
+                    >
+                      Nhập mã lớp để tham gia ngay →
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                    {studentClasses.map((cls) => (
+                      <div key={cls.id} className="p-3 rounded-xl bg-[#FEF8EE] border border-[#ECD9BA]/70 hover:border-amber-400 transition">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <span className="font-bold text-xs sm:text-sm text-slate-800 block">{cls.name}</span>
+                            <span className="text-[11px] text-stone-600 mt-0.5 block">
+                              GV: <strong className="text-stone-800">{cls.teacher_name || 'Giáo viên'}</strong>
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 shrink-0">
+                            {cls.student_count || 1} học sinh
+                          </span>
+                        </div>
+                        <div className="mt-2 pt-2 border-t border-amber-100/80 flex items-center justify-between text-[11px]">
+                          <span className="text-stone-500 font-mono">
+                            Mã: <strong className="text-[#850B10] font-bold">{cls.code}</strong>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyCode(cls.code)}
+                            className="inline-flex items-center gap-1 text-[10px] font-medium text-stone-600 hover:text-[#850B10]"
+                          >
+                            {copiedCode === cls.code ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                            <span>{copiedCode === cls.code ? 'Đã sao chép' : 'Sao chép mã'}</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-2 border-t border-slate-100">
+                <Link
+                  to="/hoc-sinh/lop-hoc"
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-[#850B10] font-bold text-xs transition border border-amber-200"
+                >
+                  <PlusCircle className="w-3.5 h-3.5" />
+                  <span>Tham gia lớp học mới bằng mã code</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Right 7 cols: Bài tập & Đề thi thầy cô giao */}
+            <div className="lg:col-span-7 bg-white rounded-2xl border border-[#ECD9BA] p-4 sm:p-5 shadow-2xs flex flex-col justify-between space-y-3">
+              <div>
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 mb-3">
+                  <div className="flex items-center gap-2">
+                    <Award className="w-4 h-4 text-[#850B10]" />
+                    <h4 className="font-black text-xs sm:text-sm text-[#850B10] uppercase tracking-wide">
+                      Bài thi & Đề kiểm tra GV giao
+                    </h4>
+                  </div>
+                  <span className="text-[10px] font-bold text-amber-900 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+                    {assignedExams.filter(e => !e.submission_id).length} cần làm
+                  </span>
+                </div>
+
+                {loadingStudentData ? (
+                  <div className="py-8 text-center text-xs text-stone-500">Đang tải danh sách bài tập...</div>
+                ) : assignedExams.length === 0 ? (
+                  <div className="py-6 text-center space-y-2">
+                    <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
+                    <p className="text-xs text-stone-600">Hiện tại em không có bài kiểm tra nào cần làm.</p>
+                    <Link
+                      to="/hoc-sinh/luyen-tap-trac-nghiem"
+                      className="inline-block text-xs font-bold text-[#850B10] hover:underline"
+                    >
+                      Luyện tập trắc nghiệm tự do để tích luỹ kiến thức →
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                    {assignedExams.slice(0, 4).map((exam) => {
+                      const isCompleted = !!exam.submission_id;
+                      return (
+                        <div
+                          key={exam.id}
+                          className={`p-3 rounded-xl border transition flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                            isCompleted
+                              ? 'bg-emerald-50/40 border-emerald-200'
+                              : 'bg-[#FEF8EE] border-[#ECD9BA] hover:border-amber-400'
+                          }`}
+                        >
+                          <div className="space-y-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              {isCompleted ? (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                  Đã nộp • {exam.score != null ? `${Number(exam.score).toFixed(1)}đ` : 'Đã chấm'}
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 animate-pulse">
+                                  <AlertCircle className="w-3 h-3 text-amber-700" />
+                                  Chưa làm
+                                </span>
+                              )}
+                              <span className="text-[11px] text-stone-500 truncate">
+                                GV: {exam.created_by_name || 'Thầy cô'}
+                              </span>
+                            </div>
+                            <h5 className="font-bold text-xs sm:text-sm text-slate-800 truncate">
+                              {exam.title}
+                            </h5>
+                            <div className="flex items-center gap-3 text-[11px] text-stone-500">
+                              <span className="inline-flex items-center gap-1">
+                                <Clock className="w-3 h-3 text-stone-400" />
+                                {exam.duration_minutes} phút
+                              </span>
+                              {exam.due_date && (
+                                <span className="inline-flex items-center gap-1">
+                                  <Calendar className="w-3 h-3 text-stone-400" />
+                                  Hạn: {new Date(exam.due_date).toLocaleDateString('vi-VN')}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="shrink-0 self-end sm:self-center">
+                            {isCompleted ? (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setActiveExamId(exam.id);
+                                  setActiveExamMode('review');
+                                }}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white text-emerald-800 font-bold text-xs border border-emerald-300 hover:bg-emerald-50 transition shadow-2xs cursor-pointer"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                <span>Xem lại</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setActiveExamId(exam.id);
+                                  setActiveExamMode('take');
+                                }}
+                                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#850B10] hover:bg-[#68070B] text-white font-bold text-xs transition shadow-xs cursor-pointer"
+                              >
+                                <Play className="w-3.5 h-3.5 fill-current" />
+                                <span>Làm bài</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+                <span className="text-stone-500 text-[11px]">
+                  Tổng số: <strong className="text-stone-800">{assignedExams.length}</strong> bài tập/đề thi
+                </span>
+                <Link
+                  to="/hoc-sinh/bai-tap-duoc-giao"
+                  className="font-bold text-[#850B10] hover:underline inline-flex items-center gap-1 text-xs"
+                >
+                  <span>Xem tất cả</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Exam Taking & Review Modal for Student on Home Page */}
+      <ExamTakingModal
+        isOpen={!!activeExamId}
+        assignmentId={activeExamId}
+        mode={activeExamMode}
+        authToken={authToken}
+        currentUser={currentUser}
+        onClose={() => setActiveExamId(null)}
+        onCompleted={() => {
+          setActiveExamId(null);
+          fetchStudentData();
+        }}
+      />
     </div>
   );
 }
